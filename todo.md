@@ -1,0 +1,1 @@
+- make rome.runtime.onMessa accept an array of strings from queryselectorall

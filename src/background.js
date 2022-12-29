@@ -1,39 +1,95 @@
-// Wrap in an onInstalled callback in order to avoid unnecessary work
-// every time the background script is run
-chrome.runtime.onInstalled.addListener(() => {
-  // Clear all rules to ensure only our expected rules are set
-  chrome.declarativeContent.onPageChanged.removeRules(undefined, async () => {
-    // Declare a rule to enable the action on example.com pages
-    let exampleRule = {
-      conditions: [
-        new chrome.declarativeContent.PageStateMatcher({
-          // pageUrl: { hostSuffix: "tylerdeitz.com" },
-          css: ["link[rel=me]"],
-        }),
-      ],
-      actions: [
-        // new chrome.declarativeContent.ShowAction()
-        new chrome.declarativeContent.SetIcon({
-          imageData: await loadImageData("icon.png"),
-        }),
-      ],
+const PROFILES_STORAGE_KEY = "profiles2";
+
+chrome.runtime.onMessage.addListener(
+  /**
+   * @param {unknown} message
+   */
+  async function onMessage(message, sender) {
+    if (typeof message !== "string" || !sender.url) {
+      return;
+    }
+
+    /**
+     * @type {string | undefined}
+     */
+    let profileUrl;
+    try {
+      const messageUrl = new URL(message);
+      const webfingerUrl = new URL(messageUrl.origin);
+      webfingerUrl.pathname = ".well-known/webfinger";
+      webfingerUrl.searchParams.set("resource", messageUrl.toString());
+      console.log(webfingerUrl.toString());
+      const webfingerResp = await fetch(webfingerUrl.toString());
+      /**
+       * @type {unknown}
+       */
+      const webfingerJson = await webfingerResp.json();
+      if (
+        !webfingerJson ||
+        typeof webfingerJson !== "object" ||
+        !("links" in webfingerJson) ||
+        !Array.isArray(webfingerJson.links)
+      ) {
+        return;
+      }
+
+      for (const linkAny of webfingerJson.links) {
+        /**
+         * @type {unknown}
+         */
+        const link = linkAny;
+        if (
+          link &&
+          typeof link === "object" &&
+          "rel" in link &&
+          link.rel === "http://webfinger.net/rel/profile-page" &&
+          "href" in link &&
+          typeof link.href === "string"
+        ) {
+          profileUrl = link.href;
+          break;
+        }
+      }
+    } catch (err) {
+      // nothing
+    }
+    if (!profileUrl) {
+      return;
+    }
+
+    /**
+     * @type {{ profileUrl: string, websiteUrl: string, viewedAt: number }}
+     */
+    const profile = {
+      profileUrl: profileUrl,
+      websiteUrl: sender.url,
+      viewedAt: Date.now(),
     };
 
-    // Finally, apply our new array of rules
-    let rules = [exampleRule];
-    chrome.declarativeContent.onPageChanged.addRules(rules);
+    /**
+     * @type {Map<string, typeof profile>}
+     */
+    let profiles;
+    try {
+      const profilesArray =
+        (await chrome.storage.local.get(PROFILES_STORAGE_KEY))?.[
+          PROFILES_STORAGE_KEY
+        ] ?? [];
 
-    console.log("added rules");
-  });
-});
+      profiles = new Map([...profilesArray].reverse());
+    } catch (err) {
+      profiles = new Map();
+    }
 
-// SVG icons aren't supported yet
-async function loadImageData(url) {
-  const img = await createImageBitmap(await (await fetch(url)).blob());
-  const { width: w, height: h } = img;
-  const canvas = new OffscreenCanvas(w, h);
-  const ctx = canvas.getContext("2d");
-  ctx.drawImage(img, 0, 0, w, h);
-  console.log("here");
-  return ctx.getImageData(0, 0, w, h);
-}
+    profiles.set(profile.profileUrl, profile);
+
+    console.log("here", profileUrl, sender);
+    console.log(profiles);
+    console.log(Array.from(profiles.entries()));
+    console.log();
+
+    await chrome.storage.local.set({
+      [PROFILES_STORAGE_KEY]: Array.from(profiles.entries()),
+    });
+  }
+);
