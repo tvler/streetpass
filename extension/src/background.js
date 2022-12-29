@@ -76,7 +76,7 @@ chrome.runtime.onMessage.addListener(
           PROFILES_STORAGE_KEY
         ] ?? [];
 
-      profiles = new Map([...profilesArray].reverse());
+      profiles = new Map(profilesArray);
     } catch (err) {
       profiles = new Map();
     }
