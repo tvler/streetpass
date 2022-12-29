@@ -8,7 +8,6 @@ const QuerySchema = z.object({
 });
 
 type LinkedWebFinger = { webFinger: WebFinger; url: string };
-
 type LinkedWebFingers = Array<LinkedWebFinger>;
 
 export default async function handler(
