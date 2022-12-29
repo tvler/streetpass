@@ -1,18 +1,18 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 import { JSDOM } from "jsdom";
-import { WebFinger, WebFingerSchema } from "../../util";
+import { Webfinger, WebfingerSchema } from "../../util";
 
 const QuerySchema = z.object({
   url: z.string(),
 });
 
-type LinkedWebFinger = { webFinger: WebFinger; url: string };
-type LinkedWebFingers = Array<LinkedWebFinger>;
+type LinkedWebfinger = { webfinger: Webfinger; url: string };
+type LinkedWebfingers = Array<LinkedWebfinger>;
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<LinkedWebFingers>
+  res: NextApiResponse<LinkedWebfingers>
 ) {
   try {
     const queryUrl = new URL(QuerySchema.parse(req.query).url);
@@ -20,30 +20,30 @@ export default async function handler(
     const elements = new JSDOM(queryUrlHtml).window.document.querySelectorAll(
       "link[rel=me], a[rel=me]"
     );
-    const unfilteredLinkedWebFingers = await Promise.allSettled(
+    const unfilteredLinkedWebfingers = await Promise.allSettled(
       Array.from(elements).map(
-        async (element): Promise<LinkedWebFinger | null> => {
+        async (element): Promise<LinkedWebfinger | null> => {
           const hrefUnchecked = element.getAttribute("href");
           if (!hrefUnchecked) {
             return null;
           }
 
           const url = new URL((await fetch(new URL(hrefUnchecked))).url);
-          const webFingerUrl = new URL(url.origin);
-          webFingerUrl.pathname = ".well-known/webfinger";
-          webFingerUrl.searchParams.set("resource", url.toString());
-          const webFingerResp = await fetch(webFingerUrl.toString());
-          const unparsedWebfingerJson = await webFingerResp.json();
-          const webFinger = WebFingerSchema.parse(unparsedWebfingerJson);
+          const webfingerUrl = new URL(url.origin);
+          webfingerUrl.pathname = ".well-known/webfinger";
+          webfingerUrl.searchParams.set("resource", url.toString());
+          const webfingerResp = await fetch(webfingerUrl.toString());
+          const unparsedWebfingerJson = await webfingerResp.json();
+          const webfinger = WebfingerSchema.parse(unparsedWebfingerJson);
 
-          return { webFinger, url: url.toString() };
+          return { webfinger, url: url.toString() };
         }
       )
     );
-    const linkedWebfingers: LinkedWebFingers = [];
-    for (const linkedWebFinger of unfilteredLinkedWebFingers) {
-      if (linkedWebFinger.status === "fulfilled" && !!linkedWebFinger.value) {
-        linkedWebfingers.push(linkedWebFinger.value);
+    const linkedWebfingers: LinkedWebfingers = [];
+    for (const linkedWebfinger of unfilteredLinkedWebfingers) {
+      if (linkedWebfinger.status === "fulfilled" && !!linkedWebfinger.value) {
+        linkedWebfingers.push(linkedWebfinger.value);
       }
     }
 

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 // https://webfinger.net/spec/
-export const WebFingerSchema = z.object({
+export const WebfingerSchema = z.object({
   subject: z.string(),
   aliases: z.optional(z.array(z.string())),
   properties: z.optional(z.record(z.string())),
@@ -18,4 +18,4 @@ export const WebFingerSchema = z.object({
   ),
 });
 
-export type WebFinger = z.infer<typeof WebFingerSchema>;
+export type Webfinger = z.infer<typeof WebfingerSchema>;
