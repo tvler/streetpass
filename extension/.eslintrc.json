@@ -25,5 +25,11 @@
       "typescript": true,
       "node": true
     }
+  },
+  "env": {
+    "browser": true
+  },
+  "globals": {
+    "chrome": "readonly"
   }
 }

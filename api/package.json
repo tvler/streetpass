@@ -1,5 +1,5 @@
 {
-  "name": "api",
+  "name": "web-finger",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -15,9 +15,16 @@
     "@types/react-dom": "18.0.10",
     "eslint": "8.30.0",
     "eslint-config-next": "13.1.1",
+    "jsdom": "^20.0.3",
     "next": "13.1.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "typescript": "4.9.4"
+    "typescript": "4.9.4",
+    "zod": "^3.20.2"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^20.0.1",
+    "eslint-config-prettier": "^8.5.0",
+    "prettier": "^2.8.1"
   }
 }
