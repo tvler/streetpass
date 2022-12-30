@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
-import { JSDOM } from "jsdom";
+import { JSDOM, VirtualConsole } from "jsdom";
 import { Webfinger, WebfingerSchema } from "../../util";
 
 const QuerySchema = z.object({
@@ -8,7 +8,7 @@ const QuerySchema = z.object({
 });
 
 type LinkedWebfinger = { webfinger: Webfinger; url: string };
-type LinkedWebfingers = Array<LinkedWebfinger>;
+export type LinkedWebfingers = Array<LinkedWebfinger>;
 
 export default async function handler(
   req: NextApiRequest,
@@ -17,9 +17,12 @@ export default async function handler(
   try {
     const queryUrl = new URL(QuerySchema.parse(req.query).url);
     const queryUrlHtml = await (await fetch(queryUrl)).text();
-    const elements = new JSDOM(queryUrlHtml).window.document.querySelectorAll(
-      "link[rel=me], a[rel=me]"
-    );
+    const elements = new JSDOM(queryUrlHtml, {
+      // bugfix https://github.com/jsdom/jsdom/issues/2230#issuecomment-466915328
+      virtualConsole: new VirtualConsole().on("error", () => {
+        // No-op to skip console errors.
+      }),
+    }).window.document.querySelectorAll("link[rel=me], a[rel=me]");
     const unfilteredLinkedWebfingers = await Promise.allSettled(
       Array.from(elements).map(
         async (element): Promise<LinkedWebfinger | null> => {

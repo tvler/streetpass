@@ -1,1 +1,3 @@
-- make rome.runtime.onMessa accept an array of strings from queryselectorall
+- good ones to check 
+- https://themarkup.org/people/dan-phiffer
+- https://tylerdeitz.com/
