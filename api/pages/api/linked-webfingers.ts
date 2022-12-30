@@ -63,7 +63,6 @@ export default async function handler(req: NextRequest) {
         "cache-control": `public, s-maxage=${cacheTimeSeconds}, stale-while-revalidate=${swrCacheTimeSeconds}, must-revalidate, max-age=0`,
       },
     });
-    return;
   } catch (err) {
     return new Response(null, { status: 500 });
   }
