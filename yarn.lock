@@ -754,7 +754,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cheerio@npm:^1.0.0-rc.12":
+"cheerio@npm:1.0.0-rc.12":
   version: 1.0.0-rc.12
   resolution: "cheerio@npm:1.0.0-rc.12"
   dependencies:
@@ -766,6 +766,21 @@ __metadata:
     parse5: ^7.0.0
     parse5-htmlparser2-tree-adapter: ^7.0.0
   checksum: 5d4c1b7a53cf22d3a2eddc0aff70cf23cbb30d01a4c79013e703a012475c02461aa1fcd99127e8d83a02216386ed6942b2c8103845fd0812300dd199e6e7e054
+  languageName: node
+  linkType: hard
+
+"cheerio@patch:cheerio@npm%3A1.0.0-rc.12#./.yarn/patches/cheerio-npm-1.0.0-rc.12-6785a97c2a.patch::locator=workspace%40workspace%3A.":
+  version: 1.0.0-rc.12
+  resolution: "cheerio@patch:cheerio@npm%3A1.0.0-rc.12#./.yarn/patches/cheerio-npm-1.0.0-rc.12-6785a97c2a.patch::version=1.0.0-rc.12&hash=9cea6c&locator=workspace%40workspace%3A."
+  dependencies:
+    cheerio-select: ^2.1.0
+    dom-serializer: ^2.0.0
+    domhandler: ^5.0.3
+    domutils: ^3.0.1
+    htmlparser2: ^8.0.1
+    parse5: ^7.0.0
+    parse5-htmlparser2-tree-adapter: ^7.0.0
+  checksum: 2afef7ac35d9be9160f6f2d036dd0d8eb221ee6c0f65b83690484ad4c20582b975bb235f407220f1ebed7a3483002616cc3c90ff1b3c1187298f7bd918521382
   languageName: node
   linkType: hard
 
