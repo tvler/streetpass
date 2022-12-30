@@ -1,3 +1,4 @@
 - good ones to check 
 - https://themarkup.org/people/dan-phiffer
 - https://tylerdeitz.com/
+- https://www.washingtonpost.com/people/pranshu-verma/

@@ -1,7 +1,11 @@
-import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
-import { JSDOM, VirtualConsole } from "jsdom";
 import { Webfinger, WebfingerSchema } from "../../util";
+import * as cheerio from "cheerio";
+import { NextRequest } from "next/server";
+
+export const config = {
+  runtime: "edge",
+};
 
 const QuerySchema = z.object({
   url: z.string(),
@@ -10,23 +14,23 @@ const QuerySchema = z.object({
 type LinkedWebfinger = { webfinger: Webfinger; url: string };
 export type LinkedWebfingers = Array<LinkedWebfinger>;
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<LinkedWebfingers>
-) {
+export default async function handler(req: NextRequest) {
   try {
-    const queryUrl = new URL(QuerySchema.parse(req.query).url);
+    const queryUrl = new URL(
+      QuerySchema.parse({ url: new URL(req.url).searchParams.get("url") }).url
+    );
     const queryUrlHtml = await (await fetch(queryUrl)).text();
-    const elements = new JSDOM(queryUrlHtml, {
-      // bugfix https://github.com/jsdom/jsdom/issues/2230#issuecomment-466915328
-      virtualConsole: new VirtualConsole().on("error", () => {
-        // No-op to skip console errors.
-      }),
-    }).window.document.querySelectorAll("link[rel=me], a[rel=me]");
+
+    const $ = cheerio.load(queryUrlHtml);
+    const hrefsUnchecked = $("link[rel=me], a[rel=me]")
+      .toArray()
+      .map((el): string | null | undefined => {
+        return el.attribs.href;
+      });
+
     const unfilteredLinkedWebfingers = await Promise.allSettled(
-      Array.from(elements).map(
-        async (element): Promise<LinkedWebfinger | null> => {
-          const hrefUnchecked = element.getAttribute("href");
+      hrefsUnchecked.map(
+        async (hrefUnchecked): Promise<LinkedWebfinger | null> => {
           if (!hrefUnchecked) {
             return null;
           }
@@ -52,17 +56,15 @@ export default async function handler(
 
     const cacheTimeSeconds = 60 * 60; // 1 hour
     const swrCacheTimeSeconds = 60 * 60 * 24 * 31; // 31 days is the max cache time https://vercel.com/docs/concepts/edge-network/caching
-    res.setHeader(
-      "Cache-Control",
-      `public, s-maxage=${cacheTimeSeconds}, stale-while-revalidate=${swrCacheTimeSeconds}, must-revalidate, max-age=0`
-    );
-    res.status(200).json(linkedWebfingers);
-    res.end();
+    return new Response(JSON.stringify(linkedWebfingers), {
+      status: 200,
+      headers: {
+        "content-type": "application/json",
+        "cache-control": `public, s-maxage=${cacheTimeSeconds}, stale-while-revalidate=${swrCacheTimeSeconds}, must-revalidate, max-age=0`,
+      },
+    });
     return;
   } catch (err) {
-    console.log(err);
-    res.status(500);
-    res.end();
-    return;
+    return new Response(null, { status: 500 });
   }
 }
