@@ -5,7 +5,13 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const test = await fetch(
-    "https://mastodon.social/.well-known/webfinger?resource=https%3A%2F%2Fmastodon.social%2F%40tvler"
+    "https://mastodon.social/.well-known/webfinger?resource=https%3A%2F%2Fmastodon.social%2F%40tvler",
+    {
+      headers: {
+        "user-agent": "undici",
+        "sec-fetch-mode": "cors",
+      },
+    }
   );
   const test2 = await test.text();
 
