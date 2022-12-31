@@ -35,15 +35,17 @@ export default async function handler(req: NextRequest) {
             return null;
           }
 
-          const url = new URL((await fetch(new URL(hrefUnchecked))).url);
-          const webfingerUrl = new URL(url.origin);
+          const visitedHref = new URL(
+            (await fetch(new URL(hrefUnchecked))).url
+          );
+          const webfingerUrl = new URL(visitedHref.origin);
           webfingerUrl.pathname = ".well-known/webfinger";
-          webfingerUrl.searchParams.set("resource", url.toString());
+          webfingerUrl.searchParams.set("resource", visitedHref.toString());
           const webfingerResp = await fetch(webfingerUrl.toString());
           const unparsedWebfingerJson = await webfingerResp.json();
           const webfinger = WebfingerSchema.parse(unparsedWebfingerJson);
 
-          return { webfinger, url: url.toString() };
+          return { webfinger, url: visitedHref.toString() };
         }
       )
     );
