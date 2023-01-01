@@ -3,7 +3,7 @@
   "name": "Hello Extensions testing",
   "description": "Base Level Extension",
   "version": "1.0",
-  "permissions": ["tabs", "storage"],
+  "permissions": ["tabs", "scripting", "storage"],
   "background": {
     "service_worker": "background.js",
     "type": "module"

@@ -1,127 +1,200 @@
-const PROFILES_STORAGE_KEY = "profiles2";
+/**
+ * @typedef {{ profileUrl: string, websiteUrl: string, viewedAt: number }} Profile
+ * @typedef {Map<string, Profile>} Profiles
+ * @typedef {'requestRelMeElementsMessage'} RequestRelMeElementsMessage
+ */
 
-// chrome.runtime.onMessage.addListener(
-//   /**
-//    * @param {unknown} message
-//    */
-//   async function onMessage(message, sender) {
-//     if (typeof message !== "string" || !sender.url) {
-//       return;
-//     }
+/**
+ * @type {RequestRelMeElementsMessage}
+ */
+const requestRelMeElementsMessage = "requestRelMeElementsMessage";
 
-//     /**
-//      * @type {string | undefined}
-//      */
-//     let profileUrl;
-//     try {
-//       const messageUrl = new URL(message);
-//       const webfingerUrl = new URL(messageUrl.origin);
-//       webfingerUrl.pathname = ".well-known/webfinger";
-//       webfingerUrl.searchParams.set("resource", messageUrl.toString());
-//       console.log(webfingerUrl.toString());
-//       const webfingerResp = await fetch(webfingerUrl.toString());
-//       /**
-//        * @type {unknown}
-//        */
-//       const webfingerJson = await webfingerResp.json();
-//       if (
-//         !webfingerJson ||
-//         typeof webfingerJson !== "object" ||
-//         !("links" in webfingerJson) ||
-//         !Array.isArray(webfingerJson.links)
-//       ) {
-//         return;
-//       }
-
-//       for (const linkAny of webfingerJson.links) {
-//         /**
-//          * @type {unknown}
-//          */
-//         const link = linkAny;
-//         if (
-//           link &&
-//           typeof link === "object" &&
-//           "rel" in link &&
-//           link.rel === "http://webfinger.net/rel/profile-page" &&
-//           "href" in link &&
-//           typeof link.href === "string"
-//         ) {
-//           profileUrl = link.href;
-//           break;
-//         }
-//       }
-//     } catch (err) {
-//       // nothing
-//     }
-//     if (!profileUrl) {
-//       return;
-//     }
-
-//     /**
-//      * @type {{ profileUrl: string, websiteUrl: string, viewedAt: number }}
-//      */
-//     const profile = {
-//       profileUrl: profileUrl,
-//       websiteUrl: sender.url,
-//       viewedAt: Date.now(),
-//     };
-
-//     /**
-//      * @type {Map<string, typeof profile>}
-//      */
-//     let profiles;
-//     try {
-//       const profilesArray =
-//         (await chrome.storage.local.get(PROFILES_STORAGE_KEY))?.[
-//           PROFILES_STORAGE_KEY
-//         ] ?? [];
-
-//       profiles = new Map(profilesArray);
-//     } catch (err) {
-//       profiles = new Map();
-//     }
-
-//     profiles.set(profile.profileUrl, profile);
-
-//     console.log("here", profileUrl, sender);
-//     console.log(profiles);
-//     console.log(Array.from(profiles.entries()));
-//     console.log();
-
-//     await chrome.storage.local.set({
-//       [PROFILES_STORAGE_KEY]: Array.from(profiles.entries()),
-//     });
-//   }
-// );
-
-chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  if (!changeInfo.url) {
-    return;
+/**
+ * @param {string | undefined} uncheckedUrl
+ * @returns {boolean}
+ */
+function getIsUrlHttpOrHttps(uncheckedUrl) {
+  if (!uncheckedUrl) {
+    return false;
   }
-
-  console.log("changed", changeInfo.url);
-
-  const linkedWebFingersUrl = new URL(
-    "https://webfinger.vercel.app/api/linked-webfingers"
-  );
-  linkedWebFingersUrl.searchParams.set("url", changeInfo.url);
 
   /**
-   * @type {import('../../api/pages/api/linked-webfingers.js').LinkedWebfingers | undefined}
+   * @type {URL}
    */
-  let linkedWebFingers;
+  let url;
   try {
-    const resp = await fetch(linkedWebFingersUrl);
-    if (resp.ok) {
-      linkedWebFingers = await resp.json();
-    }
+    url = new URL(uncheckedUrl);
   } catch (err) {
-    // Nothing
+    return false;
   }
 
-  console.log("linkedWebFingers", linkedWebFingers);
+  return url.protocol === "http:" || url.protocol === "https:";
+}
 
-  if (!linkedWebFingers?.length) {
+/**
+ * @type {Promise<void>}
+ */
+let lastProfilesPromise = Promise.resolve();
+/**
+ * @param {(profiles: Profiles) => (void | Profiles | Promise<void | Profiles>)} cb
+ */
+async function getProfiles(cb) {
+  const PROFILES_STORAGE_KEY = "profiles15";
+
+  const oldLastProfilesPromise = lastProfilesPromise;
+  lastProfilesPromise = new Promise((res) => {
+    oldLastProfilesPromise.then(async () => {
+      try {
+        /**
+         * @type {Profiles}
+         */
+        let profiles;
+        try {
+          const profilesArray =
+            (await chrome.storage.local.get(PROFILES_STORAGE_KEY))?.[
+              PROFILES_STORAGE_KEY
+            ] ?? [];
+
+          profiles = new Map(profilesArray);
+        } catch (err) {
+          profiles = new Map();
+        }
+
+        const callbackResult = await cb(profiles);
+
+        if (callbackResult) {
+          await chrome.storage.local.set({
+            [PROFILES_STORAGE_KEY]: Array.from(callbackResult.entries()),
+          });
+        }
+      } catch (err) {
+        // Nothing
+      }
+
+      res();
+    });
+  });
+  return lastProfilesPromise;
+}
+
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  if (changeInfo.status !== "complete" || !getIsUrlHttpOrHttps(tab.url)) {
     return;
   }
+
+  /**
+   * @type {import('./content-script.js').SendRelMeHrefsRet}
+   */
+  const relMeHrefs = await chrome.tabs.sendMessage(
+    tabId,
+    requestRelMeElementsMessage
+  );
+
+  console.log("relMeHrefs", relMeHrefs);
+
+  await Promise.allSettled(
+    relMeHrefs.map(async (relMeHref) => {
+      if (!getIsUrlHttpOrHttps(relMeHref)) {
+        return;
+      }
+
+      /**
+       * @type {Profile | undefined}
+       */
+      let profile;
+      await getProfiles((profiles) => {
+        profile = profiles.get(relMeHref);
+      });
+      if (!profile) {
+        const visitedRelMeHrefResp = await fetch(relMeHref);
+        if (!visitedRelMeHrefResp.ok) {
+          return;
+        }
+
+        const visitedRelMeUrl = new URL(visitedRelMeHrefResp.url);
+
+        const webfingerUrl = new URL(visitedRelMeUrl.origin);
+        webfingerUrl.pathname = ".well-known/webfinger";
+        webfingerUrl.searchParams.set("resource", visitedRelMeUrl.toString());
+
+        const webfingerResp = await fetch(webfingerUrl);
+        if (!webfingerResp.ok) {
+          return;
+        }
+
+        await webfingerResp.json();
+
+        if (!tab.url) {
+          return;
+        }
+
+        profile = {
+          profileUrl: visitedRelMeUrl.toString(),
+          websiteUrl: tab.url,
+          viewedAt: Date.now(),
+        };
+      }
+
+      await getProfiles((profiles) => {
+        if (!profile) {
+          return;
+        }
+
+        profiles.delete(relMeHref);
+        profiles.set(relMeHref, profile);
+
+        return profiles;
+      });
+    })
+  );
+
+  await getProfiles((profiles) => {
+    console.log("profiles");
+    console.log(Array.from(profiles.keys()));
+    console.log("");
+  });
 });
+
+// chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+//   /**
+//    * @param {number} ms
+//    */
+//   function sleep(ms) {
+//     /** @type Promise<void> */
+//     const p = new Promise((resolve) => {
+//       setTimeout(() => {
+//         resolve();
+//       }, ms);
+//     });
+
+//     return p;
+//   }
+
+//   if (changeInfo.status !== "complete" || !getIsUrlHttpOrHttps(tab.url)) {
+//     return;
+//   }
+
+//   console.log("start");
+//   getProfiles(async () => {
+//     console.log("getting 1");
+//     await sleep(1000);
+//     console.log("done w 1");
+//   });
+//   getProfiles(async () => {
+//     console.log("getting 2");
+//     await sleep(1000);
+//   });
+//   await getProfiles(async () => {
+//     console.log("getting 3");
+//     await sleep(1000);
+//   });
+//   getProfiles(async () => {
+//     console.log("getting 4");
+//     await sleep(500);
+//   });
+//   await getProfiles(async () => {
+//     console.log("getting 5");
+//     await sleep(1000);
+//   });
+//   console.log("done");
+// });
