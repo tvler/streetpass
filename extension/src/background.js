@@ -1,5 +1,5 @@
 import {
-  getIsUrlHttpOrHttps,
+  getUncachedProfileData,
   getRelMeHrefDataStore,
   SEND_REL_ME_HREF,
 } from "./util.js";
@@ -19,63 +19,38 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
    */
   const sendRelMeHrefPayload = msg[SEND_REL_ME_HREF];
 
-  if (!getIsUrlHttpOrHttps(sendRelMeHrefPayload.relMeHref)) {
-    return;
-  }
-
   /**
-   * @type {string | undefined}
+   * @type {import("./util.js").ProfileData | undefined}
    */
-  let profileUrl;
+  let profileData;
+
   await getRelMeHrefDataStore((relMeHrefDataStore) => {
-    profileUrl = relMeHrefDataStore.get(
+    profileData = relMeHrefDataStore.get(
       sendRelMeHrefPayload.relMeHref
-    )?.profileUrl;
+    )?.profileData;
   });
-  if (!profileUrl) {
-    try {
-      const visitedRelMeHrefResp = await fetch(sendRelMeHrefPayload.relMeHref);
-      if (!visitedRelMeHrefResp.ok) {
-        return;
-      }
 
-      const visitedRelMeUrl = new URL(visitedRelMeHrefResp.url);
-
-      const webfingerUrl = new URL(visitedRelMeUrl.origin);
-      webfingerUrl.pathname = ".well-known/webfinger";
-      webfingerUrl.searchParams.set("resource", visitedRelMeUrl.toString());
-
-      const webfingerResp = await fetch(webfingerUrl);
-      if (!webfingerResp.ok) {
-        return;
-      }
-
-      await webfingerResp.json();
-
-      profileUrl = visitedRelMeUrl.toString();
-    } catch (err) {
-      return;
-    }
+  if (!profileData) {
+    console.log("🦺getProfileData uncached", sendRelMeHrefPayload.relMeHref);
+    profileData = await getUncachedProfileData(sendRelMeHrefPayload.relMeHref);
   }
 
-  await getRelMeHrefDataStore((profiles) => {
-    if (!profileUrl) {
+  await getRelMeHrefDataStore((relMeHrefDataStore) => {
+    if (!profileData) {
       return;
     }
 
-    profiles.delete(sendRelMeHrefPayload.relMeHref);
-    profiles.set(sendRelMeHrefPayload.relMeHref, {
-      profileUrl: profileUrl,
-      websiteUrl: sendRelMeHrefPayload.tabUrl,
+    relMeHrefDataStore.delete(sendRelMeHrefPayload.relMeHref);
+    relMeHrefDataStore.set(sendRelMeHrefPayload.relMeHref, {
+      profileData: profileData,
       viewedAt: Date.now(),
+      websiteUrl: sendRelMeHrefPayload.tabUrl,
     });
 
-    return profiles;
+    return relMeHrefDataStore;
   });
 
   await getRelMeHrefDataStore((profiles) => {
-    console.log("profiles");
-    console.log(Array.from(profiles.keys()));
-    console.log("");
+    console.table(Object.fromEntries(profiles.entries()), ["type"]);
   });
 });
