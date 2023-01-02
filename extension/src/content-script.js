@@ -1,38 +1,46 @@
-/**
- * @typedef {Array<string>} SendRelMeHrefsRet
- */
-
-/**
- * @returns {SendRelMeHrefsRet}
- */
-function sendRelMeHrefs() {
-  const elements = document.querySelectorAll(":is(link, a)[rel=me]");
-
-  /**
-   * @type {Array<string>}
-   */
-  const hrefs = [];
-
-  for (const element of elements) {
-    const href = element.getAttribute("href");
-    if (href) {
-      hrefs.push(href);
-    }
-  }
-
-  return hrefs;
+function getCurrentUrlWithNoHash() {
+  const url = new URL(window.location.toString());
+  url.hash = "";
+  return url.toString();
 }
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  /**
-   * @type {import('./background.js').RequestRelMeElementsMessage}
-   */
-  const requestRelMeElementsMessage = "requestRelMeElementsMessage";
+let currentUrlWithNoHash = getCurrentUrlWithNoHash();
+/** @type {Set<string>} */
+const relMeHrefs = new Set();
 
-  if (message !== requestRelMeElementsMessage) {
-    return;
+function sendRelMeHrefs() {
+  const elements = document.querySelectorAll(":is(link, a)[rel~=me]");
+
+  for (const element of elements) {
+    const relMeHref = element.getAttribute("href");
+    if (relMeHref && !relMeHrefs.has(relMeHref)) {
+      relMeHrefs.add(relMeHref);
+      console.log("sending", relMeHref, currentUrlWithNoHash);
+
+      /** @type {import('./util.js').SendRelMeHrefPayload} */
+      const sendRelMeHrefPayload = {
+        SEND_REL_ME_HREF: {
+          tabUrl: currentUrlWithNoHash,
+          relMeHref: relMeHref,
+        },
+      };
+      chrome.runtime.sendMessage(sendRelMeHrefPayload);
+    }
+  }
+}
+
+new MutationObserver(() => {
+  const testCurrentUrlWithNoHash = getCurrentUrlWithNoHash();
+  if (currentUrlWithNoHash !== testCurrentUrlWithNoHash) {
+    currentUrlWithNoHash = testCurrentUrlWithNoHash;
+    relMeHrefs.clear();
   }
 
-  sendResponse(sendRelMeHrefs());
-  return true;
+  sendRelMeHrefs();
+}).observe(document.documentElement, {
+  subtree: true,
+  childList: true,
+  attributeFilter: ["rel"],
 });
+
+sendRelMeHrefs();

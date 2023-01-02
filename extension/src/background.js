@@ -1,200 +1,81 @@
-/**
- * @typedef {{ profileUrl: string, websiteUrl: string, viewedAt: number }} Profile
- * @typedef {Map<string, Profile>} Profiles
- * @typedef {'requestRelMeElementsMessage'} RequestRelMeElementsMessage
- */
+import {
+  getIsUrlHttpOrHttps,
+  getRelMeHrefDataStore,
+  SEND_REL_ME_HREF,
+} from "./util.js";
 
-/**
- * @type {RequestRelMeElementsMessage}
- */
-const requestRelMeElementsMessage = "requestRelMeElementsMessage";
-
-/**
- * @param {string | undefined} uncheckedUrl
- * @returns {boolean}
- */
-function getIsUrlHttpOrHttps(uncheckedUrl) {
-  if (!uncheckedUrl) {
-    return false;
-  }
-
-  /**
-   * @type {URL}
-   */
-  let url;
-  try {
-    url = new URL(uncheckedUrl);
-  } catch (err) {
-    return false;
-  }
-
-  return url.protocol === "http:" || url.protocol === "https:";
-}
-
-/**
- * @type {Promise<void>}
- */
-let lastProfilesPromise = Promise.resolve();
-/**
- * @param {(profiles: Profiles) => (void | Profiles | Promise<void | Profiles>)} cb
- */
-async function getProfiles(cb) {
-  const PROFILES_STORAGE_KEY = "profiles15";
-
-  const oldLastProfilesPromise = lastProfilesPromise;
-  lastProfilesPromise = new Promise((res) => {
-    oldLastProfilesPromise.then(async () => {
-      try {
-        /**
-         * @type {Profiles}
-         */
-        let profiles;
-        try {
-          const profilesArray =
-            (await chrome.storage.local.get(PROFILES_STORAGE_KEY))?.[
-              PROFILES_STORAGE_KEY
-            ] ?? [];
-
-          profiles = new Map(profilesArray);
-        } catch (err) {
-          profiles = new Map();
-        }
-
-        const callbackResult = await cb(profiles);
-
-        if (callbackResult) {
-          await chrome.storage.local.set({
-            [PROFILES_STORAGE_KEY]: Array.from(callbackResult.entries()),
-          });
-        }
-      } catch (err) {
-        // Nothing
-      }
-
-      res();
-    });
-  });
-  return lastProfilesPromise;
-}
-
-chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  if (changeInfo.status !== "complete" || !getIsUrlHttpOrHttps(tab.url)) {
+chrome.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
+  if (
+    !msg ||
+    typeof msg !== "object" ||
+    !(SEND_REL_ME_HREF in msg) ||
+    !msg[SEND_REL_ME_HREF]
+  ) {
     return;
   }
 
   /**
-   * @type {import('./content-script.js').SendRelMeHrefsRet}
+   * @type {import('./util.js').SendRelMeHrefPayload['SEND_REL_ME_HREF']}
    */
-  const relMeHrefs = await chrome.tabs.sendMessage(
-    tabId,
-    requestRelMeElementsMessage
-  );
+  const sendRelMeHrefPayload = msg[SEND_REL_ME_HREF];
 
-  console.log("relMeHrefs", relMeHrefs);
+  if (!getIsUrlHttpOrHttps(sendRelMeHrefPayload.relMeHref)) {
+    return;
+  }
 
-  await Promise.allSettled(
-    relMeHrefs.map(async (relMeHref) => {
-      if (!getIsUrlHttpOrHttps(relMeHref)) {
+  /**
+   * @type {string | undefined}
+   */
+  let profileUrl;
+  await getRelMeHrefDataStore((relMeHrefDataStore) => {
+    profileUrl = relMeHrefDataStore.get(
+      sendRelMeHrefPayload.relMeHref
+    )?.profileUrl;
+  });
+  if (!profileUrl) {
+    try {
+      const visitedRelMeHrefResp = await fetch(sendRelMeHrefPayload.relMeHref);
+      if (!visitedRelMeHrefResp.ok) {
         return;
       }
 
-      /**
-       * @type {Profile | undefined}
-       */
-      let profile;
-      await getProfiles((profiles) => {
-        profile = profiles.get(relMeHref);
-      });
-      if (!profile) {
-        const visitedRelMeHrefResp = await fetch(relMeHref);
-        if (!visitedRelMeHrefResp.ok) {
-          return;
-        }
+      const visitedRelMeUrl = new URL(visitedRelMeHrefResp.url);
 
-        const visitedRelMeUrl = new URL(visitedRelMeHrefResp.url);
+      const webfingerUrl = new URL(visitedRelMeUrl.origin);
+      webfingerUrl.pathname = ".well-known/webfinger";
+      webfingerUrl.searchParams.set("resource", visitedRelMeUrl.toString());
 
-        const webfingerUrl = new URL(visitedRelMeUrl.origin);
-        webfingerUrl.pathname = ".well-known/webfinger";
-        webfingerUrl.searchParams.set("resource", visitedRelMeUrl.toString());
-
-        const webfingerResp = await fetch(webfingerUrl);
-        if (!webfingerResp.ok) {
-          return;
-        }
-
-        await webfingerResp.json();
-
-        if (!tab.url) {
-          return;
-        }
-
-        profile = {
-          profileUrl: visitedRelMeUrl.toString(),
-          websiteUrl: tab.url,
-          viewedAt: Date.now(),
-        };
+      const webfingerResp = await fetch(webfingerUrl);
+      if (!webfingerResp.ok) {
+        return;
       }
 
-      await getProfiles((profiles) => {
-        if (!profile) {
-          return;
-        }
+      await webfingerResp.json();
 
-        profiles.delete(relMeHref);
-        profiles.set(relMeHref, profile);
+      profileUrl = visitedRelMeUrl.toString();
+    } catch (err) {
+      return;
+    }
+  }
 
-        return profiles;
-      });
-    })
-  );
+  await getRelMeHrefDataStore((profiles) => {
+    if (!profileUrl) {
+      return;
+    }
 
-  await getProfiles((profiles) => {
+    profiles.delete(sendRelMeHrefPayload.relMeHref);
+    profiles.set(sendRelMeHrefPayload.relMeHref, {
+      profileUrl: profileUrl,
+      websiteUrl: sendRelMeHrefPayload.tabUrl,
+      viewedAt: Date.now(),
+    });
+
+    return profiles;
+  });
+
+  await getRelMeHrefDataStore((profiles) => {
     console.log("profiles");
     console.log(Array.from(profiles.keys()));
     console.log("");
   });
 });
-
-// chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-//   /**
-//    * @param {number} ms
-//    */
-//   function sleep(ms) {
-//     /** @type Promise<void> */
-//     const p = new Promise((resolve) => {
-//       setTimeout(() => {
-//         resolve();
-//       }, ms);
-//     });
-
-//     return p;
-//   }
-
-//   if (changeInfo.status !== "complete" || !getIsUrlHttpOrHttps(tab.url)) {
-//     return;
-//   }
-
-//   console.log("start");
-//   getProfiles(async () => {
-//     console.log("getting 1");
-//     await sleep(1000);
-//     console.log("done w 1");
-//   });
-//   getProfiles(async () => {
-//     console.log("getting 2");
-//     await sleep(1000);
-//   });
-//   await getProfiles(async () => {
-//     console.log("getting 3");
-//     await sleep(1000);
-//   });
-//   getProfiles(async () => {
-//     console.log("getting 4");
-//     await sleep(500);
-//   });
-//   await getProfiles(async () => {
-//     console.log("getting 5");
-//     await sleep(1000);
-//   });
-//   console.log("done");
-// });
