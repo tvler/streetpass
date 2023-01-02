@@ -2,3 +2,5 @@
 - https://themarkup.org/people/dan-phiffer
 - https://tylerdeitz.com/
 - https://www.washingtonpost.com/people/pranshu-verma/
+- https://robb.is/
+- https://mastodon.social/@DLX

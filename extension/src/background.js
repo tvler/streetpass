@@ -51,6 +51,18 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
   });
 
   await getRelMeHrefDataStore((profiles) => {
-    console.table(Object.fromEntries(profiles.entries()), ["type"]);
+    console.table(
+      Object.fromEntries(
+        Array.from(profiles.entries()).map(([key, val]) => {
+          return [
+            key,
+            val.profileData.type === "profile"
+              ? val.profileData.profileUrl
+              : val.profileData.type,
+          ];
+        })
+      ),
+      ["profileData"]
+    );
   });
 });

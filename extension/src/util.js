@@ -6,6 +6,18 @@ export const SEND_REL_ME_HREF = "SEND_REL_ME_HREF";
  * @typedef {{ type: 'notProfile' }} NotProfile
  * @typedef {Profile | NotProfile} ProfileData
  * @typedef {Map<string, { profileData: ProfileData, websiteUrl: string, viewedAt: number }>} RelMeHrefDataStore
+ * @typedef {{
+ *   subject: string,
+ *   aliases?: Array<string>
+ *   properties?: Record<string, string>
+ *   links?: Array<{
+ *     rel: string
+ *     type?: string
+ *     href?: string
+ *     titles?: Record<string, string>
+ *     properties?: Record<string, string>
+ *   }>
+ * }} Webfinger https://webfinger.net/spec/
  */
 
 /**
@@ -38,7 +50,7 @@ let lastRelMeHrefDataStorePromise = Promise.resolve();
  * @param {(relMeHrefDataStore: RelMeHrefDataStore) => (void | RelMeHrefDataStore | Promise<void | RelMeHrefDataStore>)} cb
  */
 export async function getRelMeHrefDataStore(cb) {
-  const REL_ME_HREF_DATA_STORE_STORAGE_KEY = "profiles21";
+  const REL_ME_HREF_DATA_STORE_STORAGE_KEY = "profiles25";
 
   const oldLastRelMeHrefDataStorePromise = lastRelMeHrefDataStorePromise;
   lastRelMeHrefDataStorePromise = new Promise((res) => {
@@ -80,6 +92,19 @@ export async function getRelMeHrefDataStore(cb) {
 
 /**
  * @param {string} href
+ */
+function getIsRelWebfingerProfilePageRel(href) {
+  const webFingerProfilePageRelWithoutProtocol =
+    "//webfinger.net/rel/profile-page";
+
+  return (
+    href === `http:${webFingerProfilePageRelWithoutProtocol}` ||
+    href === `https:${webFingerProfilePageRelWithoutProtocol}`
+  );
+}
+
+/**
+ * @param {string} href
  * @returns {Promise<ProfileData>}
  */
 export async function getUncachedProfileData(href) {
@@ -104,15 +129,24 @@ export async function getUncachedProfileData(href) {
       throw new Error();
     }
 
-    await webfingerResp.json();
-
-    return {
-      type: "profile",
-      profileUrl: visitedRelMeUrl.toString(),
-    };
+    /**
+     * @type {Webfinger}
+     */
+    const webfinger = await webfingerResp.json();
+    for (const webfingerLink of webfinger.links ?? []) {
+      if (
+        getIsRelWebfingerProfilePageRel(webfingerLink.rel) &&
+        !!webfingerLink.href
+      ) {
+        return {
+          type: "profile",
+          profileUrl: webfingerLink.href,
+        };
+      }
+    }
   } catch (err) {
-    return {
-      type: "notProfile",
-    };
+    // Nothing
   }
+
+  return { type: "notProfile" };
 }
