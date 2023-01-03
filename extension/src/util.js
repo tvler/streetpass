@@ -50,7 +50,7 @@ let lastRelMeHrefDataStorePromise = Promise.resolve();
  * @param {(relMeHrefDataStore: RelMeHrefDataStore) => (void | RelMeHrefDataStore | Promise<void | RelMeHrefDataStore>)} cb
  */
 export async function getRelMeHrefDataStore(cb) {
-  const REL_ME_HREF_DATA_STORE_STORAGE_KEY = "profiles27";
+  const REL_ME_HREF_DATA_STORE_STORAGE_KEY = "profiles29";
 
   const oldLastRelMeHrefDataStorePromise = lastRelMeHrefDataStorePromise;
   lastRelMeHrefDataStorePromise = new Promise((res) => {
@@ -239,4 +239,40 @@ export function getRelativeTime(ms) {
   }
 
   return returnString;
+}
+
+/**
+ * @returns {Promise<IterableIterator<{ profileData: Profile, websiteUrl: string, viewedAt: number }>>}
+ */
+export async function getProfiles() {
+  /**
+   * @type {Map<string, { profileData: Profile, websiteUrl: string, viewedAt: number }>}
+   */
+  const profiles = new Map();
+
+  /**
+   * @type {RelMeHrefDataStore | undefined}
+   */
+  let relMeHrefDataStore;
+  await getRelMeHrefDataStore((innerRelMeHrefDataStore) => {
+    relMeHrefDataStore = innerRelMeHrefDataStore;
+  });
+
+  for (const relMeHrefData of Array.from(
+    relMeHrefDataStore?.values() ?? []
+  ).reverse()) {
+    if (relMeHrefData.profileData.type !== "profile") {
+      continue;
+    }
+    profiles.set(relMeHrefData.profileData.profileUrl, {
+      profileData: {
+        type: relMeHrefData.profileData.type,
+        profileUrl: relMeHrefData.profileData.profileUrl,
+      },
+      websiteUrl: relMeHrefData.websiteUrl,
+      viewedAt: relMeHrefData.viewedAt,
+    });
+  }
+
+  return profiles.values();
 }
