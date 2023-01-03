@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Hello Extensions testing",
+  "name": "Mastodon StreetPass",
   "description": "Base Level Extension",
   "version": "1.0",
   "permissions": ["tabs", "scripting", "storage"],
@@ -15,7 +15,7 @@
     }
   ],
   "action": {
-    "default_popup": "hello.html",
+    "default_popup": "popup.html",
     "default_title": "This is my default title!",
     "default_icon": "hello_extensions.png"
   }

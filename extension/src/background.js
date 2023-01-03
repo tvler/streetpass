@@ -20,27 +20,30 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
   const sendRelMeHrefPayload = msg[SEND_REL_ME_HREF];
 
   /**
+   * @type {boolean | undefined}
+   */
+  let hasExistingRelMeHrefData;
+  await getRelMeHrefDataStore((relMeHrefDataStore) => {
+    hasExistingRelMeHrefData = relMeHrefDataStore.has(
+      sendRelMeHrefPayload.relMeHref
+    );
+  });
+  if (hasExistingRelMeHrefData) {
+    return;
+  }
+
+  /**
    * @type {import("./util.js").ProfileData | undefined}
    */
-  let profileData;
-
-  await getRelMeHrefDataStore((relMeHrefDataStore) => {
-    profileData = relMeHrefDataStore.get(
-      sendRelMeHrefPayload.relMeHref
-    )?.profileData;
-  });
-
-  if (!profileData) {
-    console.log("🦺getProfileData uncached", sendRelMeHrefPayload.relMeHref);
-    profileData = await getUncachedProfileData(sendRelMeHrefPayload.relMeHref);
-  }
+  let profileData = await getUncachedProfileData(
+    sendRelMeHrefPayload.relMeHref
+  );
 
   await getRelMeHrefDataStore((relMeHrefDataStore) => {
     if (!profileData) {
       return;
     }
 
-    relMeHrefDataStore.delete(sendRelMeHrefPayload.relMeHref);
     relMeHrefDataStore.set(sendRelMeHrefPayload.relMeHref, {
       profileData: profileData,
       viewedAt: Date.now(),

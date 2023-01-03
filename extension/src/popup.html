@@ -1,0 +1,33 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="normalize.css" />
+    <link rel="stylesheet" type="text/css" href="index.css" />
+  </head>
+  <body>
+    <div
+      style="
+        width: 350px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-block-start: 6px;
+        padding-block-end: 18px;
+      "
+    >
+      <h1 style="padding-inline: 10px; font-size: 18px; color: #444">
+        Mastodon StreetPass
+      </h1>
+
+      <div
+        id="profile-list"
+        style="
+          display: flex;
+          flex-direction: column;
+          gap: 18px;
+          padding-inline: 10px;
+        "
+      ></div>
+    </div>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>
