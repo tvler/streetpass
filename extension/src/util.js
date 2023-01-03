@@ -5,7 +5,13 @@ export const SEND_REL_ME_HREF = "SEND_REL_ME_HREF";
  * @typedef {{ type: 'profile', profileUrl: string }} Profile
  * @typedef {{ type: 'notProfile' }} NotProfile
  * @typedef {Profile | NotProfile} ProfileData
- * @typedef {Map<string, { profileData: ProfileData, websiteUrl: string, viewedAt: number }>} RelMeHrefDataStore
+ * @typedef {{
+ *   profileData: ProfileData,
+ *   websiteUrl: string,
+ *   viewedAt: number,
+ *   relMeHref: string,
+ * }} RelMeHrefDataStoreValue
+ * @typedef {Map<string, RelMeHrefDataStoreValue>} RelMeHrefDataStore
  * @typedef {{
  *   subject: string,
  *   aliases?: Array<string>
@@ -46,12 +52,11 @@ export function getIsUrlHttpOrHttps(uncheckedUrl) {
  * @type {Promise<void>}
  */
 let lastRelMeHrefDataStorePromise = Promise.resolve();
+export const REL_ME_HREF_DATA_STORE_STORAGE_KEY = "profiles34";
 /**
  * @param {(relMeHrefDataStore: RelMeHrefDataStore) => (void | RelMeHrefDataStore | Promise<void | RelMeHrefDataStore>)} cb
  */
 export async function getRelMeHrefDataStore(cb) {
-  const REL_ME_HREF_DATA_STORE_STORAGE_KEY = "profiles29";
-
   const oldLastRelMeHrefDataStorePromise = lastRelMeHrefDataStorePromise;
   lastRelMeHrefDataStorePromise = new Promise((res) => {
     oldLastRelMeHrefDataStorePromise.then(async () => {
@@ -88,6 +93,50 @@ export async function getRelMeHrefDataStore(cb) {
     });
   });
   return lastRelMeHrefDataStorePromise;
+}
+
+/**
+ * @type {Promise<void>}
+ */
+let lastViewedProfilePromise = Promise.resolve();
+/**
+ * @param {(lastViewedProfile: string | null) => (void | string | Promise<void | string>)} cb
+ */
+export async function getLastViewedProfile(cb) {
+  const LAST_VIEWED_PROFILE_STORAGE_KEY = "lastViewedProfile1";
+
+  const oldLastViewedProfilePromise = lastViewedProfilePromise;
+  lastViewedProfilePromise = new Promise((res) => {
+    oldLastViewedProfilePromise.then(async () => {
+      try {
+        /**
+         * @type {string | null}
+         */
+        let lastViewedProfile;
+        try {
+          lastViewedProfile =
+            (await chrome.storage.local.get(LAST_VIEWED_PROFILE_STORAGE_KEY))?.[
+              LAST_VIEWED_PROFILE_STORAGE_KEY
+            ] ?? null;
+        } catch (err) {
+          lastViewedProfile = null;
+        }
+
+        const callbackResult = await cb(lastViewedProfile);
+
+        if (callbackResult) {
+          await chrome.storage.local.set({
+            [LAST_VIEWED_PROFILE_STORAGE_KEY]: callbackResult,
+          });
+        }
+      } catch (err) {
+        // Nothing
+      }
+
+      res();
+    });
+  });
+  return lastViewedProfilePromise;
 }
 
 /**
@@ -242,24 +291,17 @@ export function getRelativeTime(ms) {
 }
 
 /**
- * @returns {Promise<IterableIterator<{ profileData: Profile, websiteUrl: string, viewedAt: number }>>}
+ * @param {RelMeHrefDataStore} relMeHrefDataStore
+ * @returns {Map<string, {profileData: Profile;} & RelMeHrefDataStoreValue>}
  */
-export async function getProfiles() {
+export function getProfiles(relMeHrefDataStore) {
   /**
-   * @type {Map<string, { profileData: Profile, websiteUrl: string, viewedAt: number }>}
+   * @type {Map<string, { profileData: Profile } & RelMeHrefDataStoreValue>}
    */
   const profiles = new Map();
 
-  /**
-   * @type {RelMeHrefDataStore | undefined}
-   */
-  let relMeHrefDataStore;
-  await getRelMeHrefDataStore((innerRelMeHrefDataStore) => {
-    relMeHrefDataStore = innerRelMeHrefDataStore;
-  });
-
   for (const relMeHrefData of Array.from(
-    relMeHrefDataStore?.values() ?? []
+    relMeHrefDataStore.values()
   ).reverse()) {
     if (relMeHrefData.profileData.type !== "profile") {
       continue;
@@ -271,8 +313,9 @@ export async function getProfiles() {
       },
       websiteUrl: relMeHrefData.websiteUrl,
       viewedAt: relMeHrefData.viewedAt,
+      relMeHref: relMeHrefData.relMeHref,
     });
   }
 
-  return profiles.values();
+  return profiles;
 }

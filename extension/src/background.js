@@ -2,6 +2,8 @@ import {
   getUncachedProfileData,
   getRelMeHrefDataStore,
   SEND_REL_ME_HREF,
+  REL_ME_HREF_DATA_STORE_STORAGE_KEY,
+  getProfiles,
 } from "./util.js";
 
 chrome.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
@@ -48,6 +50,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
       profileData: profileData,
       viewedAt: Date.now(),
       websiteUrl: sendRelMeHrefPayload.tabUrl,
+      relMeHref: sendRelMeHrefPayload.relMeHref,
     });
 
     return relMeHrefDataStore;
@@ -68,4 +71,38 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
       ["profileData"]
     );
   });
+});
+
+chrome.storage.onChanged.addListener((changes, namespace) => {
+  const relMeHrefStorageChange = changes[REL_ME_HREF_DATA_STORE_STORAGE_KEY];
+  if (!relMeHrefStorageChange) {
+    return;
+  }
+
+  /**
+   * @type {import("./util.js").RelMeHrefDataStore}
+   */
+  let oldRelMeHrefDataStore;
+  try {
+    oldRelMeHrefDataStore = new Map(relMeHrefStorageChange.oldValue);
+  } catch (err) {
+    oldRelMeHrefDataStore = new Map();
+  }
+
+  /**
+   * @type {import("./util.js").RelMeHrefDataStore}
+   */
+  let newRelMeHrefDataStore;
+  try {
+    newRelMeHrefDataStore = new Map(relMeHrefStorageChange.newValue);
+  } catch (err) {
+    newRelMeHrefDataStore = new Map();
+  }
+
+  const oldProfiles = getProfiles(oldRelMeHrefDataStore);
+  const newProfiles = getProfiles(newRelMeHrefDataStore);
+
+  if (oldProfiles.size !== newProfiles.size) {
+    console.log("SHOW EXTENSION");
+  }
 });
