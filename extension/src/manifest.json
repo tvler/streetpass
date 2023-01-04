@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "StreetPass for Mastodon",
-  "description": "Discover users on Mastodon through the websites you visit",
+  "description": "A user discovery tool for Mastodon, generated from the websites you visit",
   "version": "1.0",
   "permissions": ["storage"],
   "background": {
