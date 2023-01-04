@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Mastodon StreetPass",
+  "name": "StreetPass for Mastodon",
   "description": "Discover users on Mastodon through the websites you visit",
   "version": "1.0",
   "permissions": ["storage"],
@@ -16,7 +16,7 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Mastodon StreetPass",
+    "default_title": "StreetPass",
     "default_icon": "icon-active.png"
   }
 }
