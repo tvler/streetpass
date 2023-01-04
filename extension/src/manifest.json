@@ -1,16 +1,16 @@
 {
   "manifest_version": 3,
   "name": "Mastodon StreetPass",
-  "description": "Find friends on Mastodon by the websites you visit",
+  "description": "Discover users on Mastodon through the websites you visit",
   "version": "1.0",
-  "permissions": ["tabs", "scripting", "storage"],
+  "permissions": ["storage"],
   "background": {
     "service_worker": "background.js",
     "type": "module"
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": ["https://*/*", "http://*/*"],
       "js": ["content-script.js"]
     }
   ],
