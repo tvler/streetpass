@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Mastodon StreetPass",
-  "description": "Base Level Extension",
+  "description": "Find friends on Mastodon by the websites you visit",
   "version": "1.0",
   "permissions": ["tabs", "scripting", "storage"],
   "background": {
@@ -16,7 +16,7 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "This is my default title!",
-    "default_icon": "hello_extensions.png"
+    "default_title": "Mastodon StreetPass",
+    "default_icon": "icon-active.png"
   }
 }

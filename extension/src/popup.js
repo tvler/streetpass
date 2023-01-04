@@ -1,7 +1,23 @@
 import { getDisplayHref, getProfiles, getRelMeHrefDataStore } from "./util.js";
 
-console.log("This is a popup!");
-console.log(document);
+chrome.action.setIcon({ path: "icon-inactive.png" });
+
+// await getRelMeHrefDataStore((innerRelMeHrefDataStore) => {
+//   const test = innerRelMeHrefDataStore.get("https://mastodon.social/@tvler");
+//   if (!test) {
+//     return;
+//   }
+
+//   console.log(new Intl.DateTimeFormat().format(test.viewedAt));
+
+//   console.log(
+//     new Intl.DateTimeFormat().format(test.viewedAt - 1000 * 60 * 60 * 24)
+//   );
+
+//   test.viewedAt = test.viewedAt - 1000 * 60 * 60 * 24;
+
+//   return innerRelMeHrefDataStore;
+// });
 
 /**
  * @type {import("./util.js").RelMeHrefDataStore | undefined}
@@ -12,13 +28,24 @@ await getRelMeHrefDataStore((innerRelMeHrefDataStore) => {
 });
 
 if (relMeHrefDataStore) {
-  for (const relMeHrefData of getProfiles(relMeHrefDataStore).values()) {
+  const values = Array.from(getProfiles(relMeHrefDataStore).values());
+
+  for (let i = 0; i < values.length; i++) {
+    const relMeHrefData = values[i];
+    if (!relMeHrefData) {
+      continue;
+    }
+    const prevRelMeHrefData = values[i - 1];
+    const previousItemWasDayBefore =
+      !!prevRelMeHrefData &&
+      new Date(prevRelMeHrefData.viewedAt).getDate() !==
+        new Date(relMeHrefData.viewedAt).getDate();
+
     const profileRow = document.createElement("a");
     profileRow.href = relMeHrefData.profileData.profileUrl;
     profileRow.target = "_blank";
     profileRow.style.wordBreak = "break-all";
     profileRow.style.fontSize = "13px";
-    profileRow.style.lineHeight = "1.5";
     profileRow.appendChild(
       document.createTextNode(
         getDisplayHref(relMeHrefData.profileData.profileUrl)
@@ -35,25 +62,25 @@ if (relMeHrefDataStore) {
     );
     const websiteRow = document.createElement("p");
     websiteRow.style.fontSize = "13px";
-    websiteRow.style.color = "#666";
-    websiteRow.style.lineHeight = "1.4";
+    websiteRow.style.color = "#7b7b7b";
     websiteRow.appendChild(websiteRowAnchor);
 
     const urlColumn = document.createElement("div");
     urlColumn.style.display = "flex";
     urlColumn.style.flexDirection = "column";
     urlColumn.style.alignItems = "flex-start";
+    urlColumn.style.gap = "2px";
     urlColumn.appendChild(profileRow);
     urlColumn.appendChild(websiteRow);
 
     const dateColumn = document.createElement("p");
     dateColumn.style.fontSize = "13px";
     dateColumn.style.width = "74px";
-    dateColumn.style.color = "#666";
-    profileRow.style.lineHeight = "1.5";
+    dateColumn.style.color = "#7b7b7b";
+    dateColumn.style.flexShrink = "0";
     dateColumn.appendChild(
       document.createTextNode(
-        new Intl.DateTimeFormat("en-US", {
+        new Intl.DateTimeFormat(undefined, {
           timeStyle: "short",
         }).format(relMeHrefData.viewedAt)
       )
@@ -63,10 +90,27 @@ if (relMeHrefDataStore) {
     profileListItem.style.display = "flex";
     profileListItem.style.flexDirection = "row";
     profileListItem.style.alignItems = "start";
+    profileListItem.style.lineHeight = "1.3";
     profileListItem.appendChild(dateColumn);
     profileListItem.appendChild(urlColumn);
 
     const profileList = document.querySelector("#profile-list");
+    if (previousItemWasDayBefore) {
+      const dayRow = document.createElement("p");
+      dayRow.style.fontSize = "13px";
+      // dayRow.style.marginLeft = "74px";
+      dayRow.style.color = "#7b7b7b";
+      dayRow.style.flexShrink = "0";
+      dayRow.appendChild(
+        document.createTextNode(
+          new Intl.DateTimeFormat(undefined, {
+            day: "numeric",
+            month: "short",
+          }).format(relMeHrefData.viewedAt)
+        )
+      );
+      profileList?.appendChild(dayRow);
+    }
     profileList?.appendChild(profileListItem);
   }
 }

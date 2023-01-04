@@ -103,6 +103,6 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
   const newProfiles = getProfiles(newRelMeHrefDataStore);
 
   if (oldProfiles.size !== newProfiles.size) {
-    console.log("SHOW EXTENSION");
+    chrome.action.setIcon({ path: "icon-active.png" });
   }
 });

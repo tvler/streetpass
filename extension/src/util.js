@@ -52,7 +52,7 @@ export function getIsUrlHttpOrHttps(uncheckedUrl) {
  * @type {Promise<void>}
  */
 let lastRelMeHrefDataStorePromise = Promise.resolve();
-export const REL_ME_HREF_DATA_STORE_STORAGE_KEY = "profiles34";
+export const REL_ME_HREF_DATA_STORE_STORAGE_KEY = "profiles35";
 /**
  * @param {(relMeHrefDataStore: RelMeHrefDataStore) => (void | RelMeHrefDataStore | Promise<void | RelMeHrefDataStore>)} cb
  */
