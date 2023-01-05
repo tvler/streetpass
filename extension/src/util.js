@@ -98,7 +98,7 @@ export function storageFactory(args) {
 }
 
 export const getRelMeHrefDataStore = storageFactory({
-  storageKey: "profiles36",
+  storageKey: "rel-me-href-data-store-1",
   parse(storageData) {
     /** @type {RelMeHrefDataStore} */
     let relMeHrefDataStore;
@@ -294,3 +294,74 @@ export function getProfiles(relMeHrefDataStore) {
 
   return profiles;
 }
+
+/**
+ * Test the safe storage
+ */
+// {
+//   const getInc = storageFactory({
+//     storageKey: "inc2",
+//     parse(storageData) {
+//       /** @type {number} */
+//       let num;
+//       if (typeof storageData === "number" && !isNaN(storageData)) {
+//         num = storageData;
+//       } else {
+//         num = 0;
+//       }
+//       return num;
+//     },
+//     serialize(inc) {
+//       return inc;
+//     },
+//   });
+
+//   chrome.runtime.onMessage.addListener(async () => {
+//     /**
+//      * @param {number} sleepMs
+//      * @returns {Promise<void>}
+//      */
+//     function sleep(sleepMs) {
+//       return new Promise((res) => {
+//         setTimeout(() => {
+//           res();
+//         }, sleepMs);
+//       });
+//     }
+
+//     getInc((inc) => {
+//       console.log(inc, inc === 0);
+//       return inc + 1;
+//     });
+//     getInc((inc) => {
+//       console.log(inc, inc === 1);
+//       return inc + 1;
+//     });
+//     await getInc((inc) => {
+//       console.log(inc, inc === 2);
+//       return inc + 1;
+//     });
+//     getInc((inc) => {
+//       console.log(inc, inc === 3);
+//       return inc + 1;
+//     });
+//     console.log("sleep");
+//     await sleep(1000);
+//     console.log("wakeup");
+//     getInc((inc) => {
+//       console.log(inc, inc === 4);
+//       return inc + 1;
+//     });
+//     getInc((inc) => {
+//       console.log(inc, inc === 5);
+//       return inc + 1;
+//     });
+//     await getInc((inc) => {
+//       console.log(inc, inc === 6);
+//       return inc + 1;
+//     });
+//     getInc((inc) => {
+//       console.log(inc, inc === 7);
+//     });
+//   });
+// }
