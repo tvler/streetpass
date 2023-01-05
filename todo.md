@@ -7,3 +7,4 @@
 - https://www.presscheck.org/journalists
 
 - add icon https://developer.chrome.com/docs/extensions/mv3/manifest/icons/
+- Show the date tag if the first date is from yesterday
