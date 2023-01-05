@@ -10,4 +10,4 @@ StreetPass is a browser extension that helps you find your people on Mastodon. H
 2. StreetPass lets you know when you've found one of these links, and adds them to your StreetPass list.
 3. Browse the web as usual. StreetPass will build a list of Mastodon users made up of the websites you go to.
 
-❤️ StreetPass is made possible by open web identity verification [standards](http://microformats.org/wiki/rel-me).
+❤️ StreetPass is made possible by [open web standards](http://microformats.org/wiki/rel-me).
