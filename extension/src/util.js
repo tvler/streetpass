@@ -289,14 +289,14 @@ export const getIconState = storageFactory({
   storageKey: "icon-state-1",
   parse(storageData) {
     /** @type {'on' | 'off'} */
-    const iconState = storageData === "on" ? "on" : "off";
+    const iconState = storageData === "off" ? "off" : "on";
     return iconState;
   },
   serialize(iconState) {
     return iconState;
   },
   onChange({ prev, curr }) {
-    const path = curr === "on" ? "icon-active.png" : "icon-inactive.png";
+    const path = curr === "off" ? "action-inactive.png" : "action-active.png";
     chrome.action.setIcon({
       path: path,
     });

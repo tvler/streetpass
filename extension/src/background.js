@@ -73,9 +73,12 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
 });
 
 chrome.runtime.onInstalled.addListener((details) => {
-  if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
-    getIconState(() => "on");
-  }
+  getIconState((iconState) => {
+    if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
+      return "on";
+    }
+    return iconState;
+  });
 });
 
 chrome.runtime.onStartup.addListener(() => {

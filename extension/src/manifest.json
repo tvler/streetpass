@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "StreetPass for Mastodon",
   "description": "A user discovery tool for Mastodon, generated from the websites you visit",
-  "version": "1.0",
+  "version": "2023.2",
   "permissions": ["storage"],
   "background": {
     "service_worker": "background.js",
@@ -14,9 +14,13 @@
       "js": ["content-script.js"]
     }
   ],
+  "icons": {
+    "128": "icon128.png",
+    "256": "icon256.png"
+  },
   "action": {
     "default_popup": "popup.html",
     "default_title": "StreetPass",
-    "default_icon": "icon-inactive.png"
+    "default_icon": "action-inactive.png"
   }
 }
