@@ -236,19 +236,13 @@ export function getRelativeTime(ms) {
  *   storageKey: string
  *   onChange?(args: {prev: T, curr: T}): (void | Promise<void>)
  * }) => ({
- *   storageKey: string
- *   parse(storageData: any): T
  *   (cb: (data: Readonly<T>) => (void | T)): Promise<void>}
  * )}
  */
 export function storageFactory(args) {
   let lastDataPromise = Promise.resolve();
 
-  /**
-   * @param {(data: ReturnType<typeof args.parse>) => (void | ReturnType<typeof args.parse>)} cb
-   * @returns {Promise<void>}
-   */
-  function getter(cb) {
+  return (cb) => {
     const oldLastDataPromise = lastDataPromise;
     lastDataPromise = new Promise((res) => {
       oldLastDataPromise.then(async () => {
@@ -279,10 +273,7 @@ export function storageFactory(args) {
     });
 
     return lastDataPromise;
-  }
-  getter.storageKey = args.storageKey;
-  getter.parse = args.parse;
-  return getter;
+  };
 }
 
 export const getIconState = storageFactory({
