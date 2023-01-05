@@ -49,95 +49,70 @@ export function getIsUrlHttpOrHttps(uncheckedUrl) {
 }
 
 /**
- * @type {Promise<void>}
+ * @type {<T>(args: {
+ *   parse(storageData: any): T
+ *   serialize(data: T): any
+ *   storageKey: string
+ * }) => ({
+ *   storageKey: string
+ *   parse(storageData: any): T
+ *   (cb: (data: T) => (void | T)): Promise<void>}
+ * )}
  */
-let lastRelMeHrefDataStorePromise = Promise.resolve();
-export const REL_ME_HREF_DATA_STORE_STORAGE_KEY = "profiles35";
-/**
- * @param {(relMeHrefDataStore: RelMeHrefDataStore) => (void | RelMeHrefDataStore | Promise<void | RelMeHrefDataStore>)} cb
- */
-export async function getRelMeHrefDataStore(cb) {
-  const oldLastRelMeHrefDataStorePromise = lastRelMeHrefDataStorePromise;
-  lastRelMeHrefDataStorePromise = new Promise((res) => {
-    oldLastRelMeHrefDataStorePromise.then(async () => {
-      try {
-        /**
-         * @type {RelMeHrefDataStore}
-         */
-        let relMeHrefDataStore;
+export function storageFactory(args) {
+  let lastDataPromise = Promise.resolve();
+
+  /**
+   * @param {(data: ReturnType<typeof args.parse>) => (void | ReturnType<typeof args.parse>)} cb
+   * @returns {Promise<void>}
+   */
+  function getter(cb) {
+    const oldLastDataPromise = lastDataPromise;
+    lastDataPromise = new Promise((res) => {
+      oldLastDataPromise.then(async () => {
         try {
-          const relMeHrefDataStoreArray =
-            (
-              await chrome.storage.local.get(REL_ME_HREF_DATA_STORE_STORAGE_KEY)
-            )?.[REL_ME_HREF_DATA_STORE_STORAGE_KEY] ?? [];
+          const data = args.parse(
+            (await chrome.storage.local.get(args.storageKey))?.[args.storageKey]
+          );
 
-          relMeHrefDataStore = new Map(relMeHrefDataStoreArray);
+          const cbResult = cb(data);
+
+          if (cbResult) {
+            await chrome.storage.local.set({
+              [args.storageKey]: args.serialize(cbResult),
+            });
+          }
         } catch (err) {
-          relMeHrefDataStore = new Map();
+          // Nothing
         }
 
-        const callbackResult = await cb(relMeHrefDataStore);
-
-        if (callbackResult) {
-          await chrome.storage.local.set({
-            [REL_ME_HREF_DATA_STORE_STORAGE_KEY]: Array.from(
-              callbackResult.entries()
-            ),
-          });
-        }
-      } catch (err) {
-        // Nothing
-      }
-
-      res();
+        res();
+      });
     });
-  });
-  return lastRelMeHrefDataStorePromise;
+
+    return lastDataPromise;
+  }
+  getter.storageKey = args.storageKey;
+  getter.parse = args.parse;
+  return getter;
 }
 
-/**
- * @type {Promise<void>}
- */
-let lastViewedProfilePromise = Promise.resolve();
-/**
- * @param {(lastViewedProfile: string | null) => (void | string | Promise<void | string>)} cb
- */
-export async function getLastViewedProfile(cb) {
-  const LAST_VIEWED_PROFILE_STORAGE_KEY = "lastViewedProfile1";
-
-  const oldLastViewedProfilePromise = lastViewedProfilePromise;
-  lastViewedProfilePromise = new Promise((res) => {
-    oldLastViewedProfilePromise.then(async () => {
-      try {
-        /**
-         * @type {string | null}
-         */
-        let lastViewedProfile;
-        try {
-          lastViewedProfile =
-            (await chrome.storage.local.get(LAST_VIEWED_PROFILE_STORAGE_KEY))?.[
-              LAST_VIEWED_PROFILE_STORAGE_KEY
-            ] ?? null;
-        } catch (err) {
-          lastViewedProfile = null;
-        }
-
-        const callbackResult = await cb(lastViewedProfile);
-
-        if (callbackResult) {
-          await chrome.storage.local.set({
-            [LAST_VIEWED_PROFILE_STORAGE_KEY]: callbackResult,
-          });
-        }
-      } catch (err) {
-        // Nothing
-      }
-
-      res();
-    });
-  });
-  return lastViewedProfilePromise;
-}
+export const getRelMeHrefDataStore = storageFactory({
+  storageKey: "profiles36",
+  parse(storageData) {
+    /** @type {RelMeHrefDataStore} */
+    let relMeHrefDataStore;
+    try {
+      relMeHrefDataStore = new Map(storageData);
+    } catch (err) {
+      relMeHrefDataStore = new Map();
+    }
+    return relMeHrefDataStore;
+  },
+  serialize(relMeHrefDataStore) {
+    return Array.from(relMeHrefDataStore.entries());
+  },
+});
 
 /**
  * @param {string} href

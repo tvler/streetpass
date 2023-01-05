@@ -5,3 +5,5 @@
 - https://robb.is/
 - https://mastodon.social/@DLX
 - https://www.presscheck.org/journalists
+
+- add icon https://developer.chrome.com/docs/extensions/mv3/manifest/icons/

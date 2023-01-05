@@ -2,7 +2,6 @@ import {
   getUncachedProfileData,
   getRelMeHrefDataStore,
   SEND_REL_ME_HREF,
-  REL_ME_HREF_DATA_STORE_STORAGE_KEY,
   getProfiles,
 } from "./util.js";
 
@@ -74,30 +73,18 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
 });
 
 chrome.storage.onChanged.addListener((changes, namespace) => {
-  const relMeHrefStorageChange = changes[REL_ME_HREF_DATA_STORE_STORAGE_KEY];
+  const relMeHrefStorageChange = changes[getRelMeHrefDataStore.storageKey];
   if (!relMeHrefStorageChange) {
     return;
   }
 
-  /**
-   * @type {import("./util.js").RelMeHrefDataStore}
-   */
-  let oldRelMeHrefDataStore;
-  try {
-    oldRelMeHrefDataStore = new Map(relMeHrefStorageChange.oldValue);
-  } catch (err) {
-    oldRelMeHrefDataStore = new Map();
-  }
+  const oldRelMeHrefDataStore = getRelMeHrefDataStore.parse(
+    relMeHrefStorageChange.oldValue
+  );
 
-  /**
-   * @type {import("./util.js").RelMeHrefDataStore}
-   */
-  let newRelMeHrefDataStore;
-  try {
-    newRelMeHrefDataStore = new Map(relMeHrefStorageChange.newValue);
-  } catch (err) {
-    newRelMeHrefDataStore = new Map();
-  }
+  const newRelMeHrefDataStore = getRelMeHrefDataStore.parse(
+    relMeHrefStorageChange.newValue
+  );
 
   const oldProfiles = getProfiles(oldRelMeHrefDataStore);
   const newProfiles = getProfiles(newRelMeHrefDataStore);
