@@ -1,23 +1,11 @@
-import { getDisplayHref, getProfiles, getRelMeHrefDataStore } from "./util.js";
+import {
+  getDisplayHref,
+  getIconState,
+  getProfiles,
+  getRelMeHrefDataStore,
+} from "./util.js";
 
-chrome.action.setIcon({ path: "icon-inactive.png" });
-
-// await getRelMeHrefDataStore((innerRelMeHrefDataStore) => {
-//   const test = innerRelMeHrefDataStore.get("https://mastodon.social/@tvler");
-//   if (!test) {
-//     return;
-//   }
-
-//   console.log(new Intl.DateTimeFormat().format(test.viewedAt));
-
-//   console.log(
-//     new Intl.DateTimeFormat().format(test.viewedAt - 1000 * 60 * 60 * 24)
-//   );
-
-//   test.viewedAt = test.viewedAt - 1000 * 60 * 60 * 24;
-
-//   return innerRelMeHrefDataStore;
-// });
+getIconState(() => "off");
 
 /**
  * @type {import("./util.js").RelMeHrefDataStore | undefined}
@@ -98,7 +86,6 @@ if (relMeHrefDataStore) {
     if (previousItemWasDayBefore) {
       const dayRow = document.createElement("p");
       dayRow.style.fontSize = "13px";
-      // dayRow.style.marginLeft = "74px";
       dayRow.style.color = "#7b7b7b";
       dayRow.style.flexShrink = "0";
       dayRow.appendChild(

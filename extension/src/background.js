@@ -71,25 +71,3 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
     );
   });
 });
-
-chrome.storage.onChanged.addListener((changes, namespace) => {
-  const relMeHrefStorageChange = changes[getRelMeHrefDataStore.storageKey];
-  if (!relMeHrefStorageChange) {
-    return;
-  }
-
-  const oldRelMeHrefDataStore = getRelMeHrefDataStore.parse(
-    relMeHrefStorageChange.oldValue
-  );
-
-  const newRelMeHrefDataStore = getRelMeHrefDataStore.parse(
-    relMeHrefStorageChange.newValue
-  );
-
-  const oldProfiles = getProfiles(oldRelMeHrefDataStore);
-  const newProfiles = getProfiles(newRelMeHrefDataStore);
-
-  if (oldProfiles.size !== newProfiles.size) {
-    chrome.action.setIcon({ path: "icon-active.png" });
-  }
-});

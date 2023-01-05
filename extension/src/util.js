@@ -49,70 +49,34 @@ export function getIsUrlHttpOrHttps(uncheckedUrl) {
 }
 
 /**
- * @type {<T>(args: {
- *   parse(storageData: any): T
- *   serialize(data: T): any
- *   storageKey: string
- * }) => ({
- *   storageKey: string
- *   parse(storageData: any): T
- *   (cb: (data: T) => (void | T)): Promise<void>}
- * )}
+ * @param {RelMeHrefDataStore} relMeHrefDataStore
+ * @returns {Map<string, {profileData: Profile;} & RelMeHrefDataStoreValue>}
  */
-export function storageFactory(args) {
-  let lastDataPromise = Promise.resolve();
-
+export function getProfiles(relMeHrefDataStore) {
   /**
-   * @param {(data: ReturnType<typeof args.parse>) => (void | ReturnType<typeof args.parse>)} cb
-   * @returns {Promise<void>}
+   * @type {Map<string, { profileData: Profile } & RelMeHrefDataStoreValue>}
    */
-  function getter(cb) {
-    const oldLastDataPromise = lastDataPromise;
-    lastDataPromise = new Promise((res) => {
-      oldLastDataPromise.then(async () => {
-        try {
-          const data = args.parse(
-            (await chrome.storage.local.get(args.storageKey))?.[args.storageKey]
-          );
+  const profiles = new Map();
 
-          const cbResult = cb(data);
-
-          if (cbResult) {
-            await chrome.storage.local.set({
-              [args.storageKey]: args.serialize(cbResult),
-            });
-          }
-        } catch (err) {
-          // Nothing
-        }
-
-        res();
-      });
-    });
-
-    return lastDataPromise;
-  }
-  getter.storageKey = args.storageKey;
-  getter.parse = args.parse;
-  return getter;
-}
-
-export const getRelMeHrefDataStore = storageFactory({
-  storageKey: "rel-me-href-data-store-1",
-  parse(storageData) {
-    /** @type {RelMeHrefDataStore} */
-    let relMeHrefDataStore;
-    try {
-      relMeHrefDataStore = new Map(storageData);
-    } catch (err) {
-      relMeHrefDataStore = new Map();
+  for (const relMeHrefData of Array.from(
+    relMeHrefDataStore.values()
+  ).reverse()) {
+    if (relMeHrefData.profileData.type !== "profile") {
+      continue;
     }
-    return relMeHrefDataStore;
-  },
-  serialize(relMeHrefDataStore) {
-    return Array.from(relMeHrefDataStore.entries());
-  },
-});
+    profiles.set(relMeHrefData.profileData.profileUrl, {
+      profileData: {
+        type: relMeHrefData.profileData.type,
+        profileUrl: relMeHrefData.profileData.profileUrl,
+      },
+      websiteUrl: relMeHrefData.websiteUrl,
+      viewedAt: relMeHrefData.viewedAt,
+      relMeHref: relMeHrefData.relMeHref,
+    });
+  }
+
+  return profiles;
+}
 
 /**
  * @param {string} href
@@ -266,34 +230,102 @@ export function getRelativeTime(ms) {
 }
 
 /**
- * @param {RelMeHrefDataStore} relMeHrefDataStore
- * @returns {Map<string, {profileData: Profile;} & RelMeHrefDataStoreValue>}
+ * @type {<T>(args: {
+ *   parse(storageData: any): T
+ *   serialize(data: T): any
+ *   storageKey: string
+ *   onChange?(args: {prev: T, curr: T}): (void | Promise<void>)
+ * }) => ({
+ *   storageKey: string
+ *   parse(storageData: any): T
+ *   (cb: (data: Readonly<T>) => (void | T)): Promise<void>}
+ * )}
  */
-export function getProfiles(relMeHrefDataStore) {
+export function storageFactory(args) {
+  let lastDataPromise = Promise.resolve();
+
   /**
-   * @type {Map<string, { profileData: Profile } & RelMeHrefDataStoreValue>}
+   * @param {(data: ReturnType<typeof args.parse>) => (void | ReturnType<typeof args.parse>)} cb
+   * @returns {Promise<void>}
    */
-  const profiles = new Map();
+  function getter(cb) {
+    const oldLastDataPromise = lastDataPromise;
+    lastDataPromise = new Promise((res) => {
+      oldLastDataPromise.then(async () => {
+        try {
+          const storageData = (
+            await chrome.storage.local.get(args.storageKey)
+          )?.[args.storageKey];
 
-  for (const relMeHrefData of Array.from(
-    relMeHrefDataStore.values()
-  ).reverse()) {
-    if (relMeHrefData.profileData.type !== "profile") {
-      continue;
-    }
-    profiles.set(relMeHrefData.profileData.profileUrl, {
-      profileData: {
-        type: relMeHrefData.profileData.type,
-        profileUrl: relMeHrefData.profileData.profileUrl,
-      },
-      websiteUrl: relMeHrefData.websiteUrl,
-      viewedAt: relMeHrefData.viewedAt,
-      relMeHref: relMeHrefData.relMeHref,
+          const data = args.parse(storageData);
+
+          const cbResult = cb(data);
+
+          if (cbResult) {
+            await chrome.storage.local.set({
+              [args.storageKey]: args.serialize(cbResult),
+            });
+            await args.onChange?.({
+              prev: args.parse(storageData),
+              curr: cbResult,
+            });
+          }
+        } catch (err) {
+          // Nothing
+        }
+
+        res();
+      });
     });
-  }
 
-  return profiles;
+    return lastDataPromise;
+  }
+  getter.storageKey = args.storageKey;
+  getter.parse = args.parse;
+  return getter;
 }
+
+export const getIconState = storageFactory({
+  storageKey: "icon-state-1",
+  parse(storageData) {
+    /** @type {'on' | 'off'} */
+    const iconState = storageData === "on" ? "on" : "off";
+    return iconState;
+  },
+  serialize(iconState) {
+    return iconState;
+  },
+  onChange({ prev, curr }) {
+    const path = curr === "on" ? "icon-active.png" : "icon-inactive.png";
+    chrome.action.setIcon({
+      path: path,
+    });
+  },
+});
+
+export const getRelMeHrefDataStore = storageFactory({
+  storageKey: "rel-me-href-data-store-2",
+  parse(storageData) {
+    /** @type {RelMeHrefDataStore} */
+    let relMeHrefDataStore;
+    try {
+      relMeHrefDataStore = new Map(storageData);
+    } catch (err) {
+      relMeHrefDataStore = new Map();
+    }
+    return relMeHrefDataStore;
+  },
+  serialize(relMeHrefDataStore) {
+    return Array.from(relMeHrefDataStore.entries());
+  },
+  async onChange({ prev, curr }) {
+    const prevProfiles = getProfiles(prev);
+    const currrofiles = getProfiles(curr);
+    if (prevProfiles.size !== currrofiles.size) {
+      getIconState(() => "on");
+    }
+  },
+});
 
 /**
  * Test the safe storage
