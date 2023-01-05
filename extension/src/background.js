@@ -2,7 +2,7 @@ import {
   getUncachedProfileData,
   getRelMeHrefDataStore,
   SEND_REL_ME_HREF,
-  getProfiles,
+  getIconState,
 } from "./util.js";
 
 chrome.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
@@ -55,19 +55,28 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
     return relMeHrefDataStore;
   });
 
-  await getRelMeHrefDataStore((profiles) => {
-    console.table(
-      Object.fromEntries(
-        Array.from(profiles.entries()).map(([key, val]) => {
-          return [
-            key,
-            val.profileData.type === "profile"
-              ? val.profileData.profileUrl
-              : val.profileData.type,
-          ];
-        })
-      ),
-      ["profileData"]
-    );
-  });
+  // getRelMeHrefDataStore((profiles) => {
+  //   console.table(
+  //     Object.fromEntries(
+  //       Array.from(profiles.entries()).map(([key, val]) => {
+  //         return [
+  //           key,
+  //           val.profileData.type === "profile"
+  //             ? val.profileData.profileUrl
+  //             : val.profileData.type,
+  //         ];
+  //       })
+  //     ),
+  //     ["profileData"]
+  //   );
+  // });
+});
+
+chrome.runtime.onInstalled.addListener(() => {
+  getIconState(() => "on");
+});
+
+chrome.runtime.onStartup.addListener(() => {
+  // Trigger an onChange to set the correct icon
+  getIconState((iconState) => iconState);
 });

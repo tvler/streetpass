@@ -17,6 +17,6 @@
   "action": {
     "default_popup": "popup.html",
     "default_title": "StreetPass",
-    "default_icon": "icon-active.png"
+    "default_icon": "icon-inactive.png"
   }
 }
