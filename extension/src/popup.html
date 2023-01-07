@@ -5,18 +5,36 @@
   </head>
   <body>
     <div
+      id="root"
       style="
+        position: relative;
         width: 350px;
+        min-height: 600px;
         display: flex;
         flex-direction: column;
-        gap: 8px;
-        padding-block-start: 6px;
-        padding-block-end: 18px;
+        gap: 18px;
       "
     >
-      <h1 style="padding-inline: 10px; font-size: 18px; color: #444">
-        StreetPass
-      </h1>
+      <div style="display: flex; flex-direction: column; padding-top: 9px">
+        <img
+          src="icon128.png"
+          width="48"
+          height="48"
+          style="align-self: center"
+        />
+
+        <h1
+          style="
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+            line-height: 1.21;
+            align-self: center;
+          "
+        >
+          StreetPass
+        </h1>
+      </div>
 
       <div
         id="profile-list"
@@ -24,10 +42,14 @@
           display: flex;
           flex-direction: column;
           gap: 18px;
-          padding-inline: 10px;
+          padding-inline: 12px;
+          font-size: 13px;
+          line-height: 1.45;
+          padding-block-end: 18px;
         "
       ></div>
     </div>
+
     <script type="module" src="popup.js"></script>
   </body>
 </html>
