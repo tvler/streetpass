@@ -7,5 +7,7 @@
 - https://www.presscheck.org/journalists
 
 - marketing site
-- banner images
-- new screenshots
+
+good screenshot sites
+- http://www.herethat.com/
+- https://www.newrafael.com/websites/
