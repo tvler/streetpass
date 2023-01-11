@@ -9,4 +9,3 @@
 - marketing site
 - banner images
 - new screenshots
-- "+2" extension banner text
