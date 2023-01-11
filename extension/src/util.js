@@ -295,6 +295,9 @@ export const getIconState = storageFactory({
       path: path,
     });
 
+    chrome.action.setBadgeBackgroundColor({ color: "#9f99f5" });
+    // chrome.action.setBadgeBackgroundColor({ color: "#5F55EC" });
+
     chrome.action.setBadgeText({ text: badgeText });
   },
 });
