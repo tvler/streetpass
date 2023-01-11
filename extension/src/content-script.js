@@ -15,7 +15,6 @@ function sendRelMeHrefs() {
     const relMeHref = element.getAttribute("href");
     if (relMeHref && !relMeHrefs.has(relMeHref)) {
       relMeHrefs.add(relMeHref);
-      console.log("sending", relMeHref, currentUrlWithNoHash);
 
       /** @type {import('./util.js').SendRelMeHrefPayload} */
       const sendRelMeHrefPayload = {

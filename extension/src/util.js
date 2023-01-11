@@ -255,7 +255,7 @@ export function storageFactory(args) {
 
           const cbResult = cb(data);
 
-          if (cbResult) {
+          if (cbResult !== undefined) {
             await chrome.storage.local.set({
               [args.storageKey]: args.serialize(cbResult),
             });
@@ -277,25 +277,30 @@ export function storageFactory(args) {
 }
 
 export const getIconState = storageFactory({
-  storageKey: "icon-state-1",
+  storageKey: "icon-state-3",
   parse(storageData) {
-    /** @type {'on' | 'off'} */
-    const iconState = storageData === "off" ? "off" : "on";
+    /** @type {{state: 'on' | 'off', unreadCount?: number}} */
+    const iconState = storageData ?? { state: "off" };
     return iconState;
   },
   serialize(iconState) {
     return iconState;
   },
   onChange({ prev, curr }) {
-    const path = curr === "off" ? "action-inactive.png" : "action-active.png";
+    const path =
+      curr.state === "off" ? "action-inactive.png" : "action-active.png";
+    const badgeText = curr.unreadCount ? `+${curr.unreadCount}` : "";
+
     chrome.action.setIcon({
       path: path,
     });
+
+    chrome.action.setBadgeText({ text: badgeText });
   },
 });
 
 export const getRelMeHrefDataStore = storageFactory({
-  storageKey: "rel-me-href-data-store-2",
+  storageKey: "rel-me-href-data-store-3",
   parse(storageData) {
     /** @type {RelMeHrefDataStore} */
     let relMeHrefDataStore;
@@ -311,9 +316,14 @@ export const getRelMeHrefDataStore = storageFactory({
   },
   async onChange({ prev, curr }) {
     const prevProfiles = getProfiles(prev);
-    const currrofiles = getProfiles(curr);
-    if (prevProfiles.size !== currrofiles.size) {
-      getIconState(() => "on");
+    const currProfiles = getProfiles(curr);
+    if (currProfiles.size > prevProfiles.size) {
+      getIconState((iconState) => ({
+        state: "on",
+        unreadCount:
+          (iconState.unreadCount ?? 0) +
+          (currProfiles.size - prevProfiles.size),
+      }));
     }
   },
 });

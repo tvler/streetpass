@@ -5,7 +5,9 @@ import {
   getRelMeHrefDataStore,
 } from "./util.js";
 
-getIconState(() => "off");
+getIconState(() => {
+  return { state: "off" };
+});
 
 /**
  * @type {import("./util.js").RelMeHrefDataStore | undefined}
@@ -23,13 +25,13 @@ if (relMeHrefDataStore) {
     userCount.style.position = "absolute";
     userCount.style.top = "12px";
     userCount.style.right = "12px";
-    userCount.style.paddingBlock = "3px";
-    userCount.style.paddingInline = "6px";
+    userCount.style.paddingBlock = "2px";
+    userCount.style.paddingInline = "5px";
     userCount.style.backgroundColor = "#EFEDFC";
     userCount.style.borderRadius = "6px";
     userCount.style.color = "#5F55EC";
     userCount.style.fontWeight = "500";
-    userCount.style.fontSize = "12px";
+    userCount.style.fontSize = "11px";
     userCount.style.lineHeight = "1.3";
     userCount.appendChild(document.createTextNode(`${values.length}`));
     document.querySelector("#root")?.appendChild(userCount);

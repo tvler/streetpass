@@ -73,9 +73,11 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
 });
 
 chrome.runtime.onInstalled.addListener((details) => {
+  chrome.action.setBadgeBackgroundColor({ color: "#9f99f5" });
+
   getIconState((iconState) => {
     if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
-      return "on";
+      return { state: "on", unreadCount: iconState.unreadCount };
     }
     return iconState;
   });
