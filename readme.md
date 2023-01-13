@@ -1,4 +1,4 @@
-<img width="520" alt="Screenshot 2023-01-03 at 9 53 28 PM" src="https://user-images.githubusercontent.com/4934193/210492726-c8f29135-256a-4c1a-a1b7-9b3d0f64dbc8.png">
+<img width="560" alt="screen2" src="https://user-images.githubusercontent.com/4934193/211939099-867fd704-2d28-401f-a856-f869433edb04.png">
 
 _Coming soon to chrome web store._
 
