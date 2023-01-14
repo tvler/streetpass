@@ -3,7 +3,7 @@ import Image from "next/image";
 import icon from "../public/icon256.png";
 import webstore from "../public/webstore.png";
 import screen1 from "../public/screen1.png";
-import screen2 from "../public/screen2.png";
+import screen3 from "../public/screen3.png";
 import Head from "next/head";
 
 export default function Page() {
@@ -105,15 +105,15 @@ export default function Page() {
           quality={100}
           src={screen1}
           alt=""
-          width={1280}
+          width={1296}
           className="mt-8 w-full max-w-xl"
         />
 
         <Image
           quality={100}
-          src={screen2}
+          src={screen3}
           alt=""
-          width={1280}
+          width={1296}
           className="mt-5 w-full max-w-xl"
         />
 
