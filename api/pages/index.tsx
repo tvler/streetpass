@@ -118,8 +118,11 @@ export default function Page() {
         />
 
         <div className="w-full max-w-lg font-medium">
-          <p className="mt-8 text-center">
-            Made by <a href="">Tyler</a>
+          <p className="mt-8 mb-8 text-center">
+            Made by{" "}
+            <a className="text-purple underline" href="https://tylerdeitz.com/">
+              Tyler
+            </a>
           </p>
         </div>
       </div>
