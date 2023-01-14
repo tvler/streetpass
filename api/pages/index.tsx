@@ -29,7 +29,7 @@ export default function Page() {
             height={85}
           />
 
-          <h1 className="text-3xl font-semibold">StreetPass</h1>
+          <h1 className="-mt-1.5 text-3xl font-semibold">StreetPass</h1>
 
           <p className="text-md text-center font-semibold leading-5 text-purple">
             Find your people
