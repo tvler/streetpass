@@ -1,6 +1,6 @@
-<img width="560" alt="" src="./api/public.screen3.png">
+<img width="560" alt="" src="https://raw.githubusercontent.com/tvler/streetpass/main/api/public/screen3.png">
 
-_Coming soon to chrome web store._
+[Download on Chrome Web Store](https://chrome.google.com/webstore/detail/streetpass-for-mastodon/fphjfedjhinpnjblomfebcjjpdpakhhn)
 
 # StreetPass for Mastodon
 
