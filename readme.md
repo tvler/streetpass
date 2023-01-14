@@ -1,4 +1,4 @@
-<img width="560" alt="screen2" src="https://user-images.githubusercontent.com/4934193/211939099-867fd704-2d28-401f-a856-f869433edb04.png">
+<img width="560" alt="" src="./api/public.screen3.png">
 
 _Coming soon to chrome web store._
 
