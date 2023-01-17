@@ -6,7 +6,8 @@
 - https://mastodon.social/@DLX
 - https://www.presscheck.org/journalists
 
-- marketing site
+- cross browser https://akoskm.com/building-a-cross-browser-extension#heading-bundlers
+- https://akoskm.com/how-to-build-cross-browser-extensions-react-typescript-tailwindcss-vite
 
 good screenshot sites
 - http://www.herethat.com/
