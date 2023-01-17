@@ -1,3 +1,5 @@
+import browser from "webextension-polyfill";
+
 export const SEND_REL_ME_HREF = "SEND_REL_ME_HREF";
 
 /**
@@ -248,7 +250,7 @@ export function storageFactory(args) {
       oldLastDataPromise.then(async () => {
         try {
           const storageData = (
-            await chrome.storage.local.get(args.storageKey)
+            await browser.storage.local.get(args.storageKey)
           )?.[args.storageKey];
 
           const data = args.parse(storageData);
@@ -256,7 +258,7 @@ export function storageFactory(args) {
           const cbResult = cb(data);
 
           if (cbResult !== undefined) {
-            await chrome.storage.local.set({
+            await browser.storage.local.set({
               [args.storageKey]: args.serialize(cbResult),
             });
             await args.onChange?.({
@@ -291,14 +293,14 @@ export const getIconState = storageFactory({
       curr.state === "off" ? "action-inactive.png" : "action-active.png";
     const badgeText = curr.unreadCount ? `+${curr.unreadCount}` : "";
 
-    chrome.action.setIcon({
+    browser.action.setIcon({
       path: path,
     });
 
-    chrome.action.setBadgeBackgroundColor({ color: "#9f99f5" });
-    // chrome.action.setBadgeBackgroundColor({ color: "#5F55EC" });
+    browser.action.setBadgeBackgroundColor({ color: "#9f99f5" });
+    // browser.action.setBadgeBackgroundColor({ color: "#5F55EC" });
 
-    chrome.action.setBadgeText({ text: badgeText });
+    browser.action.setBadgeText({ text: badgeText });
   },
 });
 

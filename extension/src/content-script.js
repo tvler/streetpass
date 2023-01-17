@@ -1,3 +1,7 @@
+/* eslint-env browser */
+
+import browser from "webextension-polyfill";
+
 function getCurrentUrlWithNoHash() {
   const url = new URL(window.location.toString());
   url.hash = "";
@@ -23,7 +27,7 @@ function sendRelMeHrefs() {
           relMeHref: relMeHref,
         },
       };
-      chrome.runtime.sendMessage(sendRelMeHrefPayload);
+      browser.runtime.sendMessage(sendRelMeHrefPayload);
     }
   }
 }

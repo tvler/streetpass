@@ -12,3 +12,6 @@
 good screenshot sites
 - http://www.herethat.com/
 - https://www.newrafael.com/websites/
+
+todo
+- check if if (details.reason === "install") { works

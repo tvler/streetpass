@@ -1,3 +1,4 @@
+import browser from "webextension-polyfill";
 import {
   getUncachedProfileData,
   getRelMeHrefDataStore,
@@ -5,7 +6,7 @@ import {
   getIconState,
 } from "./util.js";
 
-chrome.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
+browser.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
   if (
     !msg ||
     typeof msg !== "object" ||
@@ -72,16 +73,16 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
   // });
 });
 
-chrome.runtime.onInstalled.addListener((details) => {
+browser.runtime.onInstalled.addListener((details) => {
   getIconState((iconState) => {
-    if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
+    if (details.reason === "install") {
       return { state: "on", unreadCount: iconState.unreadCount };
     }
     return iconState;
   });
 });
 
-chrome.runtime.onStartup.addListener(() => {
+browser.runtime.onStartup.addListener(() => {
   // Trigger an onChange to set the correct icon
   getIconState((iconState) => iconState);
 });
