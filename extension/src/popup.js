@@ -67,7 +67,7 @@ if (relMeHrefDataStore) {
       continue;
     }
     const prevRelMeHrefData = values[i - 1];
-    const prevRelMeHrefDate = !!prevRelMeHrefData
+    const prevRelMeHrefDate = prevRelMeHrefData
       ? new Date(prevRelMeHrefData.viewedAt).getDate()
       : new Date().getDate();
     const previousItemWasDayBefore =
