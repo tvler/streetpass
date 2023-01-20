@@ -1,3 +1,4 @@
+import path from "node:path";
 import { defineConfig } from "vite";
 
 export default defineConfig({
@@ -5,11 +6,14 @@ export default defineConfig({
     target: "esnext",
     emptyOutDir: true,
     lib: {
-      entry: ["src/background.js", "src/popup.js"],
+      entry: ["src/background.js"],
       formats: ["es"],
     },
     minify: false,
     rollupOptions: {
+      input: {
+        popup: path.resolve(__dirname, "src/popup.html"),
+      },
       output: {
         preserveModules: true,
         preserveModulesRoot: "src",
