@@ -5,6 +5,7 @@ import {
   SEND_REL_ME_HREF,
   getIconState,
 } from "./util.js";
+import type { SendRelMeHrefPayload } from "./util.js";
 
 browser.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
   if (
@@ -16,15 +17,10 @@ browser.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
     return;
   }
 
-  /**
-   * @type {import('./util.js').SendRelMeHrefPayload['SEND_REL_ME_HREF']}
-   */
-  const sendRelMeHrefPayload = msg[SEND_REL_ME_HREF];
+  const sendRelMeHrefPayload: SendRelMeHrefPayload["SEND_REL_ME_HREF"] =
+    msg[SEND_REL_ME_HREF];
 
-  /**
-   * @type {boolean | undefined}
-   */
-  let hasExistingRelMeHrefData;
+  let hasExistingRelMeHrefData: boolean | undefined;
   await getRelMeHrefDataStore((relMeHrefDataStore) => {
     hasExistingRelMeHrefData = relMeHrefDataStore.has(
       sendRelMeHrefPayload.relMeHref
@@ -34,10 +30,7 @@ browser.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
     return;
   }
 
-  /**
-   * @type {import("./util.js").ProfileData | undefined}
-   */
-  let profileData = await getUncachedProfileData(
+  const profileData = await getUncachedProfileData(
     sendRelMeHrefPayload.relMeHref
   );
 

@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es2020",
-    "lib": ["es2020", "DOM", "DOM.Iterable"],
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "allowJs": true,
     "skipLibCheck": true,
     "checkJs": true,
@@ -14,7 +14,8 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "noEmit": true,
-    "noUncheckedIndexedAccess": true
+    "noUncheckedIndexedAccess": true,
+    "noImplicitAny": true
   },
   "include": ["./src/**/*"],
   "exclude": ["node_modules"]

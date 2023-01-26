@@ -5,15 +5,13 @@ import {
   getProfiles,
   getRelMeHrefDataStore,
 } from "./util.js";
+import type { RelMeHrefDataStore } from "./util.js";
 
 getIconState(() => {
   return { state: "off" };
 });
 
-/**
- * @type {import("./util.js").RelMeHrefDataStore | undefined}
- */
-let relMeHrefDataStore;
+let relMeHrefDataStore: RelMeHrefDataStore | undefined;
 await getRelMeHrefDataStore((innerRelMeHrefDataStore) => {
   relMeHrefDataStore = innerRelMeHrefDataStore;
 });

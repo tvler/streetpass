@@ -1,5 +1,3 @@
-import browser from "webextension-polyfill";
-
 export const SEND_REL_ME_HREF = "SEND_REL_ME_HREF";
 
 /**

@@ -1,5 +1,7 @@
 /* eslint-env browser */
 
+import type { SendRelMeHrefPayload } from "./util.js";
+
 function getCurrentUrlWithNoHash() {
   const url = new URL(window.location.toString());
   url.hash = "";
@@ -7,8 +9,7 @@ function getCurrentUrlWithNoHash() {
 }
 
 let currentUrlWithNoHash = getCurrentUrlWithNoHash();
-/** @type {Set<string>} */
-const relMeHrefs = new Set();
+const relMeHrefs: Set<string> = new Set();
 
 function sendRelMeHrefs() {
   const elements = document.querySelectorAll(":is(link, a)[rel~=me]");
@@ -18,8 +19,7 @@ function sendRelMeHrefs() {
     if (relMeHref && !relMeHrefs.has(relMeHref)) {
       relMeHrefs.add(relMeHref);
 
-      /** @type {import('./util.js').SendRelMeHrefPayload} */
-      const sendRelMeHrefPayload = {
+      const sendRelMeHrefPayload: SendRelMeHrefPayload = {
         SEND_REL_ME_HREF: {
           tabUrl: currentUrlWithNoHash,
           relMeHref: relMeHref,
