@@ -290,7 +290,7 @@ export const getIconState = storageFactory({
   },
   onChange({ prev, curr }) {
     const path =
-      curr.state === "off" ? "action-inactive.png" : "action-active.png";
+      curr.state === "off" ? "/action-inactive.png" : "/action-active.png";
     const badgeText = curr.unreadCount ? `+${curr.unreadCount}` : "";
 
     browser.action.setIcon({

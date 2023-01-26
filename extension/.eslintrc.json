@@ -15,5 +15,8 @@
     "browser": true,
     "node": true
   },
+  "globals": {
+    "browser": "readonly"
+  },
   "ignorePatterns": ["dist/**/*"]
 }

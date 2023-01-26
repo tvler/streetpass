@@ -1,4 +1,5 @@
 - good ones to check 
+- https://gnu.tiflolinux.org/avefenix
 - https://themarkup.org/people/dan-phiffer
 - https://tylerdeitz.com/
 - https://www.washingtonpost.com/people/pranshu-verma/

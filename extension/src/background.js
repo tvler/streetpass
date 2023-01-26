@@ -1,4 +1,4 @@
-import browser from "webextension-polyfill";
+import "webextension-polyfill";
 import {
   getUncachedProfileData,
   getRelMeHrefDataStore,
