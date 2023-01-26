@@ -1,44 +1,43 @@
 export const SEND_REL_ME_HREF = "SEND_REL_ME_HREF";
 
-/**
- * @typedef {{ [SEND_REL_ME_HREF]: {relMeHref: string, tabUrl: string}}} SendRelMeHrefPayload
- * @typedef {{ type: 'profile', profileUrl: string }} Profile
- * @typedef {{ type: 'notProfile' }} NotProfile
- * @typedef {Profile | NotProfile} ProfileData
- * @typedef {{
- *   profileData: ProfileData,
- *   websiteUrl: string,
- *   viewedAt: number,
- *   relMeHref: string,
- * }} RelMeHrefDataStoreValue
- * @typedef {Map<string, RelMeHrefDataStoreValue>} RelMeHrefDataStore
- * @typedef {{
- *   subject: string,
- *   aliases?: Array<string>
- *   properties?: Record<string, string>
- *   links?: Array<{
- *     rel: string
- *     type?: string
- *     href?: string
- *     titles?: Record<string, string>
- *     properties?: Record<string, string>
- *   }>
- * }} Webfinger https://webfinger.net/spec/
- */
+export type SendRelMeHrefPayload = {
+  [SEND_REL_ME_HREF]: { relMeHref: string; tabUrl: string };
+};
 
-/**
- * @param {string | undefined} uncheckedUrl
- * @returns {boolean}
- */
-export function getIsUrlHttpOrHttps(uncheckedUrl) {
+type Profile = { type: "profile"; profileUrl: string };
+
+type NotProfile = { type: "notProfile" };
+
+type ProfileData = Profile | NotProfile;
+
+type RelMeHrefDataStoreValue = {
+  profileData: ProfileData;
+  websiteUrl: string;
+  viewedAt: number;
+  relMeHref: string;
+};
+
+export type RelMeHrefDataStore = Map<string, RelMeHrefDataStoreValue>;
+
+type Webfinger = {
+  subject: string;
+  aliases?: Array<string>;
+  properties?: Record<string, string>;
+  links?: Array<{
+    rel: string;
+    type?: string;
+    href?: string;
+    titles?: Record<string, string>;
+    properties?: Record<string, string>;
+  }>;
+};
+
+export function getIsUrlHttpOrHttps(uncheckedUrl: string | undefined): boolean {
   if (!uncheckedUrl) {
     return false;
   }
 
-  /**
-   * @type {URL}
-   */
-  let url;
+  let url: URL;
   try {
     url = new URL(uncheckedUrl);
   } catch (err) {
@@ -48,15 +47,13 @@ export function getIsUrlHttpOrHttps(uncheckedUrl) {
   return url.protocol === "http:" || url.protocol === "https:";
 }
 
-/**
- * @param {RelMeHrefDataStore} relMeHrefDataStore
- * @returns {Map<string, {profileData: Profile;} & RelMeHrefDataStoreValue>}
- */
-export function getProfiles(relMeHrefDataStore) {
-  /**
-   * @type {Map<string, { profileData: Profile } & RelMeHrefDataStoreValue>}
-   */
-  const profiles = new Map();
+export function getProfiles(
+  relMeHrefDataStore: RelMeHrefDataStore
+): Map<string, { profileData: Profile } & RelMeHrefDataStoreValue> {
+  const profiles: Map<
+    string,
+    { profileData: Profile } & RelMeHrefDataStoreValue
+  > = new Map();
 
   for (const relMeHrefData of Array.from(
     relMeHrefDataStore.values()
@@ -78,10 +75,7 @@ export function getProfiles(relMeHrefDataStore) {
   return profiles;
 }
 
-/**
- * @param {string} href
- */
-function getIsRelWebfingerProfilePageRel(href) {
+function getIsRelWebfingerProfilePageRel(href: string) {
   const webFingerProfilePageRelWithoutProtocol =
     "//webfinger.net/rel/profile-page";
 
@@ -91,11 +85,9 @@ function getIsRelWebfingerProfilePageRel(href) {
   );
 }
 
-/**
- * @param {string} href
- * @returns {Promise<ProfileData>}
- */
-export async function getUncachedProfileData(href) {
+export async function getUncachedProfileData(
+  href: string
+): Promise<ProfileData> {
   try {
     if (!getIsUrlHttpOrHttps(href)) {
       throw new Error();
@@ -117,10 +109,7 @@ export async function getUncachedProfileData(href) {
       throw new Error();
     }
 
-    /**
-     * @type {Webfinger}
-     */
-    const webfinger = await webfingerResp.json();
+    const webfinger: Webfinger = await webfingerResp.json();
     for (const webfingerLink of webfinger.links ?? []) {
       if (
         getIsRelWebfingerProfilePageRel(webfingerLink.rel) &&
@@ -139,15 +128,8 @@ export async function getUncachedProfileData(href) {
   return { type: "notProfile" };
 }
 
-/**
- * @param {string} href
- * @returns {string}
- */
-export function getDisplayHref(href) {
-  /**
-   * @type {URL}
-   */
-  let url;
+export function getDisplayHref(href: string): string {
+  let url: URL;
   try {
     url = new URL(href);
   } catch (err) {
@@ -173,73 +155,14 @@ export function getDisplayHref(href) {
   return strippedUrl;
 }
 
-/**
- * @param {number} ms
- * @returns {string}
- */
-export function getRelativeTime(ms) {
-  /**
-   * @type {Map<Intl.RelativeTimeFormatUnit, number>}
-   */
-  const units = new Map([
-    ["year", 24 * 60 * 60 * 1000 * 365],
-    ["month", (24 * 60 * 60 * 1000 * 365) / 12],
-    ["day", 24 * 60 * 60 * 1000],
-    ["hour", 60 * 60 * 1000],
-  ]);
-
-  // ["minute", 60 * 1000],
-
-  var rtf = new Intl.RelativeTimeFormat("en", {
-    numeric: "always", // other values: "auto"
-    style: "short", // other values: "short" or "narrow"
-  });
-
-  /**
-   * @type {Intl.RelativeTimeFormatUnit}
-   */
-  let chosenUnit = "minute";
-  for (var [unit, unitValueMs] of units) {
-    if (Math.abs(ms) > unitValueMs) {
-      chosenUnit = unit;
-      break;
-    }
-  }
-
-  const parts = rtf.formatToParts(
-    -Math.round(ms / (units.get(chosenUnit) ?? 60 * 1000)),
-    chosenUnit
-  );
-
-  const stringStart = " ";
-  const stringEnd = ". ago";
-  let returnString = "";
-  for (const part of parts) {
-    let stringToAdd = part.value;
-    if (stringToAdd.startsWith(stringStart)) {
-      stringToAdd = stringToAdd.slice(stringStart.length);
-    }
-    if (stringToAdd.endsWith(stringEnd)) {
-      stringToAdd = stringToAdd.slice(0, -stringEnd.length);
-    }
-
-    returnString += stringToAdd;
-  }
-
-  return returnString;
-}
-
-/**
- * @type {<T>(args: {
- *   parse(storageData: any): T
- *   serialize(data: T): any
- *   storageKey: string
- *   onChange?(args: {prev: T, curr: T}): (void | Promise<void>)
- * }) => ({
- *   (cb: (data: Readonly<T>) => (void | T)): Promise<void>}
- * )}
- */
-export function storageFactory(args) {
+export function storageFactory<T>(args: {
+  parse(storageData: any): T;
+  serialize(data: T): any;
+  storageKey: string;
+  onChange?(args: { prev: T; curr: T }): void | Promise<void>;
+}): {
+  (cb: (data: Readonly<T>) => void | T): Promise<void>;
+} {
   let lastDataPromise = Promise.resolve();
 
   return (cb) => {
@@ -279,8 +202,8 @@ export function storageFactory(args) {
 export const getIconState = storageFactory({
   storageKey: "icon-state-3",
   parse(storageData) {
-    /** @type {{state: 'on' | 'off', unreadCount?: number}} */
-    const iconState = storageData ?? { state: "off" };
+    const iconState: { state: "on" | "off"; unreadCount?: number } =
+      storageData ?? { state: "off" };
     return iconState;
   },
   serialize(iconState) {
@@ -305,8 +228,7 @@ export const getIconState = storageFactory({
 export const getRelMeHrefDataStore = storageFactory({
   storageKey: "rel-me-href-data-store-3",
   parse(storageData) {
-    /** @type {RelMeHrefDataStore} */
-    let relMeHrefDataStore;
+    let relMeHrefDataStore: RelMeHrefDataStore;
     try {
       relMeHrefDataStore = new Map(storageData);
     } catch (err) {
@@ -338,8 +260,7 @@ export const getRelMeHrefDataStore = storageFactory({
 //   const getInc = storageFactory({
 //     storageKey: "inc2",
 //     parse(storageData) {
-//       /** @type {number} */
-//       let num;
+//       let num: number;
 //       if (typeof storageData === "number" && !isNaN(storageData)) {
 //         num = storageData;
 //       } else {
