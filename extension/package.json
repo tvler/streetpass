@@ -2,7 +2,8 @@
   "type": "module",
   "packageManager": "yarn@3.3.1",
   "scripts": {
-    "build": "tsc && vite build"
+    "build": "tsc && yarn build:chrome",
+    "build:chrome": "vite build --config vite.config.chrome.ts"
   },
   "devDependencies": {
     "@types/webextension-polyfill": "^0.10.0",

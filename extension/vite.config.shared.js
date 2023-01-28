@@ -1,11 +1,13 @@
 import path from "node:path";
-import { defineConfig } from "vite";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
 const webextensionPolyfillPathName = require.resolve("webextension-polyfill");
 
-export default defineConfig({
+/**
+ * @type {import('vite').UserConfig}
+ */
+export const sharedConfig = {
   build: {
     target: "esnext",
     emptyOutDir: true,
@@ -36,4 +38,15 @@ export default defineConfig({
       },
     },
   },
-});
+};
+
+/**
+ * @type {import('vite').UserConfig}
+ */
+export const chromeConfig = {
+  ...sharedConfig,
+  build: {
+    ...sharedConfig.build,
+    outDir: path.resolve(__dirname, "dist-chrome"),
+  },
+};

@@ -17,6 +17,6 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitAny": true
   },
-  "include": ["./src/**/*"],
-  "exclude": ["node_modules"]
+  "include": ["./**/*"],
+  "exclude": ["node_modules", "dist-chrome"]
 }
