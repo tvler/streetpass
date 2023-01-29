@@ -1,6 +1,8 @@
 import path from "node:path";
 import { createRequire } from "node:module";
+import url from "node:url";
 
+const dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
 const webextensionPolyfillPathName = require.resolve("webextension-polyfill");
 
@@ -24,9 +26,9 @@ export const sharedConfig = {
       preserveEntrySignatures: "strict",
       input: {
         "webextension-polyfill": webextensionPolyfillPathName,
-        popup: path.resolve(__dirname, "src/popup.html"),
-        background: path.resolve(__dirname, "src/background.ts"),
-        "content-script": path.resolve(__dirname, "src/content-script.ts"),
+        popup: path.resolve(dirname, "src/popup.html"),
+        background: path.resolve(dirname, "src/background.ts"),
+        "content-script": path.resolve(dirname, "src/content-script.ts"),
       },
       output: {
         minifyInternalExports: false,
@@ -47,6 +49,6 @@ export const chromeConfig = {
   ...sharedConfig,
   build: {
     ...sharedConfig.build,
-    outDir: path.resolve(__dirname, "dist-chrome"),
+    outDir: path.resolve(dirname, "dist-chrome"),
   },
 };
