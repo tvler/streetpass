@@ -19,5 +19,5 @@
   "globals": {
     "browser": "readonly"
   },
-  "ignorePatterns": ["dist/**/*"]
+  "ignorePatterns": ["dist-chrome/**/*", "dist-firefox/**/*"]
 }

@@ -2,8 +2,9 @@
   "type": "module",
   "packageManager": "yarn@3.3.1",
   "scripts": {
-    "build": "tsc && yarn build:chrome",
-    "build:chrome": "vite build --config vite.config.chrome.ts && node ./build-manifest-chrome.js"
+    "build": "tsc && yarn build:chrome && yarn build:firefox",
+    "build:chrome": "vite build --config vite.config.chrome.ts && node ./build-manifest-chrome.js",
+    "build:firefox": "vite build --config vite.config.firefox.ts && node ./build-manifest-firefox.js"
   },
   "devDependencies": {
     "@types/webextension-polyfill": "^0.10.0",
