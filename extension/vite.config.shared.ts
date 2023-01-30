@@ -23,17 +23,17 @@ export function getConfig(target: Target): UserConfig {
     input.push(path.resolve(dirname, "src/background-page-firefox.html"));
   }
 
+  function targets<Value>(
+    args: Record<Target, Value>
+  ): (typeof args)[keyof typeof args] {
+    return args[target];
+  }
+
   return {
     plugins: [
       {
         name: "build-manifest",
         generateBundle() {
-          function targets<Value>(
-            args: Record<Target, Value>
-          ): (typeof args)[keyof typeof args] {
-            return args[target];
-          }
-
           const manifest: Manifest.WebExtensionManifest = {
             manifest_version: targets({ chrome: 3, firefox: 2 }),
             name: "StreetPass for Mastodon",
@@ -94,10 +94,10 @@ export function getConfig(target: Target): UserConfig {
       },
     ],
     build: {
-      outDir: {
+      outDir: targets({
         firefox: path.resolve(dirname, "dist-firefox"),
         chrome: path.resolve(dirname, "dist-chrome"),
-      }[target],
+      }),
       target: "esnext",
       emptyOutDir: true,
       minify: false,

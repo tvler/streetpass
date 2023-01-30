@@ -16,9 +16,10 @@ document.querySelector("#root")?.addEventListener("click", (ev) => {
   const origin = target?.closest("a");
 
   if (origin && !!origin.href) {
-    window.requestAnimationFrame(() => {
+    // Need to pause before closing popup in firefox or else links will open in new window
+    window.setTimeout(() => {
       window.close();
-    });
+    }, 80);
   }
 });
 

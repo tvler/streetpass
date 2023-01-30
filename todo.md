@@ -16,4 +16,4 @@ good screenshot sites
 
 todo
 - check if if (details.reason === "install") { works
-- make src/popup.html compile path
+- tailwind and react
