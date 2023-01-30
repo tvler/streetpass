@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+@layer base {
+  :root {
+    @apply text-cool-black;
+
+    cursor: default;
+    -webkit-font-smoothing: antialiased;
+    font-size: 16px;
+  }
+
+  button,
+  [role="button"] {
+    cursor: default;
+  }
+}
+
+@layer utilities {
+  .break-word {
+    word-break: break-word;
+  }
+}

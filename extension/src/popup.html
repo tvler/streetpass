@@ -2,53 +2,22 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" type="text/css" href="normalize.css" />
-    <link rel="stylesheet" type="text/css" href="index.css" />
+    <link rel="stylesheet" type="text/css" href="popup.css" />
   </head>
   <body>
     <div
       id="root"
-      style="
-        position: relative;
-        width: 350px;
-        min-height: 600px;
-        display: flex;
-        flex-direction: column;
-        gap: 18px;
-      "
+      class="relative flex flex-col min-h-[600px] w-[350px] gap-18"
     >
-      <div style="display: flex; flex-direction: column; padding-top: 9px">
-        <img
-          src="/icon128.png"
-          width="48"
-          height="48"
-          style="align-self: center"
-        />
+      <div class="flex flex-col items-center pt-[9px]">
+        <img src="/icon128.png" width="48" height="48" />
 
-        <h1
-          style="
-            font-size: 14px;
-            color: #333;
-            font-weight: 500;
-            line-height: 1.21;
-            align-self: center;
-          "
-        >
-          StreetPass
-        </h1>
+        <h1 class="text-14 font-medium leading-[1.21]">StreetPass</h1>
       </div>
 
       <div
+        class="flex flex-col gap-18 px-12 text-13 leading-[1.45] pb-18"
         id="profile-list"
-        style="
-          display: flex;
-          flex-direction: column;
-          gap: 18px;
-          padding-inline: 12px;
-          font-size: 13px;
-          line-height: 1.45;
-          padding-block-end: 18px;
-        "
       ></div>
     </div>
 
