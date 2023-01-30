@@ -214,14 +214,15 @@ export const getIconState = storageFactory({
       curr.state === "off" ? "/action-inactive.png" : "/action-active.png";
     const badgeText = curr.unreadCount ? `+${curr.unreadCount}` : "";
 
-    browser.action.setIcon({
+    const browserAction = browser.action ?? browser.browserAction;
+    browserAction.setIcon({
       path: path,
     });
 
-    browser.action.setBadgeBackgroundColor({ color: "#9f99f5" });
-    // browser.action.setBadgeBackgroundColor({ color: "#5F55EC" });
+    browserAction.setBadgeBackgroundColor({ color: "#9f99f5" });
+    // browserAction.setBadgeBackgroundColor({ color: "#5F55EC" });
 
-    browser.action.setBadgeText({ text: badgeText });
+    browserAction.setBadgeText({ text: badgeText });
   },
 });
 

@@ -7,6 +7,21 @@ import {
 } from "./util.js";
 import type { RelMeHrefDataStore } from "./util.js";
 
+document.querySelector("#root")?.addEventListener("click", (ev) => {
+  if (!ev.target) {
+    return;
+  }
+  const target = ev.target as Element;
+
+  const origin = target?.closest("a");
+
+  if (origin && !!origin.href) {
+    window.requestAnimationFrame(() => {
+      window.close();
+    });
+  }
+});
+
 getIconState(() => {
   return { state: "off" };
 });
