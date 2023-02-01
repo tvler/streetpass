@@ -17,3 +17,4 @@ good screenshot sites
 todo
 - check if if (details.reason === "install") { works
 - tailwind and react
+- Firefox download button https://extensionworkshop.com/documentation/publish/promoting-your-extension/#promote-your-addon
