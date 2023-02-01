@@ -18,15 +18,15 @@ export default function Page() {
         <title>StreetPass for Mastodon</title>
       </Head>
 
-      <div className="flex flex-col items-center px-3 pt-8">
+      <div className="flex flex-col items-center px-3 pt-6">
         <div className="flex flex-col items-center">
           <Image
             quality={100}
             loading="eager"
             src={icon}
             alt=""
-            width={85}
-            height={85}
+            width={72}
+            height={72}
           />
 
           <h1 className="-mt-1.5 text-3xl font-semibold">StreetPass</h1>
