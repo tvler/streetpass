@@ -1,7 +1,8 @@
 /* eslint-disable react/no-unescaped-entities */
 import Image from "next/image";
 import icon from "../public/icon256.png";
-import webstore from "../public/webstore.png";
+import chrome from "../public/chrome.png";
+import firefox from "../public/firefox.png";
 import screen1 from "../public/screen1.png";
 import screen3 from "../public/screen3.png";
 import Head from "next/head";
@@ -38,28 +39,39 @@ export default function Page() {
           </p>
         </div>
 
-        <a
-          href="https://chrome.google.com/webstore/detail/streetpass-for-mastodon/fphjfedjhinpnjblomfebcjjpdpakhhn"
-          className="mt-8 flex flex-col items-center text-center text-sm font-medium text-purple underline"
-        >
-          <Image
-            src={webstore}
-            quality={100}
-            loading="eager"
-            alt=""
-            width={220}
-          />
-          <span className="mt-1">Download for Chrome</span>
-        </a>
+        <div className="grid auto-cols-fr grid-flow-col gap-6">
+          <a
+            href="https://chrome.google.com/webstore/detail/streetpass-for-mastodon/fphjfedjhinpnjblomfebcjjpdpakhhn"
+            className="mt-8 flex flex-col items-center text-center text-sm font-medium text-purple underline"
+          >
+            <Image
+              src={chrome}
+              quality={100}
+              loading="eager"
+              alt=""
+              height={72}
+            />
+            <span className="mt-1">Add to Chrome</span>
+          </a>
 
-        <a
-          href="https://github.com/tvler/streetpass"
-          className="mt-1 text-center text-sm font-medium text-purple underline"
-        >
-          View on GitHub
-        </a>
+          <div className="flex">
+            <a
+              href="https://chrome.google.com/webstore/detail/streetpass-for-mastodon/fphjfedjhinpnjblomfebcjjpdpakhhn"
+              className="mt-8 flex flex-col items-center text-center text-sm font-medium text-purple underline"
+            >
+              <Image
+                src={firefox}
+                quality={100}
+                loading="eager"
+                alt=""
+                height={72}
+              />
+              <span className="mt-1">Add to Firefox</span>
+            </a>
+          </div>
+        </div>
 
-        <div className="w-full max-w-lg font-medium">
+        <div className="w-full max-w-lg font-medium leading-[1.55]">
           <p className="mt-8">
             StreetPass is a simple browser extension that helps you find your
             people on Mastodon. Here's how it works:
@@ -96,6 +108,13 @@ export default function Page() {
               className="text-purple underline"
             >
               identity verification standards
+            </a>{" "}
+            and is 100% open source!{" "}
+            <a
+              className="text-purple underline"
+              href="https://github.com/tvler/streetpass"
+            >
+              View on GitHub
             </a>
             .
           </p>
