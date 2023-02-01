@@ -25,8 +25,8 @@ export default function Page() {
             loading="eager"
             src={icon}
             alt=""
-            width={72}
-            height={72}
+            width={76}
+            height={76}
           />
 
           <h1 className="-mt-1.5 text-3xl font-semibold">StreetPass</h1>
