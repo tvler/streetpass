@@ -39,10 +39,10 @@ export default function Page() {
           </p>
         </div>
 
-        <div className="grid auto-cols-fr grid-flow-col gap-6">
+        <div className="mt-6 grid auto-cols-fr grid-flow-col gap-6">
           <a
             href="https://chrome.google.com/webstore/detail/streetpass-for-mastodon/fphjfedjhinpnjblomfebcjjpdpakhhn"
-            className="mt-8 flex flex-col items-center text-center text-sm font-medium text-purple underline"
+            className="flex flex-col items-center text-center text-sm font-medium text-purple underline"
           >
             <Image
               src={chrome}
@@ -57,7 +57,7 @@ export default function Page() {
           <div className="flex">
             <a
               href="https://chrome.google.com/webstore/detail/streetpass-for-mastodon/fphjfedjhinpnjblomfebcjjpdpakhhn"
-              className="mt-8 flex flex-col items-center text-center text-sm font-medium text-purple underline"
+              className="flex flex-col items-center text-center text-sm font-medium text-purple underline"
             >
               <Image
                 src={firefox}
@@ -72,7 +72,7 @@ export default function Page() {
         </div>
 
         <div className="w-full max-w-lg font-medium leading-[1.55]">
-          <p className="mt-8">
+          <p className="mt-6">
             StreetPass is a simple browser extension that helps you find your
             people on Mastodon. Here's how it works:
           </p>
@@ -137,7 +137,7 @@ export default function Page() {
         />
 
         <div className="w-full max-w-lg font-medium">
-          <p className="mt-8 mb-8 text-center">
+          <p className="my-6 text-center">
             Made by{" "}
             <a className="text-purple underline" href="https://tylerdeitz.com/">
               Tyler
