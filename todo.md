@@ -15,6 +15,5 @@ good screenshot sites
 - https://www.newrafael.com/websites/
 
 todo
-- Add download for firefox to readme https://github.com/tvler/streetpass
 - check if if (details.reason === "install") { works
 - react
