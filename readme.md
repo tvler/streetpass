@@ -2,6 +2,8 @@
 
 [Download for Chrome](https://chrome.google.com/webstore/detail/streetpass-for-mastodon/fphjfedjhinpnjblomfebcjjpdpakhhn)
 
+[Download for Firefox](https://addons.mozilla.org/en-US/firefox/addon/streetpass-for-mastodon/)
+
 # StreetPass for Mastodon
 
 StreetPass is a browser extension that helps you find your people on Mastodon. Here's how it works:
