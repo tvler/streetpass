@@ -49,14 +49,14 @@ export default function Page() {
               quality={100}
               loading="eager"
               alt=""
-              height={72}
+              height={62}
             />
             <span className="mt-1">Add to Chrome</span>
           </a>
 
           <div className="flex">
             <a
-              href="https://chrome.google.com/webstore/detail/streetpass-for-mastodon/fphjfedjhinpnjblomfebcjjpdpakhhn"
+              href="https://addons.mozilla.org/en-US/firefox/addon/streetpass-for-mastodon/"
               className="flex flex-col items-center text-center text-sm font-medium text-purple underline"
             >
               <Image
@@ -64,14 +64,14 @@ export default function Page() {
                 quality={100}
                 loading="eager"
                 alt=""
-                height={72}
+                height={62}
               />
               <span className="mt-1">Add to Firefox</span>
             </a>
           </div>
         </div>
 
-        <div className="w-full max-w-lg font-medium leading-[1.55]">
+        <div className="w-full max-w-lg font-medium leading-[1.5]">
           <p className="mt-6">
             StreetPass is a simple browser extension that helps you find your
             people on Mastodon. Here's how it works:
