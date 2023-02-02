@@ -37,7 +37,7 @@ export function getConfig(target: Target): UserConfig {
           const manifest: Manifest.WebExtensionManifest = {
             manifest_version: targets({ chrome: 3, firefox: 2 }),
             name: "StreetPass for Mastodon",
-            version: "2023.4",
+            version: "2023.5",
             description: "Find your people on Mastodon",
             homepage_url: "https://streetpass.social/",
             permissions: ["storage"],
