@@ -4,6 +4,8 @@ import url from "node:url";
 import type { UserConfig } from "vite";
 import type { Manifest } from "webextension-polyfill";
 
+import { VERSION } from "../constants.js";
+
 const dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
 const webextensionPolyfillPathName = require.resolve("webextension-polyfill");
@@ -37,7 +39,7 @@ export function getConfig(target: Target): UserConfig {
           const manifest: Manifest.WebExtensionManifest = {
             manifest_version: targets({ chrome: 3, firefox: 2 }),
             name: "StreetPass for Mastodon",
-            version: "2023.5",
+            version: VERSION,
             description: "Find your people on Mastodon",
             homepage_url: "https://streetpass.social/",
             permissions: ["storage"],

@@ -15,5 +15,6 @@ good screenshot sites
 - https://www.newrafael.com/websites/
 
 todo
+- add v2023.5 to the top of the page and link to github
 - check if if (details.reason === "install") { works
 - react

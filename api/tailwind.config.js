@@ -10,7 +10,8 @@ module.exports = {
       transparent: "transparent",
       white: "#fff",
       purple: {
-        DEFAULT: "#5f55ec",
+        light: "#EFEDFC",
+        DEFAULT: "#5F55EC",
       },
       gray: {
         DEFAULT: "#7b7b7b",
