@@ -3,6 +3,7 @@ import Image from "next/image";
 import icon from "../public/icon256.png";
 import chrome from "../public/chrome.png";
 import firefox from "../public/firefox.png";
+import safari from "../public/safari.png";
 import screen1 from "../public/screen1.png";
 import screen3 from "../public/screen3.png";
 import Head from "next/head";
@@ -67,41 +68,63 @@ export default function Page() {
         </div>
 
         <div className="mt-4 grid auto-cols-fr grid-flow-col gap-6">
-          <a
-            href="https://chrome.google.com/webstore/detail/streetpass-for-mastodon/fphjfedjhinpnjblomfebcjjpdpakhhn"
-            className="flex flex-col items-center text-center text-sm font-medium text-purple underline"
-          >
-            <Image
-              src={chrome}
-              quality={100}
-              loading="eager"
-              alt=""
-              height={62}
-            />
-            <span className="mt-1">Add to Chrome</span>
-          </a>
+          {(["chrome", "firefox", "safari"] as const).map((browser) => {
+            const link = {
+              chrome:
+                "https://chrome.google.com/webstore/detail/streetpass-for-mastodon/fphjfedjhinpnjblomfebcjjpdpakhhn",
+              firefox:
+                "https://addons.mozilla.org/en-US/firefox/addon/streetpass-for-mastodon/",
+              safari:
+                "https://addons.mozilla.org/en-US/firefox/addon/streetpass-for-mastodon/",
+            }[browser];
 
-          <div className="flex">
-            <a
-              href="https://addons.mozilla.org/en-US/firefox/addon/streetpass-for-mastodon/"
-              className="flex flex-col items-center text-center text-sm font-medium text-purple underline"
-            >
-              <Image
-                src={firefox}
-                quality={100}
-                loading="eager"
-                alt=""
-                height={62}
-              />
-              <span className="mt-1">Add to Firefox</span>
-            </a>
-          </div>
+            const imageSrc = {
+              chrome: chrome,
+              firefox: firefox,
+              safari: safari,
+            }[browser];
+
+            const title = {
+              chrome: "Chrome",
+              firefox: "Firefox",
+              safari: "Safari",
+            }[browser];
+
+            return (
+              <a
+                key={title}
+                href={link}
+                className={
+                  "flex flex-col items-center text-center text-sm font-medium text-purple underline" +
+                  (browser === "safari"
+                    ? " pointer-events-none opacity-50 grayscale"
+                    : "")
+                }
+              >
+                <Image
+                  src={imageSrc}
+                  quality={100}
+                  loading="eager"
+                  alt=""
+                  height={62}
+                />
+                <span className="relative mt-1 inline-block">
+                  {title}
+                  {browser === "safari" && (
+                    <span className="absolute top-[3px] text-xs">
+                      &nbsp;(soon!)
+                    </span>
+                  )}
+                </span>
+              </a>
+            );
+          })}
         </div>
 
         <div className="mt-6 flex w-full max-w-lg flex-col items-start font-medium leading-[1.5]">
           <p className="">
-            StreetPass is a simple browser extension that helps you find your
-            people on Mastodon. Here's how it works:
+            StreetPass is a browser extension that helps you find your people on
+            Mastodon. Here's how it works:
           </p>
 
           <p className="mt-5">
@@ -136,14 +159,7 @@ export default function Page() {
             >
               identity verification standards
             </a>{" "}
-            and is 100% open source!{" "}
-            <a
-              className="text-purple underline"
-              href="https://github.com/tvler/streetpass"
-            >
-              View on GitHub
-            </a>
-            .
+            and is 100% open source!
           </p>
         </div>
 
