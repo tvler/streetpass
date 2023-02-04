@@ -43,7 +43,7 @@ export default function Page() {
 
           <a
             href="https://github.com/tvler/streetpass"
-            className="mt-6 inline-flex rounded-r-[0.5em] bg-purple-light text-sm text-[0.7rem] leading-[1.9]"
+            className="mt-8 inline-flex rounded-r-[0.5em] bg-purple-light text-sm text-[0.7rem] leading-[1.9]"
           >
             <span className="inline-flex items-center gap-[0.25em] rounded-[0.5em] bg-purple px-[0.45em] font-semibold text-white">
               <svg
@@ -121,7 +121,7 @@ export default function Page() {
           })}
         </div>
 
-        <div className="mt-6 flex w-full max-w-lg flex-col items-start font-medium leading-[1.5]">
+        <div className="mt-8 flex w-full max-w-lg flex-col items-start font-medium leading-[1.5]">
           <p className="">
             StreetPass is a browser extension that helps you find your people on
             Mastodon. Here's how it works:
