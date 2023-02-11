@@ -15,6 +15,7 @@ good screenshot sites
 - https://www.newrafael.com/websites/
 
 todo
-- add v2023.5 to the top of the page and link to github
+- bug https://mastodon.social/@danjones000@microwords.goodevilgenius.org/109814359998688174
+- goto social support https://mastodon.social/@emil@helo.fuse.pl/109836215334237802
 - check if if (details.reason === "install") { works
 - react
