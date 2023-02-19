@@ -26,7 +26,6 @@ export function getConfig(target: Target): UserConfig {
     targets({
       chrome: path.resolve(dirname, "src/background.ts"),
       firefox: path.resolve(dirname, "src/background-page-firefox.html"),
-      // safari: path.resolve(dirname, "src/background.ts"),
       safari: path.resolve(dirname, "src/background-page-firefox.html"),
     }),
   ];
