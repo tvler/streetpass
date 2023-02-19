@@ -26,4 +26,4 @@ todo
 - check if if (details.reason === "install") { works
 - react
 
-xcrun /Applications/Xcode.app/Contents/Developer/usr/bin/safari-web-extension-converter --swift --macos-only --project-location ./safari-app --no-open /Users/tyler/code/mastodon-profile-extension/extension/dist-safari 
+xcrun /Applications/Xcode.app/Contents/Developer/usr/bin/safari-web-extension-converter --swift --macos-only --project-location ./safari-app --no-open --rebuild-project ./safari-app/StreetPass\ for\ Mastodon/StreetPass\ for\ Mastodon.xcodeproj/
