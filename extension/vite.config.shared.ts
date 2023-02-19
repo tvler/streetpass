@@ -10,7 +10,7 @@ const dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
 const webextensionPolyfillPathName = require.resolve("webextension-polyfill");
 
-type Target = "chrome" | "firefox";
+type Target = "chrome" | "firefox" | "safari";
 
 export function getConfig(target: Target): UserConfig {
   const input = [
@@ -37,7 +37,7 @@ export function getConfig(target: Target): UserConfig {
         name: "build-manifest",
         generateBundle() {
           const manifest: Manifest.WebExtensionManifest = {
-            manifest_version: targets({ chrome: 3, firefox: 2 }),
+            manifest_version: targets({ chrome: 3, firefox: 2, safari: 3 }),
             name: "StreetPass for Mastodon",
             version: VERSION,
             description: "Find your people on Mastodon",
@@ -65,6 +65,7 @@ export function getConfig(target: Target): UserConfig {
               >({
                 chrome: { action: action },
                 firefox: { browser_action: action },
+                safari: { action: action },
               });
             })(),
             background: targets<Manifest.WebExtensionManifest["background"]>({
@@ -75,6 +76,9 @@ export function getConfig(target: Target): UserConfig {
               firefox: {
                 page: "src/background-page-firefox.html",
                 persistent: false,
+              },
+              safari: {
+                service_worker: "background.js",
               },
             }),
           };
@@ -99,6 +103,7 @@ export function getConfig(target: Target): UserConfig {
       outDir: targets({
         firefox: path.resolve(dirname, "dist-firefox"),
         chrome: path.resolve(dirname, "dist-chrome"),
+        safari: path.resolve(dirname, "dist-safari"),
       }),
       target: "esnext",
       emptyOutDir: true,
