@@ -1,28 +1,13 @@
-import "webextension-polyfill";
-import {
-  getUncachedProfileData,
-  getRelMeHrefDataStore,
-  SEND_REL_ME_HREF,
-  getIconState,
-} from "./util.js";
-import type { SendRelMeHrefPayload } from "./util.js";
+import './browser-polyfill.js';
+import { SEND_REL_ME_HREF, getRelMeHrefDataStore, getUncachedProfileData, getIconState } from './util.js';
 
 browser.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
-  if (
-    !msg ||
-    typeof msg !== "object" ||
-    !(SEND_REL_ME_HREF in msg) ||
-    !msg[SEND_REL_ME_HREF]
-  ) {
+  if (!msg || typeof msg !== "object" || !(SEND_REL_ME_HREF in msg) || !msg[SEND_REL_ME_HREF]) {
     return;
   }
-
-  const sendRelMeHrefPayload: SendRelMeHrefPayload["SEND_REL_ME_HREF"] =
-    msg[SEND_REL_ME_HREF];
-
+  const sendRelMeHrefPayload = msg[SEND_REL_ME_HREF];
   console.log("background", sendRelMeHrefPayload);
-
-  let hasExistingRelMeHrefData: boolean | undefined;
+  let hasExistingRelMeHrefData;
   await getRelMeHrefDataStore((relMeHrefDataStore) => {
     hasExistingRelMeHrefData = relMeHrefDataStore.has(
       sendRelMeHrefPayload.relMeHref
@@ -31,43 +16,22 @@ browser.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
   if (hasExistingRelMeHrefData) {
     return;
   }
-
   const profileData = await getUncachedProfileData(
     sendRelMeHrefPayload.relMeHref
   );
-
   await getRelMeHrefDataStore((relMeHrefDataStore) => {
     if (!profileData) {
       return;
     }
-
     relMeHrefDataStore.set(sendRelMeHrefPayload.relMeHref, {
-      profileData: profileData,
+      profileData,
       viewedAt: Date.now(),
       websiteUrl: sendRelMeHrefPayload.tabUrl,
-      relMeHref: sendRelMeHrefPayload.relMeHref,
+      relMeHref: sendRelMeHrefPayload.relMeHref
     });
-
     return relMeHrefDataStore;
   });
-
-  // getRelMeHrefDataStore((profiles) => {
-  //   console.table(
-  //     Object.fromEntries(
-  //       Array.from(profiles.entries()).map(([key, val]) => {
-  //         return [
-  //           key,
-  //           val.profileData.type === "profile"
-  //             ? val.profileData.profileUrl
-  //             : val.profileData.type,
-  //         ];
-  //       })
-  //     ),
-  //     ["profileData"]
-  //   );
-  // });
 });
-
 browser.runtime.onInstalled.addListener((details) => {
   getIconState((iconState) => {
     if (details.reason === "install") {
@@ -76,8 +40,6 @@ browser.runtime.onInstalled.addListener((details) => {
     return iconState;
   });
 });
-
 browser.runtime.onStartup.addListener(() => {
-  // Trigger an onChange to set the correct icon
   getIconState((iconState) => iconState);
 });

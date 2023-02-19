@@ -13,23 +13,23 @@ const webextensionPolyfillPathName = require.resolve("webextension-polyfill");
 type Target = "chrome" | "firefox" | "safari";
 
 export function getConfig(target: Target): UserConfig {
-  const input = [
-    webextensionPolyfillPathName,
-    path.resolve(dirname, "src/popup.html"),
-    path.resolve(dirname, "src/content-script.ts"),
-  ];
-  if (target === "chrome") {
-    input.push(path.resolve(dirname, "src/background.ts"));
-  }
-  if (target === "firefox") {
-    input.push(path.resolve(dirname, "src/background-page-firefox.html"));
-  }
-
   function targets<Value>(
     args: Record<Target, Value>
   ): (typeof args)[keyof typeof args] {
     return args[target];
   }
+
+  const input = [
+    webextensionPolyfillPathName,
+    path.resolve(dirname, "src/popup.html"),
+    path.resolve(dirname, "src/content-script.ts"),
+    targets({
+      chrome: path.resolve(dirname, "src/background.ts"),
+      firefox: path.resolve(dirname, "src/background-page-firefox.html"),
+      // safari: path.resolve(dirname, "src/background.ts"),
+      safari: path.resolve(dirname, "src/background-page-firefox.html"),
+    }),
+  ];
 
   return {
     plugins: [
@@ -78,7 +78,8 @@ export function getConfig(target: Target): UserConfig {
                 persistent: false,
               },
               safari: {
-                service_worker: "background.js",
+                page: "src/background-page-firefox.html",
+                // service_worker: "background.js",
               },
             }),
           };
