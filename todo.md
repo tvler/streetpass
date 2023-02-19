@@ -25,3 +25,5 @@ todo
 - goto social support https://mastodon.social/@emil@helo.fuse.pl/109836215334237802
 - check if if (details.reason === "install") { works
 - react
+
+xcrun /Applications/Xcode.app/Contents/Developer/usr/bin/safari-web-extension-converter /Users/tyler/code/mastodon-profile-extension/extension/dist-safari
