@@ -5,6 +5,7 @@ import type { ConfigEnv, PluginOption, UserConfig } from "vite";
 import type { Manifest } from "webextension-polyfill";
 import childProcess from "node:child_process";
 import { z } from "zod";
+import assert from "node:assert";
 
 import { VERSION } from "../constants.js";
 
@@ -42,7 +43,18 @@ export function getConfig(
   ];
 
   const extensionName = `StreetPass for Mastodon${
-    config.mode === "dev" ? ` ${Date.now()}` : ``
+    config.mode === "dev"
+      ? ` ${new Intl.DateTimeFormat(undefined, {
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+          // timeStyle: "short",
+        })
+          .format()
+          .replaceAll(",", "")
+          .replaceAll(":", " ")}`
+      : ``
   }`;
 
   return {
@@ -119,14 +131,41 @@ export function getConfig(
         safari: {
           name: "build-safari-app",
           writeBundle(options) {
+            assert(options.dir);
+
             childProcess.spawnSync(
-              `xcrun /Applications/Xcode.app/Contents/Developer/usr/bin/safari-web-extension-converter \
---swift \
---macos-only \
---no-open \
---project-location ${options.dir} \
-${options.dir}`,
-              { shell: true, stdio: "inherit" }
+              `xcrun /Applications/Xcode.app/Contents/Developer/usr/bin/safari-web-extension-converter`,
+              [
+                "--swift",
+                "--macos-only",
+                "--no-open",
+                "--project-location",
+                options.dir,
+                options.dir,
+              ],
+              {
+                shell: true,
+                stdio: "inherit",
+              }
+            );
+
+            childProcess.spawnSync(
+              "xcodebuild",
+              [
+                "-project",
+                `"${path.resolve(
+                  options.dir,
+                  `${extensionName}`,
+                  `${extensionName}.xcodeproj`
+                )}"`,
+                "-allowProvisioningUpdates",
+                "DEVELOPMENT_TEAM=WLTVAXDPZT",
+                "-quiet",
+              ],
+              {
+                shell: true,
+                stdio: "inherit",
+              }
             );
           },
         },
