@@ -1,8 +1,9 @@
 import path from "node:path";
 import { createRequire } from "node:module";
 import url from "node:url";
-import type { UserConfig } from "vite";
+import type { PluginOption, UserConfig } from "vite";
 import type { Manifest } from "webextension-polyfill";
+import childProcess from "node:child_process";
 
 import { VERSION } from "../constants.js";
 
@@ -98,6 +99,25 @@ export function getConfig(target: Target): UserConfig {
           });
         },
       },
+      targets<PluginOption>({
+        chrome: null,
+        firefox: null,
+        safari: {
+          name: "build-safari-app",
+          writeBundle(a, b) {
+            console.log(a.dir);
+            childProcess.spawnSync(
+              `xcrun /Applications/Xcode.app/Contents/Developer/usr/bin/safari-web-extension-converter \
+--swift \
+--macos-only \
+--no-open \
+--project-location ${a.dir} \
+${a.dir}`,
+              { shell: true, stdio: "inherit" }
+            );
+          },
+        },
+      }),
     ],
     build: {
       outDir: targets({
