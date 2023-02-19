@@ -7,46 +7,46 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2F9DDD9629A1BFFB009D4CB1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F9DDD9529A1BFFB009D4CB1 /* AppDelegate.swift */; };
-		2F9DDD9A29A1BFFB009D4CB1 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 2F9DDD9829A1BFFB009D4CB1 /* Main.html */; };
-		2F9DDD9C29A1BFFB009D4CB1 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 2F9DDD9B29A1BFFB009D4CB1 /* Icon.png */; };
-		2F9DDD9E29A1BFFB009D4CB1 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 2F9DDD9D29A1BFFB009D4CB1 /* Style.css */; };
-		2F9DDDA029A1BFFB009D4CB1 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 2F9DDD9F29A1BFFB009D4CB1 /* Script.js */; };
-		2F9DDDA229A1BFFB009D4CB1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F9DDDA129A1BFFB009D4CB1 /* ViewController.swift */; };
-		2F9DDDA529A1BFFB009D4CB1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2F9DDDA329A1BFFB009D4CB1 /* Main.storyboard */; };
-		2F9DDDA729A1BFFC009D4CB1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2F9DDDA629A1BFFC009D4CB1 /* Assets.xcassets */; };
-		2F9DDDB029A1BFFC009D4CB1 /* StreetPass for Mastodon Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2F9DDDAF29A1BFFC009D4CB1 /* StreetPass for Mastodon Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		2F9DDDB529A1BFFC009D4CB1 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F9DDDB429A1BFFC009D4CB1 /* SafariWebExtensionHandler.swift */; };
-		2F9DDDCC29A1BFFC009D4CB1 /* browser-polyfill.js in Resources */ = {isa = PBXBuildFile; fileRef = 2F9DDDC229A1BFFC009D4CB1 /* browser-polyfill.js */; };
-		2F9DDDCD29A1BFFC009D4CB1 /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 2F9DDDC329A1BFFC009D4CB1 /* popup.js */; };
-		2F9DDDCE29A1BFFC009D4CB1 /* icon128.png in Resources */ = {isa = PBXBuildFile; fileRef = 2F9DDDC429A1BFFC009D4CB1 /* icon128.png */; };
-		2F9DDDCF29A1BFFC009D4CB1 /* action-active.png in Resources */ = {isa = PBXBuildFile; fileRef = 2F9DDDC529A1BFFC009D4CB1 /* action-active.png */; };
-		2F9DDDD029A1BFFC009D4CB1 /* action-inactive.png in Resources */ = {isa = PBXBuildFile; fileRef = 2F9DDDC629A1BFFC009D4CB1 /* action-inactive.png */; };
-		2F9DDDD129A1BFFC009D4CB1 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 2F9DDDC729A1BFFC009D4CB1 /* manifest.json */; };
-		2F9DDDD229A1BFFC009D4CB1 /* icon256.png in Resources */ = {isa = PBXBuildFile; fileRef = 2F9DDDC829A1BFFC009D4CB1 /* icon256.png */; };
-		2F9DDDD329A1BFFC009D4CB1 /* content-script.js in Resources */ = {isa = PBXBuildFile; fileRef = 2F9DDDC929A1BFFC009D4CB1 /* content-script.js */; };
-		2F9DDDD429A1BFFC009D4CB1 /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = 2F9DDDCA29A1BFFC009D4CB1 /* popup.css */; };
-		2F9DDDD529A1BFFC009D4CB1 /* src in Resources */ = {isa = PBXBuildFile; fileRef = 2F9DDDCB29A1BFFC009D4CB1 /* src */; };
+		2F14763029A1C09E00DECB8E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F14762F29A1C09E00DECB8E /* AppDelegate.swift */; };
+		2F14763429A1C09E00DECB8E /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 2F14763229A1C09E00DECB8E /* Main.html */; };
+		2F14763629A1C09E00DECB8E /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 2F14763529A1C09E00DECB8E /* Icon.png */; };
+		2F14763829A1C09E00DECB8E /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 2F14763729A1C09E00DECB8E /* Style.css */; };
+		2F14763A29A1C09E00DECB8E /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 2F14763929A1C09E00DECB8E /* Script.js */; };
+		2F14763C29A1C09E00DECB8E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F14763B29A1C09E00DECB8E /* ViewController.swift */; };
+		2F14763F29A1C09E00DECB8E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2F14763D29A1C09E00DECB8E /* Main.storyboard */; };
+		2F14764129A1C09F00DECB8E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2F14764029A1C09F00DECB8E /* Assets.xcassets */; };
+		2F14764A29A1C09F00DECB8E /* StreetPass for Mastodon Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2F14764929A1C09F00DECB8E /* StreetPass for Mastodon Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		2F14764F29A1C09F00DECB8E /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F14764E29A1C09F00DECB8E /* SafariWebExtensionHandler.swift */; };
+		2F14766629A1C09F00DECB8E /* browser-polyfill.js in Resources */ = {isa = PBXBuildFile; fileRef = 2F14765C29A1C09F00DECB8E /* browser-polyfill.js */; };
+		2F14766729A1C09F00DECB8E /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 2F14765D29A1C09F00DECB8E /* popup.js */; };
+		2F14766829A1C09F00DECB8E /* icon128.png in Resources */ = {isa = PBXBuildFile; fileRef = 2F14765E29A1C09F00DECB8E /* icon128.png */; };
+		2F14766929A1C09F00DECB8E /* action-active.png in Resources */ = {isa = PBXBuildFile; fileRef = 2F14765F29A1C09F00DECB8E /* action-active.png */; };
+		2F14766A29A1C09F00DECB8E /* action-inactive.png in Resources */ = {isa = PBXBuildFile; fileRef = 2F14766029A1C09F00DECB8E /* action-inactive.png */; };
+		2F14766B29A1C09F00DECB8E /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 2F14766129A1C09F00DECB8E /* manifest.json */; };
+		2F14766C29A1C09F00DECB8E /* icon256.png in Resources */ = {isa = PBXBuildFile; fileRef = 2F14766229A1C09F00DECB8E /* icon256.png */; };
+		2F14766D29A1C09F00DECB8E /* content-script.js in Resources */ = {isa = PBXBuildFile; fileRef = 2F14766329A1C09F00DECB8E /* content-script.js */; };
+		2F14766E29A1C09F00DECB8E /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = 2F14766429A1C09F00DECB8E /* popup.css */; };
+		2F14766F29A1C09F00DECB8E /* src in Resources */ = {isa = PBXBuildFile; fileRef = 2F14766529A1C09F00DECB8E /* src */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		2F9DDDB129A1BFFC009D4CB1 /* PBXContainerItemProxy */ = {
+		2F14764B29A1C09F00DECB8E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 2F9DDD8A29A1BFFB009D4CB1 /* Project object */;
+			containerPortal = 2F14762429A1C09E00DECB8E /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 2F9DDDAE29A1BFFC009D4CB1;
+			remoteGlobalIDString = 2F14764829A1C09F00DECB8E;
 			remoteInfo = "StreetPass for Mastodon Extension";
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		2F9DDDBD29A1BFFC009D4CB1 /* Embed Foundation Extensions */ = {
+		2F14765729A1C09F00DECB8E /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				2F9DDDB029A1BFFC009D4CB1 /* StreetPass for Mastodon Extension.appex in Embed Foundation Extensions */,
+				2F14764A29A1C09F00DECB8E /* StreetPass for Mastodon Extension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -54,43 +54,43 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		2F9DDD9229A1BFFB009D4CB1 /* StreetPass for Mastodon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "StreetPass for Mastodon.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		2F9DDD9529A1BFFB009D4CB1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		2F9DDD9929A1BFFB009D4CB1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = ../Base.lproj/Main.html; sourceTree = "<group>"; };
-		2F9DDD9B29A1BFFB009D4CB1 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
-		2F9DDD9D29A1BFFB009D4CB1 /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
-		2F9DDD9F29A1BFFB009D4CB1 /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
-		2F9DDDA129A1BFFB009D4CB1 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		2F9DDDA429A1BFFB009D4CB1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		2F9DDDA629A1BFFC009D4CB1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		2F9DDDA829A1BFFC009D4CB1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		2F9DDDA929A1BFFC009D4CB1 /* StreetPass_for_Mastodon.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = StreetPass_for_Mastodon.entitlements; sourceTree = "<group>"; };
-		2F9DDDAA29A1BFFC009D4CB1 /* StreetPass for Mastodon.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "StreetPass for Mastodon.entitlements"; sourceTree = "<group>"; };
-		2F9DDDAF29A1BFFC009D4CB1 /* StreetPass for Mastodon Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "StreetPass for Mastodon Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
-		2F9DDDB429A1BFFC009D4CB1 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
-		2F9DDDB629A1BFFC009D4CB1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		2F9DDDB729A1BFFC009D4CB1 /* StreetPass_for_Mastodon_Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = StreetPass_for_Mastodon_Extension.entitlements; sourceTree = "<group>"; };
-		2F9DDDC229A1BFFC009D4CB1 /* browser-polyfill.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "browser-polyfill.js"; path = "../../../dist-safari/browser-polyfill.js"; sourceTree = "<group>"; };
-		2F9DDDC329A1BFFC009D4CB1 /* popup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = popup.js; path = "../../../dist-safari/popup.js"; sourceTree = "<group>"; };
-		2F9DDDC429A1BFFC009D4CB1 /* icon128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon128.png; path = "../../../dist-safari/icon128.png"; sourceTree = "<group>"; };
-		2F9DDDC529A1BFFC009D4CB1 /* action-active.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "action-active.png"; path = "../../../dist-safari/action-active.png"; sourceTree = "<group>"; };
-		2F9DDDC629A1BFFC009D4CB1 /* action-inactive.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "action-inactive.png"; path = "../../../dist-safari/action-inactive.png"; sourceTree = "<group>"; };
-		2F9DDDC729A1BFFC009D4CB1 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = "../../../dist-safari/manifest.json"; sourceTree = "<group>"; };
-		2F9DDDC829A1BFFC009D4CB1 /* icon256.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon256.png; path = "../../../dist-safari/icon256.png"; sourceTree = "<group>"; };
-		2F9DDDC929A1BFFC009D4CB1 /* content-script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "content-script.js"; path = "../../../dist-safari/content-script.js"; sourceTree = "<group>"; };
-		2F9DDDCA29A1BFFC009D4CB1 /* popup.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = popup.css; path = "../../../dist-safari/popup.css"; sourceTree = "<group>"; };
-		2F9DDDCB29A1BFFC009D4CB1 /* src */ = {isa = PBXFileReference; lastKnownFileType = folder; name = src; path = "../../../dist-safari/src"; sourceTree = "<group>"; };
+		2F14762C29A1C09E00DECB8E /* StreetPass for Mastodon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "StreetPass for Mastodon.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2F14762F29A1C09E00DECB8E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		2F14763329A1C09E00DECB8E /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = ../Base.lproj/Main.html; sourceTree = "<group>"; };
+		2F14763529A1C09E00DECB8E /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		2F14763729A1C09E00DECB8E /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
+		2F14763929A1C09E00DECB8E /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
+		2F14763B29A1C09E00DECB8E /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		2F14763E29A1C09E00DECB8E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		2F14764029A1C09F00DECB8E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		2F14764229A1C09F00DECB8E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2F14764329A1C09F00DECB8E /* StreetPass_for_Mastodon.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = StreetPass_for_Mastodon.entitlements; sourceTree = "<group>"; };
+		2F14764429A1C09F00DECB8E /* StreetPass for Mastodon.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "StreetPass for Mastodon.entitlements"; sourceTree = "<group>"; };
+		2F14764929A1C09F00DECB8E /* StreetPass for Mastodon Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "StreetPass for Mastodon Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2F14764E29A1C09F00DECB8E /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		2F14765029A1C09F00DECB8E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2F14765129A1C09F00DECB8E /* StreetPass_for_Mastodon_Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = StreetPass_for_Mastodon_Extension.entitlements; sourceTree = "<group>"; };
+		2F14765C29A1C09F00DECB8E /* browser-polyfill.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "browser-polyfill.js"; path = "../../../dist-safari/browser-polyfill.js"; sourceTree = "<group>"; };
+		2F14765D29A1C09F00DECB8E /* popup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = popup.js; path = "../../../dist-safari/popup.js"; sourceTree = "<group>"; };
+		2F14765E29A1C09F00DECB8E /* icon128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon128.png; path = "../../../dist-safari/icon128.png"; sourceTree = "<group>"; };
+		2F14765F29A1C09F00DECB8E /* action-active.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "action-active.png"; path = "../../../dist-safari/action-active.png"; sourceTree = "<group>"; };
+		2F14766029A1C09F00DECB8E /* action-inactive.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "action-inactive.png"; path = "../../../dist-safari/action-inactive.png"; sourceTree = "<group>"; };
+		2F14766129A1C09F00DECB8E /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = "../../../dist-safari/manifest.json"; sourceTree = "<group>"; };
+		2F14766229A1C09F00DECB8E /* icon256.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon256.png; path = "../../../dist-safari/icon256.png"; sourceTree = "<group>"; };
+		2F14766329A1C09F00DECB8E /* content-script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "content-script.js"; path = "../../../dist-safari/content-script.js"; sourceTree = "<group>"; };
+		2F14766429A1C09F00DECB8E /* popup.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = popup.css; path = "../../../dist-safari/popup.css"; sourceTree = "<group>"; };
+		2F14766529A1C09F00DECB8E /* src */ = {isa = PBXFileReference; lastKnownFileType = folder; name = src; path = "../../../dist-safari/src"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		2F9DDD8F29A1BFFB009D4CB1 /* Frameworks */ = {
+		2F14762929A1C09E00DECB8E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		2F9DDDAC29A1BFFC009D4CB1 /* Frameworks */ = {
+		2F14764629A1C09F00DECB8E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -100,74 +100,74 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		2F9DDD8929A1BFFB009D4CB1 = {
+		2F14762329A1C09E00DECB8E = {
 			isa = PBXGroup;
 			children = (
-				2F9DDD9429A1BFFB009D4CB1 /* StreetPass for Mastodon */,
-				2F9DDDB329A1BFFC009D4CB1 /* StreetPass for Mastodon Extension */,
-				2F9DDD9329A1BFFB009D4CB1 /* Products */,
+				2F14762E29A1C09E00DECB8E /* StreetPass for Mastodon */,
+				2F14764D29A1C09F00DECB8E /* StreetPass for Mastodon Extension */,
+				2F14762D29A1C09E00DECB8E /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		2F9DDD9329A1BFFB009D4CB1 /* Products */ = {
+		2F14762D29A1C09E00DECB8E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				2F9DDD9229A1BFFB009D4CB1 /* StreetPass for Mastodon.app */,
-				2F9DDDAF29A1BFFC009D4CB1 /* StreetPass for Mastodon Extension.appex */,
+				2F14762C29A1C09E00DECB8E /* StreetPass for Mastodon.app */,
+				2F14764929A1C09F00DECB8E /* StreetPass for Mastodon Extension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		2F9DDD9429A1BFFB009D4CB1 /* StreetPass for Mastodon */ = {
+		2F14762E29A1C09E00DECB8E /* StreetPass for Mastodon */ = {
 			isa = PBXGroup;
 			children = (
-				2F9DDD9529A1BFFB009D4CB1 /* AppDelegate.swift */,
-				2F9DDDA129A1BFFB009D4CB1 /* ViewController.swift */,
-				2F9DDDA329A1BFFB009D4CB1 /* Main.storyboard */,
-				2F9DDDA629A1BFFC009D4CB1 /* Assets.xcassets */,
-				2F9DDDA829A1BFFC009D4CB1 /* Info.plist */,
-				2F9DDDA929A1BFFC009D4CB1 /* StreetPass_for_Mastodon.entitlements */,
-				2F9DDDAA29A1BFFC009D4CB1 /* StreetPass for Mastodon.entitlements */,
-				2F9DDD9729A1BFFB009D4CB1 /* Resources */,
+				2F14762F29A1C09E00DECB8E /* AppDelegate.swift */,
+				2F14763B29A1C09E00DECB8E /* ViewController.swift */,
+				2F14763D29A1C09E00DECB8E /* Main.storyboard */,
+				2F14764029A1C09F00DECB8E /* Assets.xcassets */,
+				2F14764229A1C09F00DECB8E /* Info.plist */,
+				2F14764329A1C09F00DECB8E /* StreetPass_for_Mastodon.entitlements */,
+				2F14764429A1C09F00DECB8E /* StreetPass for Mastodon.entitlements */,
+				2F14763129A1C09E00DECB8E /* Resources */,
 			);
 			path = "StreetPass for Mastodon";
 			sourceTree = "<group>";
 		};
-		2F9DDD9729A1BFFB009D4CB1 /* Resources */ = {
+		2F14763129A1C09E00DECB8E /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				2F9DDD9829A1BFFB009D4CB1 /* Main.html */,
-				2F9DDD9B29A1BFFB009D4CB1 /* Icon.png */,
-				2F9DDD9D29A1BFFB009D4CB1 /* Style.css */,
-				2F9DDD9F29A1BFFB009D4CB1 /* Script.js */,
+				2F14763229A1C09E00DECB8E /* Main.html */,
+				2F14763529A1C09E00DECB8E /* Icon.png */,
+				2F14763729A1C09E00DECB8E /* Style.css */,
+				2F14763929A1C09E00DECB8E /* Script.js */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		2F9DDDB329A1BFFC009D4CB1 /* StreetPass for Mastodon Extension */ = {
+		2F14764D29A1C09F00DECB8E /* StreetPass for Mastodon Extension */ = {
 			isa = PBXGroup;
 			children = (
-				2F9DDDC129A1BFFC009D4CB1 /* Resources */,
-				2F9DDDB429A1BFFC009D4CB1 /* SafariWebExtensionHandler.swift */,
-				2F9DDDB629A1BFFC009D4CB1 /* Info.plist */,
-				2F9DDDB729A1BFFC009D4CB1 /* StreetPass_for_Mastodon_Extension.entitlements */,
+				2F14765B29A1C09F00DECB8E /* Resources */,
+				2F14764E29A1C09F00DECB8E /* SafariWebExtensionHandler.swift */,
+				2F14765029A1C09F00DECB8E /* Info.plist */,
+				2F14765129A1C09F00DECB8E /* StreetPass_for_Mastodon_Extension.entitlements */,
 			);
 			path = "StreetPass for Mastodon Extension";
 			sourceTree = "<group>";
 		};
-		2F9DDDC129A1BFFC009D4CB1 /* Resources */ = {
+		2F14765B29A1C09F00DECB8E /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				2F9DDDC229A1BFFC009D4CB1 /* browser-polyfill.js */,
-				2F9DDDC329A1BFFC009D4CB1 /* popup.js */,
-				2F9DDDC429A1BFFC009D4CB1 /* icon128.png */,
-				2F9DDDC529A1BFFC009D4CB1 /* action-active.png */,
-				2F9DDDC629A1BFFC009D4CB1 /* action-inactive.png */,
-				2F9DDDC729A1BFFC009D4CB1 /* manifest.json */,
-				2F9DDDC829A1BFFC009D4CB1 /* icon256.png */,
-				2F9DDDC929A1BFFC009D4CB1 /* content-script.js */,
-				2F9DDDCA29A1BFFC009D4CB1 /* popup.css */,
-				2F9DDDCB29A1BFFC009D4CB1 /* src */,
+				2F14765C29A1C09F00DECB8E /* browser-polyfill.js */,
+				2F14765D29A1C09F00DECB8E /* popup.js */,
+				2F14765E29A1C09F00DECB8E /* icon128.png */,
+				2F14765F29A1C09F00DECB8E /* action-active.png */,
+				2F14766029A1C09F00DECB8E /* action-inactive.png */,
+				2F14766129A1C09F00DECB8E /* manifest.json */,
+				2F14766229A1C09F00DECB8E /* icon256.png */,
+				2F14766329A1C09F00DECB8E /* content-script.js */,
+				2F14766429A1C09F00DECB8E /* popup.css */,
+				2F14766529A1C09F00DECB8E /* src */,
 			);
 			name = Resources;
 			path = "StreetPass for Mastodon Extension";
@@ -176,32 +176,32 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		2F9DDD9129A1BFFB009D4CB1 /* StreetPass for Mastodon */ = {
+		2F14762B29A1C09E00DECB8E /* StreetPass for Mastodon */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 2F9DDDBE29A1BFFC009D4CB1 /* Build configuration list for PBXNativeTarget "StreetPass for Mastodon" */;
+			buildConfigurationList = 2F14765829A1C09F00DECB8E /* Build configuration list for PBXNativeTarget "StreetPass for Mastodon" */;
 			buildPhases = (
-				2F9DDD8E29A1BFFB009D4CB1 /* Sources */,
-				2F9DDD8F29A1BFFB009D4CB1 /* Frameworks */,
-				2F9DDD9029A1BFFB009D4CB1 /* Resources */,
-				2F9DDDBD29A1BFFC009D4CB1 /* Embed Foundation Extensions */,
+				2F14762829A1C09E00DECB8E /* Sources */,
+				2F14762929A1C09E00DECB8E /* Frameworks */,
+				2F14762A29A1C09E00DECB8E /* Resources */,
+				2F14765729A1C09F00DECB8E /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				2F9DDDB229A1BFFC009D4CB1 /* PBXTargetDependency */,
+				2F14764C29A1C09F00DECB8E /* PBXTargetDependency */,
 			);
 			name = "StreetPass for Mastodon";
 			productName = "StreetPass for Mastodon";
-			productReference = 2F9DDD9229A1BFFB009D4CB1 /* StreetPass for Mastodon.app */;
+			productReference = 2F14762C29A1C09E00DECB8E /* StreetPass for Mastodon.app */;
 			productType = "com.apple.product-type.application";
 		};
-		2F9DDDAE29A1BFFC009D4CB1 /* StreetPass for Mastodon Extension */ = {
+		2F14764829A1C09F00DECB8E /* StreetPass for Mastodon Extension */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 2F9DDDBA29A1BFFC009D4CB1 /* Build configuration list for PBXNativeTarget "StreetPass for Mastodon Extension" */;
+			buildConfigurationList = 2F14765429A1C09F00DECB8E /* Build configuration list for PBXNativeTarget "StreetPass for Mastodon Extension" */;
 			buildPhases = (
-				2F9DDDAB29A1BFFC009D4CB1 /* Sources */,
-				2F9DDDAC29A1BFFC009D4CB1 /* Frameworks */,
-				2F9DDDAD29A1BFFC009D4CB1 /* Resources */,
+				2F14764529A1C09F00DECB8E /* Sources */,
+				2F14764629A1C09F00DECB8E /* Frameworks */,
+				2F14764729A1C09F00DECB8E /* Resources */,
 			);
 			buildRules = (
 			);
@@ -209,28 +209,28 @@
 			);
 			name = "StreetPass for Mastodon Extension";
 			productName = "StreetPass for Mastodon Extension";
-			productReference = 2F9DDDAF29A1BFFC009D4CB1 /* StreetPass for Mastodon Extension.appex */;
+			productReference = 2F14764929A1C09F00DECB8E /* StreetPass for Mastodon Extension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		2F9DDD8A29A1BFFB009D4CB1 /* Project object */ = {
+		2F14762429A1C09E00DECB8E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1420;
 				LastUpgradeCheck = 1420;
 				TargetAttributes = {
-					2F9DDD9129A1BFFB009D4CB1 = {
+					2F14762B29A1C09E00DECB8E = {
 						CreatedOnToolsVersion = 14.2;
 					};
-					2F9DDDAE29A1BFFC009D4CB1 = {
+					2F14764829A1C09F00DECB8E = {
 						CreatedOnToolsVersion = 14.2;
 					};
 				};
 			};
-			buildConfigurationList = 2F9DDD8D29A1BFFB009D4CB1 /* Build configuration list for PBXProject "StreetPass for Mastodon" */;
+			buildConfigurationList = 2F14762729A1C09E00DECB8E /* Build configuration list for PBXProject "StreetPass for Mastodon" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -238,91 +238,91 @@
 				en,
 				Base,
 			);
-			mainGroup = 2F9DDD8929A1BFFB009D4CB1;
-			productRefGroup = 2F9DDD9329A1BFFB009D4CB1 /* Products */;
+			mainGroup = 2F14762329A1C09E00DECB8E;
+			productRefGroup = 2F14762D29A1C09E00DECB8E /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				2F9DDD9129A1BFFB009D4CB1 /* StreetPass for Mastodon */,
-				2F9DDDAE29A1BFFC009D4CB1 /* StreetPass for Mastodon Extension */,
+				2F14762B29A1C09E00DECB8E /* StreetPass for Mastodon */,
+				2F14764829A1C09F00DECB8E /* StreetPass for Mastodon Extension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		2F9DDD9029A1BFFB009D4CB1 /* Resources */ = {
+		2F14762A29A1C09E00DECB8E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2F9DDD9C29A1BFFB009D4CB1 /* Icon.png in Resources */,
-				2F9DDDA529A1BFFB009D4CB1 /* Main.storyboard in Resources */,
-				2F9DDDA029A1BFFB009D4CB1 /* Script.js in Resources */,
-				2F9DDD9A29A1BFFB009D4CB1 /* Main.html in Resources */,
-				2F9DDDA729A1BFFC009D4CB1 /* Assets.xcassets in Resources */,
-				2F9DDD9E29A1BFFB009D4CB1 /* Style.css in Resources */,
+				2F14763629A1C09E00DECB8E /* Icon.png in Resources */,
+				2F14763F29A1C09E00DECB8E /* Main.storyboard in Resources */,
+				2F14763A29A1C09E00DECB8E /* Script.js in Resources */,
+				2F14763429A1C09E00DECB8E /* Main.html in Resources */,
+				2F14764129A1C09F00DECB8E /* Assets.xcassets in Resources */,
+				2F14763829A1C09E00DECB8E /* Style.css in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		2F9DDDAD29A1BFFC009D4CB1 /* Resources */ = {
+		2F14764729A1C09F00DECB8E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2F9DDDCC29A1BFFC009D4CB1 /* browser-polyfill.js in Resources */,
-				2F9DDDD329A1BFFC009D4CB1 /* content-script.js in Resources */,
-				2F9DDDD229A1BFFC009D4CB1 /* icon256.png in Resources */,
-				2F9DDDD029A1BFFC009D4CB1 /* action-inactive.png in Resources */,
-				2F9DDDCD29A1BFFC009D4CB1 /* popup.js in Resources */,
-				2F9DDDD429A1BFFC009D4CB1 /* popup.css in Resources */,
-				2F9DDDCE29A1BFFC009D4CB1 /* icon128.png in Resources */,
-				2F9DDDD129A1BFFC009D4CB1 /* manifest.json in Resources */,
-				2F9DDDCF29A1BFFC009D4CB1 /* action-active.png in Resources */,
-				2F9DDDD529A1BFFC009D4CB1 /* src in Resources */,
+				2F14766629A1C09F00DECB8E /* browser-polyfill.js in Resources */,
+				2F14766D29A1C09F00DECB8E /* content-script.js in Resources */,
+				2F14766C29A1C09F00DECB8E /* icon256.png in Resources */,
+				2F14766A29A1C09F00DECB8E /* action-inactive.png in Resources */,
+				2F14766729A1C09F00DECB8E /* popup.js in Resources */,
+				2F14766E29A1C09F00DECB8E /* popup.css in Resources */,
+				2F14766829A1C09F00DECB8E /* icon128.png in Resources */,
+				2F14766B29A1C09F00DECB8E /* manifest.json in Resources */,
+				2F14766929A1C09F00DECB8E /* action-active.png in Resources */,
+				2F14766F29A1C09F00DECB8E /* src in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		2F9DDD8E29A1BFFB009D4CB1 /* Sources */ = {
+		2F14762829A1C09E00DECB8E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2F9DDDA229A1BFFB009D4CB1 /* ViewController.swift in Sources */,
-				2F9DDD9629A1BFFB009D4CB1 /* AppDelegate.swift in Sources */,
+				2F14763C29A1C09E00DECB8E /* ViewController.swift in Sources */,
+				2F14763029A1C09E00DECB8E /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		2F9DDDAB29A1BFFC009D4CB1 /* Sources */ = {
+		2F14764529A1C09F00DECB8E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2F9DDDB529A1BFFC009D4CB1 /* SafariWebExtensionHandler.swift in Sources */,
+				2F14764F29A1C09F00DECB8E /* SafariWebExtensionHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		2F9DDDB229A1BFFC009D4CB1 /* PBXTargetDependency */ = {
+		2F14764C29A1C09F00DECB8E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 2F9DDDAE29A1BFFC009D4CB1 /* StreetPass for Mastodon Extension */;
-			targetProxy = 2F9DDDB129A1BFFC009D4CB1 /* PBXContainerItemProxy */;
+			target = 2F14764829A1C09F00DECB8E /* StreetPass for Mastodon Extension */;
+			targetProxy = 2F14764B29A1C09F00DECB8E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		2F9DDD9829A1BFFB009D4CB1 /* Main.html */ = {
+		2F14763229A1C09E00DECB8E /* Main.html */ = {
 			isa = PBXVariantGroup;
 			children = (
-				2F9DDD9929A1BFFB009D4CB1 /* Base */,
+				2F14763329A1C09E00DECB8E /* Base */,
 			);
 			name = Main.html;
 			sourceTree = "<group>";
 		};
-		2F9DDDA329A1BFFB009D4CB1 /* Main.storyboard */ = {
+		2F14763D29A1C09E00DECB8E /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				2F9DDDA429A1BFFB009D4CB1 /* Base */,
+				2F14763E29A1C09E00DECB8E /* Base */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -330,7 +330,7 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		2F9DDDB829A1BFFC009D4CB1 /* Debug */ = {
+		2F14765229A1C09F00DECB8E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -390,7 +390,7 @@
 			};
 			name = Debug;
 		};
-		2F9DDDB929A1BFFC009D4CB1 /* Release */ = {
+		2F14765329A1C09F00DECB8E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -443,7 +443,7 @@
 			};
 			name = Release;
 		};
-		2F9DDDBB29A1BFFC009D4CB1 /* Debug */ = {
+		2F14765529A1C09F00DECB8E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "StreetPass for Mastodon Extension/StreetPass_for_Mastodon_Extension.entitlements";
@@ -459,7 +459,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -473,7 +473,7 @@
 			};
 			name = Debug;
 		};
-		2F9DDDBC29A1BFFC009D4CB1 /* Release */ = {
+		2F14765629A1C09F00DECB8E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "StreetPass for Mastodon Extension/StreetPass_for_Mastodon_Extension.entitlements";
@@ -489,7 +489,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -503,7 +503,7 @@
 			};
 			name = Release;
 		};
-		2F9DDDBF29A1BFFC009D4CB1 /* Debug */ = {
+		2F14765929A1C09F00DECB8E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
@@ -524,7 +524,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -539,7 +539,7 @@
 			};
 			name = Debug;
 		};
-		2F9DDDC029A1BFFC009D4CB1 /* Release */ = {
+		2F14765A29A1C09F00DECB8E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
@@ -560,7 +560,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -578,34 +578,34 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		2F9DDD8D29A1BFFB009D4CB1 /* Build configuration list for PBXProject "StreetPass for Mastodon" */ = {
+		2F14762729A1C09E00DECB8E /* Build configuration list for PBXProject "StreetPass for Mastodon" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				2F9DDDB829A1BFFC009D4CB1 /* Debug */,
-				2F9DDDB929A1BFFC009D4CB1 /* Release */,
+				2F14765229A1C09F00DECB8E /* Debug */,
+				2F14765329A1C09F00DECB8E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		2F9DDDBA29A1BFFC009D4CB1 /* Build configuration list for PBXNativeTarget "StreetPass for Mastodon Extension" */ = {
+		2F14765429A1C09F00DECB8E /* Build configuration list for PBXNativeTarget "StreetPass for Mastodon Extension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				2F9DDDBB29A1BFFC009D4CB1 /* Debug */,
-				2F9DDDBC29A1BFFC009D4CB1 /* Release */,
+				2F14765529A1C09F00DECB8E /* Debug */,
+				2F14765629A1C09F00DECB8E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		2F9DDDBE29A1BFFC009D4CB1 /* Build configuration list for PBXNativeTarget "StreetPass for Mastodon" */ = {
+		2F14765829A1C09F00DECB8E /* Build configuration list for PBXNativeTarget "StreetPass for Mastodon" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				2F9DDDBF29A1BFFC009D4CB1 /* Debug */,
-				2F9DDDC029A1BFFC009D4CB1 /* Release */,
+				2F14765929A1C09F00DECB8E /* Debug */,
+				2F14765A29A1C09F00DECB8E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 2F9DDD8A29A1BFFB009D4CB1 /* Project object */;
+	rootObject = 2F14762429A1C09E00DECB8E /* Project object */;
 }
