@@ -1,9 +1,10 @@
 import path from "node:path";
 import { createRequire } from "node:module";
 import url from "node:url";
-import type { PluginOption, UserConfig } from "vite";
+import type { ConfigEnv, PluginOption, UserConfig } from "vite";
 import type { Manifest } from "webextension-polyfill";
 import childProcess from "node:child_process";
+import { z } from "zod";
 
 import { VERSION } from "../constants.js";
 
@@ -13,7 +14,16 @@ const webextensionPolyfillPathName = require.resolve("webextension-polyfill");
 
 type Target = "chrome" | "firefox" | "safari";
 
-export function getConfig(target: Target): UserConfig {
+const configSchema = z.object({
+  mode: z.union([z.literal("dev"), z.literal("production")]),
+});
+
+export function getConfig(
+  target: Target,
+  unparsedConfig: ConfigEnv
+): UserConfig {
+  const config = configSchema.parse(unparsedConfig);
+
   function targets<Value>(
     args: Record<Target, Value>
   ): (typeof args)[keyof typeof args] {
@@ -31,6 +41,10 @@ export function getConfig(target: Target): UserConfig {
     }),
   ];
 
+  const extensionName = `StreetPass for Mastodon${
+    config.mode === "dev" ? ` ${Date.now()}` : ``
+  }`;
+
   return {
     plugins: [
       {
@@ -38,7 +52,7 @@ export function getConfig(target: Target): UserConfig {
         generateBundle() {
           const manifest: Manifest.WebExtensionManifest = {
             manifest_version: targets({ chrome: 3, firefox: 2, safari: 3 }),
-            name: "StreetPass for Mastodon",
+            name: extensionName,
             version: VERSION,
             description: "Find your people on Mastodon",
             homepage_url: "https://streetpass.social/",
@@ -104,15 +118,14 @@ export function getConfig(target: Target): UserConfig {
         firefox: null,
         safari: {
           name: "build-safari-app",
-          writeBundle(a, b) {
-            console.log(a.dir);
+          writeBundle(options) {
             childProcess.spawnSync(
               `xcrun /Applications/Xcode.app/Contents/Developer/usr/bin/safari-web-extension-converter \
 --swift \
 --macos-only \
 --no-open \
---project-location ${a.dir} \
-${a.dir}`,
+--project-location ${options.dir} \
+${options.dir}`,
               { shell: true, stdio: "inherit" }
             );
           },
