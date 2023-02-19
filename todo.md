@@ -7,8 +7,14 @@
 - https://mastodon.social/@DLX
 - https://www.presscheck.org/journalists
 
-- cross browser https://akoskm.com/building-a-cross-browser-extension#heading-bundlers
+cross browser 
+- https://akoskm.com/building-a-cross-browser-extension#heading-bundlers
 - https://akoskm.com/how-to-build-cross-browser-extensions-react-typescript-tailwindcss-vite
+
+safari
+- https://developer.apple.com/videos/play/wwdc2020/10665/
+- https://developer.apple.com/videos/play/wwdc2022/10099/
+- https://developer.apple.com/safari/extensions/
 
 good screenshot sites
 - http://www.herethat.com/
