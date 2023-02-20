@@ -26,7 +26,6 @@ function sendRelMeHrefs() {
         },
       };
       browser.runtime.sendMessage(sendRelMeHrefPayload);
-      console.log("sendRelMeHrefPayload", sendRelMeHrefPayload);
     }
   }
 }

@@ -20,8 +20,6 @@ browser.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
   const sendRelMeHrefPayload: SendRelMeHrefPayload["SEND_REL_ME_HREF"] =
     msg[SEND_REL_ME_HREF];
 
-  console.log("background", sendRelMeHrefPayload);
-
   let hasExistingRelMeHrefData: boolean | undefined;
   await getRelMeHrefDataStore((relMeHrefDataStore) => {
     hasExistingRelMeHrefData = relMeHrefDataStore.has(
