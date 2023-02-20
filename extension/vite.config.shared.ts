@@ -37,8 +37,8 @@ export function getConfig(
     path.resolve(dirname, "src/content-script.ts"),
     targets({
       chrome: path.resolve(dirname, "src/background.ts"),
-      firefox: path.resolve(dirname, "src/background-page-firefox.html"),
-      safari: path.resolve(dirname, "src/background-page-firefox.html"),
+      firefox: path.resolve(dirname, "src/background-page.html"),
+      safari: path.resolve(dirname, "src/background-page.html"),
     }),
   ];
 
@@ -49,7 +49,6 @@ export function getConfig(
           day: "numeric",
           hour: "numeric",
           minute: "numeric",
-          // timeStyle: "short",
         })
           .format()
           .replaceAll(",", "")
@@ -100,12 +99,11 @@ export function getConfig(
                 type: "module",
               },
               firefox: {
-                page: "src/background-page-firefox.html",
+                page: "src/background-page.html",
                 persistent: false,
               },
               safari: {
-                page: "src/background-page-firefox.html",
-                // service_worker: "background.js",
+                page: "src/background-page.html",
               },
             }),
           };
