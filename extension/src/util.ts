@@ -85,6 +85,25 @@ function getIsRelWebfingerProfilePageRel(href: string) {
   );
 }
 
+function constructOpenIDUrl(visitedRelMeUrl: URL) {
+  const webfingerHost = visitedRelMeUrl.hostname;
+  const accountName = visitedRelMeUrl.pathname.replace("/", "");
+
+  const webfingerUrl = new URL(visitedRelMeUrl.origin);
+  webfingerUrl.pathname = ".well-known/webfinger";
+
+  if (!accountName || !webfingerHost) {
+    throw new Error();
+  }
+
+  webfingerUrl.searchParams.set(
+    "resource",
+    `acct:@${accountName}@${webfingerHost}`
+  );
+
+  return webfingerUrl;
+}
+
 export async function getUncachedProfileData(
   href: string
 ): Promise<ProfileData> {
@@ -104,9 +123,13 @@ export async function getUncachedProfileData(
     webfingerUrl.pathname = ".well-known/webfinger";
     webfingerUrl.searchParams.set("resource", visitedRelMeUrl.toString());
 
-    const webfingerResp = await fetch(webfingerUrl);
+    let webfingerResp = await fetch(webfingerUrl);
     if (!webfingerResp.ok) {
-      throw new Error();
+      const openIdRelMe = constructOpenIDUrl(visitedRelMeUrl);
+      webfingerResp = await fetch(openIdRelMe);
+      if (!webfingerResp.ok) {
+        throw new Error();
+      }
     }
 
     const webfinger: Webfinger = await webfingerResp.json();
