@@ -44,3 +44,5 @@ xcodebuild -project dist-safari/StreetPass\ for\ Mastodon/StreetPass\ for\ Masto
 xcodebuild -project dist-safari/StreetPass\ for\ Mastodon/StreetPass\ for\ Mastodon.xcodeproj -allowProvisioningUpdates -quiet
 
 xcodebuild -project dist-safari/StreetPass\ for\ Mastodon/StreetPass\ for\ Mastodon.xcodeproj -allowProvisioningUpdates DEVELOPMENT_TEAM=WLTVAXDPZT -quiet
+
+https://en.wikipedia.org/wiki/Axonometric_projection#Three_types
