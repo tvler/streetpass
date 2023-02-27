@@ -8,12 +8,11 @@ import { z } from "zod";
 import assert from "node:assert";
 
 import { VERSION } from "../constants.js";
+import type { Target } from "./src/util.js";
 
 const dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
 const webextensionPolyfillPathName = require.resolve("webextension-polyfill");
-
-type Target = "chrome" | "firefox" | "safari";
 
 const configSchema = z.object({
   mode: z.union([z.literal("dev"), z.literal("production")]),
@@ -198,6 +197,9 @@ export function getConfig(
           esModule: true,
         },
       },
+    },
+    define: {
+      __TARGET__: JSON.stringify(target),
     },
   };
 }

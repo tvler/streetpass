@@ -4,6 +4,8 @@ export type SendRelMeHrefPayload = {
   [SEND_REL_ME_HREF]: { relMeHref: string; tabUrl: string };
 };
 
+export type Target = "chrome" | "firefox" | "safari";
+
 type Profile = { type: "profile"; profileUrl: string };
 
 type NotProfile = { type: "notProfile" };
