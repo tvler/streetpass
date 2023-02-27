@@ -8,7 +8,7 @@ import { z } from "zod";
 import assert from "node:assert";
 
 import { VERSION } from "../constants.js";
-import type { Target } from "./src/util.js";
+import { actionActive, actionInactive, Target } from "./src/util.js";
 
 const dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
@@ -81,7 +81,15 @@ export function getConfig(
               const action: Manifest.ActionManifest = {
                 default_popup: "src/popup.html",
                 default_title: "StreetPass",
-                default_icon: "action-inactive.png",
+                default_icon: targets<Record<string, string>>({
+                  chrome: actionInactive,
+                  firefox: actionInactive,
+                  safari:
+                    /**
+                     * Safari can't render grayed out icon
+                     */
+                    actionActive,
+                }),
               };
               return targets<
                 | Pick<Manifest.WebExtensionManifest, "action">
