@@ -74,8 +74,8 @@ export function getConfig(
               },
             ],
             icons: {
-              128: "icon128.png",
-              256: "icon256.png",
+              128: "icon-128.png",
+              256: "icon-256.png",
             },
             ...(() => {
               const action: Manifest.ActionManifest = {
