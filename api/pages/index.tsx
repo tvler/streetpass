@@ -5,7 +5,7 @@ import chrome from "../public/chrome.png";
 import firefox from "../public/firefox.png";
 import safari from "../public/safari.png";
 import screen1 from "../public/screen1.png";
-import screen2 from "../public/screen2.png";
+import screen3 from "../public/screen3.png";
 import Head from "next/head";
 
 import { VERSION } from "../../constants";
@@ -173,7 +173,7 @@ export default function Page() {
 
         <Image
           quality={100}
-          src={screen2}
+          src={screen3}
           alt=""
           width={1296}
           className="mt-5 w-full max-w-xl"
