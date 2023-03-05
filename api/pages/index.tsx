@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
 import Image from "next/image";
-import icon from "../public/icon256.png";
+import icon from "../public/icon-256.png";
 import chrome from "../public/chrome.png";
 import firefox from "../public/firefox.png";
 import safari from "../public/safari.png";

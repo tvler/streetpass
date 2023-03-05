@@ -1,29 +1,28 @@
 import path from "node:path";
 import { createRequire } from "node:module";
 import url from "node:url";
-import type { UserConfig } from "vite";
+import type { ConfigEnv, PluginOption, UserConfig } from "vite";
 import type { Manifest } from "webextension-polyfill";
+import childProcess from "node:child_process";
+import { z } from "zod";
+import assert from "node:assert";
 
 import { VERSION } from "../constants.js";
+import { actionActive, actionInactive, Target } from "./src/util.js";
 
 const dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
 const webextensionPolyfillPathName = require.resolve("webextension-polyfill");
 
-type Target = "chrome" | "firefox";
+const configSchema = z.object({
+  mode: z.union([z.literal("dev"), z.literal("production")]),
+});
 
-export function getConfig(target: Target): UserConfig {
-  const input = [
-    webextensionPolyfillPathName,
-    path.resolve(dirname, "src/popup.html"),
-    path.resolve(dirname, "src/content-script.ts"),
-  ];
-  if (target === "chrome") {
-    input.push(path.resolve(dirname, "src/background.ts"));
-  }
-  if (target === "firefox") {
-    input.push(path.resolve(dirname, "src/background-page-firefox.html"));
-  }
+export function getConfig(
+  target: Target,
+  unparsedConfig: ConfigEnv
+): UserConfig {
+  const config = configSchema.parse(unparsedConfig);
 
   function targets<Value>(
     args: Record<Target, Value>
@@ -31,14 +30,39 @@ export function getConfig(target: Target): UserConfig {
     return args[target];
   }
 
+  const input = [
+    webextensionPolyfillPathName,
+    path.resolve(dirname, "src/popup.html"),
+    path.resolve(dirname, "src/content-script.ts"),
+    targets({
+      chrome: path.resolve(dirname, "src/background.ts"),
+      firefox: path.resolve(dirname, "src/background-page.html"),
+      safari: path.resolve(dirname, "src/background-page.html"),
+    }),
+  ];
+
+  const extensionName = `StreetPass for Mastodon${
+    config.mode === "dev"
+      ? ` ${new Intl.DateTimeFormat(undefined, {
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+        })
+          .format()
+          .replaceAll(",", "")
+          .replaceAll(":", " ")}`
+      : ``
+  }`;
+
   return {
     plugins: [
       {
         name: "build-manifest",
         generateBundle() {
           const manifest: Manifest.WebExtensionManifest = {
-            manifest_version: targets({ chrome: 3, firefox: 2 }),
-            name: "StreetPass for Mastodon",
+            manifest_version: targets({ chrome: 3, firefox: 2, safari: 3 }),
+            name: extensionName,
             version: VERSION,
             description: "Find your people on Mastodon",
             homepage_url: "https://streetpass.social/",
@@ -50,14 +74,22 @@ export function getConfig(target: Target): UserConfig {
               },
             ],
             icons: {
-              128: "icon128.png",
-              256: "icon256.png",
+              128: "icon-128.png",
+              256: "icon-256.png",
             },
             ...(() => {
               const action: Manifest.ActionManifest = {
                 default_popup: "src/popup.html",
                 default_title: "StreetPass",
-                default_icon: "action-inactive.png",
+                default_icon: targets<Record<string, string>>({
+                  chrome: actionInactive,
+                  firefox: actionInactive,
+                  safari:
+                    /**
+                     * Safari can't render grayed out icon
+                     */
+                    actionActive,
+                }),
               };
               return targets<
                 | Pick<Manifest.WebExtensionManifest, "action">
@@ -65,6 +97,7 @@ export function getConfig(target: Target): UserConfig {
               >({
                 chrome: { action: action },
                 firefox: { browser_action: action },
+                safari: { action: action },
               });
             })(),
             background: targets<Manifest.WebExtensionManifest["background"]>({
@@ -73,8 +106,11 @@ export function getConfig(target: Target): UserConfig {
                 type: "module",
               },
               firefox: {
-                page: "src/background-page-firefox.html",
+                page: "src/background-page.html",
                 persistent: false,
+              },
+              safari: {
+                page: "src/background-page.html",
               },
             }),
           };
@@ -94,11 +130,57 @@ export function getConfig(target: Target): UserConfig {
           });
         },
       },
+      targets<PluginOption>({
+        chrome: null,
+        firefox: null,
+        safari: {
+          name: "build-safari-app",
+          writeBundle(options) {
+            assert(options.dir);
+
+            childProcess.spawnSync(
+              `xcrun /Applications/Xcode.app/Contents/Developer/usr/bin/safari-web-extension-converter`,
+              [
+                "--swift",
+                "--macos-only",
+                "--no-open",
+                "--project-location",
+                options.dir,
+                options.dir,
+              ],
+              {
+                shell: true,
+                stdio: "inherit",
+              }
+            );
+
+            childProcess.spawnSync(
+              "xcodebuild",
+              [
+                "-project",
+                `"${path.resolve(
+                  options.dir,
+                  `${extensionName}`,
+                  `${extensionName}.xcodeproj`
+                )}"`,
+                "-allowProvisioningUpdates",
+                "DEVELOPMENT_TEAM=WLTVAXDPZT",
+                "-quiet",
+              ],
+              {
+                shell: true,
+                stdio: "inherit",
+              }
+            );
+          },
+        },
+      }),
     ],
     build: {
       outDir: targets({
         firefox: path.resolve(dirname, "dist-firefox"),
         chrome: path.resolve(dirname, "dist-chrome"),
+        safari: path.resolve(dirname, "dist-safari"),
       }),
       target: "esnext",
       emptyOutDir: true,
@@ -123,6 +205,9 @@ export function getConfig(target: Target): UserConfig {
           esModule: true,
         },
       },
+    },
+    define: {
+      __TARGET__: JSON.stringify(target),
     },
   };
 }

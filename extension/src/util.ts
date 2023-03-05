@@ -4,6 +4,8 @@ export type SendRelMeHrefPayload = {
   [SEND_REL_ME_HREF]: { relMeHref: string; tabUrl: string };
 };
 
+export type Target = "chrome" | "firefox" | "safari";
+
 type Profile = { type: "profile"; profileUrl: string };
 
 type NotProfile = { type: "notProfile" };
@@ -199,6 +201,20 @@ export function storageFactory<T>(args: {
   };
 }
 
+export const actionInactive = {
+  "16": "/action-inactive-16.png",
+  "19": "/action-inactive-19.png",
+  "32": "/action-inactive-32.png",
+  "38": "/action-inactive-38.png",
+} as const satisfies Record<string, string>;
+
+export const actionActive = {
+  "16": "/action-active-16.png",
+  "19": "/action-active-19.png",
+  "32": "/action-active-32.png",
+  "38": "/action-active-38.png",
+} as const satisfies Record<string, string>;
+
 export const getIconState = storageFactory({
   storageKey: "icon-state-3",
   parse(storageData) {
@@ -210,18 +226,26 @@ export const getIconState = storageFactory({
     return iconState;
   },
   onChange({ prev, curr }) {
-    const path =
-      curr.state === "off" ? "/action-inactive.png" : "/action-active.png";
-    const badgeText = curr.unreadCount ? `+${curr.unreadCount}` : "";
+    /**
+     * Firefox is still at manifest v2
+     */
+    const browserAction =
+      __TARGET__ === "firefox" ? browser.browserAction : browser.action;
 
-    const browserAction = browser.action ?? browser.browserAction;
-    browserAction.setIcon({
-      path: path,
-    });
+    /**
+     * Safari can't render grayed out icon
+     */
+    if (__TARGET__ !== "safari") {
+      const path = curr.state === "off" ? actionInactive : actionActive;
+
+      browserAction.setIcon({
+        path: path,
+      });
+    }
 
     browserAction.setBadgeBackgroundColor({ color: "#9f99f5" });
-    // browserAction.setBadgeBackgroundColor({ color: "#5F55EC" });
 
+    const badgeText = curr.unreadCount ? `+${curr.unreadCount}` : "";
     browserAction.setBadgeText({ text: badgeText });
   },
 });
