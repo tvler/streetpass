@@ -13,7 +13,6 @@ import {
   actionInactive,
   Build,
   getTargetFromBuild,
-  Target,
 } from "./src/util.js";
 
 const dirname = path.dirname(url.fileURLToPath(import.meta.url));
@@ -84,10 +83,20 @@ export function getConfig(build: Build, unparsedConfig: ConfigEnv): UserConfig {
                 js: ["browser-polyfill.js", "content-script.js"],
               },
             ],
-            icons: {
-              128: "icon-128.png",
-              256: "icon-256.png",
-            },
+            icons: targets({
+              chrome: {
+                128: "icon-128.png",
+                256: "icon-256.png",
+              },
+              firefox: {
+                128: "icon-128.png",
+                256: "icon-256.png",
+              },
+              safari: {
+                128: "icon-128-nopadding.png",
+                256: "icon-256-nopadding.png",
+              },
+            }),
             ...(() => {
               const action: Manifest.ActionManifest = {
                 default_popup: "src/popup.html",
