@@ -8,7 +8,13 @@ import { z } from "zod";
 import assert from "node:assert";
 
 import { VERSION } from "../constants.js";
-import { actionActive, actionInactive, Target } from "./src/util.js";
+import {
+  actionActive,
+  actionInactive,
+  Build,
+  getTargetFromBuild,
+  Target,
+} from "./src/util.js";
 
 const dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
@@ -18,28 +24,33 @@ const configSchema = z.object({
   mode: z.union([z.literal("dev"), z.literal("production")]),
 });
 
-export function getConfig(
-  target: Target,
-  unparsedConfig: ConfigEnv
-): UserConfig {
+export function getConfig(build: Build, unparsedConfig: ConfigEnv): UserConfig {
   const config = configSchema.parse(unparsedConfig);
 
-  function targets<Value>(
-    args: Record<Target, Value>
-  ): (typeof args)[keyof typeof args] {
-    return args[target];
-  }
+  function targets<Value>(args: {
+    chrome: Value;
+    firefox: Value;
+    safari: Value;
+  }): Value;
+  function targets<Value>(args: {
+    chrome: Value;
+    firefox: Value;
+    safari: Value;
+    "safari-background": Value;
+  }): Value;
+  function targets<Value>(args: {
+    chrome: Value;
+    firefox: Value;
+    safari: Value;
+    "safari-background"?: Value;
+  }): Value {
+    const resolvedSafariBackground: Value =
+      "safari-background" in args ? args["safari-background"] : args.safari;
 
-  const input = [
-    // webextensionPolyfillPathName,
-    // path.resolve(dirname, "src/popup.html"),
-    // path.resolve(dirname, "src/content-script.ts"),
-    targets({
-      chrome: path.resolve(dirname, "src/background.ts"),
-      firefox: path.resolve(dirname, "src/background-page.html"),
-      safari: path.resolve(dirname, "src/background-page.html"),
-    }),
-  ];
+    return build === "safari-background"
+      ? resolvedSafariBackground
+      : args[build];
+  }
 
   const extensionName = `StreetPass for Mastodon${
     config.mode === "dev"
@@ -100,7 +111,7 @@ export function getConfig(
                 safari: { action: action },
               });
             })(),
-            background: targets<Manifest.WebExtensionManifest["background"]>({
+            background: targets({
               chrome: {
                 service_worker: "background.js",
                 type: "module",
@@ -114,7 +125,7 @@ export function getConfig(
               },
             }),
           };
-          if (target === "firefox") {
+          if (build === "firefox") {
             // Chrome doesn't support this yet
             manifest.browser_specific_settings = {
               gecko: {
@@ -130,51 +141,52 @@ export function getConfig(
           });
         },
       },
-      // targets<PluginOption>({
-      //   chrome: null,
-      //   firefox: null,
-      //   safari: {
-      //     name: "build-safari-app",
-      //     writeBundle(options) {
-      //       assert(options.dir);
+      targets<PluginOption>({
+        chrome: null,
+        firefox: null,
+        safari: {
+          name: "build-safari-app",
+          writeBundle(options) {
+            assert(options.dir);
 
-      //       childProcess.spawnSync(
-      //         `xcrun /Applications/Xcode.app/Contents/Developer/usr/bin/safari-web-extension-converter`,
-      //         [
-      //           "--swift",
-      //           "--macos-only",
-      //           "--no-open",
-      //           "--project-location",
-      //           options.dir,
-      //           options.dir,
-      //         ],
-      //         {
-      //           shell: true,
-      //           stdio: "inherit",
-      //         }
-      //       );
+            childProcess.spawnSync(
+              `xcrun /Applications/Xcode.app/Contents/Developer/usr/bin/safari-web-extension-converter`,
+              [
+                "--swift",
+                "--macos-only",
+                "--no-open",
+                "--project-location",
+                options.dir,
+                options.dir,
+              ],
+              {
+                shell: true,
+                stdio: "inherit",
+              }
+            );
 
-      //       childProcess.spawnSync(
-      //         "xcodebuild",
-      //         [
-      //           "-project",
-      //           `"${path.resolve(
-      //             options.dir,
-      //             `${extensionName}`,
-      //             `${extensionName}.xcodeproj`
-      //           )}"`,
-      //           "-allowProvisioningUpdates",
-      //           "DEVELOPMENT_TEAM=WLTVAXDPZT",
-      //           "-quiet",
-      //         ],
-      //         {
-      //           shell: true,
-      //           stdio: "inherit",
-      //         }
-      //       );
-      //     },
-      //   },
-      // }),
+            childProcess.spawnSync(
+              "xcodebuild",
+              [
+                "-project",
+                `"${path.resolve(
+                  options.dir,
+                  `${extensionName}`,
+                  `${extensionName}.xcodeproj`
+                )}"`,
+                "-allowProvisioningUpdates",
+                "DEVELOPMENT_TEAM=WLTVAXDPZT",
+                "-quiet",
+              ],
+              {
+                shell: true,
+                stdio: "inherit",
+              }
+            );
+          },
+        },
+        "safari-background": null,
+      }),
     ],
     build: {
       outDir: targets({
@@ -195,7 +207,22 @@ export function getConfig(
       rollupOptions: {
         strictDeprecations: true,
         preserveEntrySignatures: "strict",
-        input: input,
+        input: (() => {
+          if (build === "safari-background") {
+            return path.resolve(dirname, "src/background.ts");
+          }
+
+          return [
+            webextensionPolyfillPathName,
+            path.resolve(dirname, "src/popup.html"),
+            path.resolve(dirname, "src/content-script.ts"),
+            targets({
+              chrome: path.resolve(dirname, "src/background.ts"),
+              firefox: path.resolve(dirname, "src/background-page.html"),
+              safari: null,
+            }),
+          ].filter(Boolean);
+        })(),
         output: {
           format: "es",
           minifyInternalExports: false,
@@ -209,7 +236,7 @@ export function getConfig(
       },
     },
     define: {
-      __TARGET__: JSON.stringify(target),
+      __TARGET__: JSON.stringify(getTargetFromBuild(build)),
     },
   };
 }

@@ -15,7 +15,8 @@
     "jsx": "react-jsx",
     "noEmit": true,
     "noUncheckedIndexedAccess": true,
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "exactOptionalPropertyTypes": true
   },
   "include": ["./**/*"],
   "exclude": ["node_modules", "dist-chrome", "dist-firefox"]
