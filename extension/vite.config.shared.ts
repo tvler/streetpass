@@ -236,7 +236,6 @@ export function getConfig(build: Build, unparsedConfig: ConfigEnv): UserConfig {
           ].filter(Boolean);
         })(),
         output: {
-          format: "es",
           minifyInternalExports: false,
           inlineDynamicImports: build === "safari-background" ? true : false,
           validate: true,
