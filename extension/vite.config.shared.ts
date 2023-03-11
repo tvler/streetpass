@@ -121,7 +121,7 @@ export function getConfig(build: Build, unparsedConfig: ConfigEnv): UserConfig {
                 persistent: false,
               },
               safari: {
-                page: "src/background-page.html",
+                service_worker: "background.js",
               },
             }),
           };
@@ -134,11 +134,13 @@ export function getConfig(build: Build, unparsedConfig: ConfigEnv): UserConfig {
             };
           }
 
-          this.emitFile({
-            type: "asset",
-            fileName: "manifest.json",
-            source: JSON.stringify(manifest),
-          });
+          if (build !== "safari-background") {
+            this.emitFile({
+              type: "asset",
+              fileName: "manifest.json",
+              source: JSON.stringify(manifest),
+            });
+          }
         },
       },
       targets<PluginOption>({
@@ -188,6 +190,7 @@ export function getConfig(build: Build, unparsedConfig: ConfigEnv): UserConfig {
         "safari-background": null,
       }),
     ],
+    publicDir: build === "safari-background" ? false : "public",
     build: {
       outDir: targets({
         firefox: path.resolve(dirname, "dist-firefox"),
@@ -195,7 +198,7 @@ export function getConfig(build: Build, unparsedConfig: ConfigEnv): UserConfig {
         safari: path.resolve(dirname, "dist-safari"),
       }),
       target: "esnext",
-      emptyOutDir: true,
+      emptyOutDir: build === "safari" ? false : true,
       minify: false,
       modulePreload: {
         polyfill: false,
@@ -226,7 +229,7 @@ export function getConfig(build: Build, unparsedConfig: ConfigEnv): UserConfig {
         output: {
           format: "es",
           minifyInternalExports: false,
-          inlineDynamicImports: true,
+          inlineDynamicImports: build === "safari-background" ? true : false,
           validate: true,
           entryFileNames: `[name].js`,
           assetFileNames: `[name].[ext]`,

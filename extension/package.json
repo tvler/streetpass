@@ -5,7 +5,8 @@
     "build": "tsc && yarn build:chrome && yarn build:firefox",
     "build:chrome": "vite build --config vite.config.chrome.ts",
     "build:firefox": "vite build --config vite.config.firefox.ts",
-    "build:safari": "vite build --config vite.config.safari.ts",
+    "build:safari": "yarn build:safari:background && yarn build:safari:main",
+    "build:safari:main": "vite build --config vite.config.safari.ts",
     "build:safari:background": "vite build --config vite.config.safari-background.ts"
   },
   "devDependencies": {
