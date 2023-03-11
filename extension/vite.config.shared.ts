@@ -32,13 +32,13 @@ export function getConfig(
 
   const input = [
     // webextensionPolyfillPathName,
-    path.resolve(dirname, "src/popup.html"),
+    // path.resolve(dirname, "src/popup.html"),
     // path.resolve(dirname, "src/content-script.ts"),
-    // targets({
-    //   chrome: path.resolve(dirname, "src/background.ts"),
-    //   firefox: path.resolve(dirname, "src/background-page.html"),
-    //   safari: path.resolve(dirname, "src/background-page.html"),
-    // }),
+    targets({
+      chrome: path.resolve(dirname, "src/background.ts"),
+      firefox: path.resolve(dirname, "src/background-page.html"),
+      safari: path.resolve(dirname, "src/background-page.html"),
+    }),
   ];
 
   const extensionName = `StreetPass for Mastodon${
@@ -176,7 +176,6 @@ export function getConfig(
       //   },
       // }),
     ],
-
     build: {
       outDir: targets({
         firefox: path.resolve(dirname, "dist-firefox"),
@@ -193,17 +192,15 @@ export function getConfig(
       commonjsOptions: {
         include: [],
       },
-
       rollupOptions: {
         strictDeprecations: true,
-        // preserveEntrySignatures: "strict",
+        preserveEntrySignatures: "strict",
         input: input,
         output: {
           format: "es",
-          // minifyInternalExports: false,
+          minifyInternalExports: false,
           inlineDynamicImports: true,
           validate: true,
-
           entryFileNames: `[name].js`,
           assetFileNames: `[name].[ext]`,
           chunkFileNames: `[name].js`,
