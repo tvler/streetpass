@@ -31,14 +31,14 @@ export function getConfig(
   }
 
   const input = [
-    webextensionPolyfillPathName,
+    // webextensionPolyfillPathName,
     path.resolve(dirname, "src/popup.html"),
-    path.resolve(dirname, "src/content-script.ts"),
-    targets({
-      chrome: path.resolve(dirname, "src/background.ts"),
-      firefox: path.resolve(dirname, "src/background-page.html"),
-      safari: path.resolve(dirname, "src/background-page.html"),
-    }),
+    // path.resolve(dirname, "src/content-script.ts"),
+    // targets({
+    //   chrome: path.resolve(dirname, "src/background.ts"),
+    //   firefox: path.resolve(dirname, "src/background-page.html"),
+    //   safari: path.resolve(dirname, "src/background-page.html"),
+    // }),
   ];
 
   const extensionName = `StreetPass for Mastodon${
@@ -130,54 +130,53 @@ export function getConfig(
           });
         },
       },
-      targets<PluginOption>({
-        chrome: null,
-        firefox: null,
-        safari: {
-          name: "build-safari-app",
-          writeBundle(options) {
-            /*
-            assert(options.dir);
+      // targets<PluginOption>({
+      //   chrome: null,
+      //   firefox: null,
+      //   safari: {
+      //     name: "build-safari-app",
+      //     writeBundle(options) {
+      //       assert(options.dir);
 
-            childProcess.spawnSync(
-              `xcrun /Applications/Xcode.app/Contents/Developer/usr/bin/safari-web-extension-converter`,
-              [
-                "--swift",
-                "--macos-only",
-                "--no-open",
-                "--project-location",
-                options.dir,
-                options.dir,
-              ],
-              {
-                shell: true,
-                stdio: "inherit",
-              }
-            );
+      //       childProcess.spawnSync(
+      //         `xcrun /Applications/Xcode.app/Contents/Developer/usr/bin/safari-web-extension-converter`,
+      //         [
+      //           "--swift",
+      //           "--macos-only",
+      //           "--no-open",
+      //           "--project-location",
+      //           options.dir,
+      //           options.dir,
+      //         ],
+      //         {
+      //           shell: true,
+      //           stdio: "inherit",
+      //         }
+      //       );
 
-            childProcess.spawnSync(
-              "xcodebuild",
-              [
-                "-project",
-                `"${path.resolve(
-                  options.dir,
-                  `${extensionName}`,
-                  `${extensionName}.xcodeproj`
-                )}"`,
-                "-allowProvisioningUpdates",
-                "DEVELOPMENT_TEAM=WLTVAXDPZT",
-                "-quiet",
-              ],
-              {
-                shell: true,
-                stdio: "inherit",
-              }
-            );
-            */
-          },
-        },
-      }),
+      //       childProcess.spawnSync(
+      //         "xcodebuild",
+      //         [
+      //           "-project",
+      //           `"${path.resolve(
+      //             options.dir,
+      //             `${extensionName}`,
+      //             `${extensionName}.xcodeproj`
+      //           )}"`,
+      //           "-allowProvisioningUpdates",
+      //           "DEVELOPMENT_TEAM=WLTVAXDPZT",
+      //           "-quiet",
+      //         ],
+      //         {
+      //           shell: true,
+      //           stdio: "inherit",
+      //         }
+      //       );
+      //     },
+      //   },
+      // }),
     ],
+
     build: {
       outDir: targets({
         firefox: path.resolve(dirname, "dist-firefox"),
@@ -194,13 +193,17 @@ export function getConfig(
       commonjsOptions: {
         include: [],
       },
+
       rollupOptions: {
         strictDeprecations: true,
-        preserveEntrySignatures: "strict",
+        // preserveEntrySignatures: "strict",
         input: input,
         output: {
-          minifyInternalExports: false,
+          format: "es",
+          // minifyInternalExports: false,
+          inlineDynamicImports: true,
           validate: true,
+
           entryFileNames: `[name].js`,
           assetFileNames: `[name].[ext]`,
           chunkFileNames: `[name].js`,
