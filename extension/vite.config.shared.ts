@@ -8,7 +8,12 @@ import { z } from "zod";
 import assert from "node:assert";
 
 import { VERSION } from "../constants.js";
-import { actionActive, actionInactive, Target } from "./src/util.js";
+import {
+  actionActive,
+  actionInactive,
+  Build,
+  getTargetFromBuild,
+} from "./src/util.js";
 
 const dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
@@ -18,28 +23,33 @@ const configSchema = z.object({
   mode: z.union([z.literal("dev"), z.literal("production")]),
 });
 
-export function getConfig(
-  target: Target,
-  unparsedConfig: ConfigEnv
-): UserConfig {
+export function getConfig(build: Build, unparsedConfig: ConfigEnv): UserConfig {
   const config = configSchema.parse(unparsedConfig);
 
-  function targets<Value>(
-    args: Record<Target, Value>
-  ): (typeof args)[keyof typeof args] {
-    return args[target];
-  }
+  function targets<Value>(args: {
+    chrome: Value;
+    firefox: Value;
+    safari: Value;
+  }): Value;
+  function targets<Value>(args: {
+    chrome: Value;
+    firefox: Value;
+    safari: Value;
+    "safari-background": Value;
+  }): Value;
+  function targets<Value>(args: {
+    chrome: Value;
+    firefox: Value;
+    safari: Value;
+    "safari-background"?: Value;
+  }): Value {
+    const resolvedSafariBackground: Value =
+      "safari-background" in args ? args["safari-background"] : args.safari;
 
-  const input = [
-    webextensionPolyfillPathName,
-    path.resolve(dirname, "src/popup.html"),
-    path.resolve(dirname, "src/content-script.ts"),
-    targets({
-      chrome: path.resolve(dirname, "src/background.ts"),
-      firefox: path.resolve(dirname, "src/background-page.html"),
-      safari: path.resolve(dirname, "src/background-page.html"),
-    }),
-  ];
+    return build === "safari-background"
+      ? resolvedSafariBackground
+      : args[build];
+  }
 
   const extensionName = `StreetPass for Mastodon${
     config.mode === "dev"
@@ -73,10 +83,20 @@ export function getConfig(
                 js: ["browser-polyfill.js", "content-script.js"],
               },
             ],
-            icons: {
-              128: "icon-128.png",
-              256: "icon-256.png",
-            },
+            icons: targets({
+              chrome: {
+                128: "icon-128.png",
+                256: "icon-256.png",
+              },
+              firefox: {
+                128: "icon-128.png",
+                256: "icon-256.png",
+              },
+              safari: {
+                128: "icon-128-nopadding.png",
+                256: "icon-256-nopadding.png",
+              },
+            }),
             ...(() => {
               const action: Manifest.ActionManifest = {
                 default_popup: "src/popup.html",
@@ -100,7 +120,7 @@ export function getConfig(
                 safari: { action: action },
               });
             })(),
-            background: targets<Manifest.WebExtensionManifest["background"]>({
+            background: targets({
               chrome: {
                 service_worker: "background.js",
                 type: "module",
@@ -110,11 +130,11 @@ export function getConfig(
                 persistent: false,
               },
               safari: {
-                page: "src/background-page.html",
+                service_worker: "background.js",
               },
             }),
           };
-          if (target === "firefox") {
+          if (build === "firefox") {
             // Chrome doesn't support this yet
             manifest.browser_specific_settings = {
               gecko: {
@@ -123,11 +143,13 @@ export function getConfig(
             };
           }
 
-          this.emitFile({
-            type: "asset",
-            fileName: "manifest.json",
-            source: JSON.stringify(manifest),
-          });
+          if (build !== "safari-background") {
+            this.emitFile({
+              type: "asset",
+              fileName: "manifest.json",
+              source: JSON.stringify(manifest),
+            });
+          }
         },
       },
       targets<PluginOption>({
@@ -154,28 +176,30 @@ export function getConfig(
               }
             );
 
-            childProcess.spawnSync(
-              "xcodebuild",
-              [
-                "-project",
-                `"${path.resolve(
-                  options.dir,
-                  `${extensionName}`,
-                  `${extensionName}.xcodeproj`
-                )}"`,
-                "-allowProvisioningUpdates",
-                "DEVELOPMENT_TEAM=WLTVAXDPZT",
-                "-quiet",
-              ],
-              {
-                shell: true,
-                stdio: "inherit",
-              }
-            );
+            // childProcess.spawnSync(
+            //   "xcodebuild",
+            //   [
+            //     "-project",
+            //     `"${path.resolve(
+            //       options.dir,
+            //       `${extensionName}`,
+            //       `${extensionName}.xcodeproj`
+            //     )}"`,
+            //     "-allowProvisioningUpdates",
+            //     "DEVELOPMENT_TEAM=WLTVAXDPZT",
+            //     "-quiet",
+            //   ],
+            //   {
+            //     shell: true,
+            //     stdio: "inherit",
+            //   }
+            // );
           },
         },
+        "safari-background": null,
       }),
     ],
+    publicDir: build === "safari-background" ? false : "public",
     build: {
       outDir: targets({
         firefox: path.resolve(dirname, "dist-firefox"),
@@ -183,7 +207,7 @@ export function getConfig(
         safari: path.resolve(dirname, "dist-safari"),
       }),
       target: "esnext",
-      emptyOutDir: true,
+      emptyOutDir: build === "safari" ? false : true,
       minify: false,
       modulePreload: {
         polyfill: false,
@@ -195,9 +219,25 @@ export function getConfig(
       rollupOptions: {
         strictDeprecations: true,
         preserveEntrySignatures: "strict",
-        input: input,
+        input: (() => {
+          if (build === "safari-background") {
+            return path.resolve(dirname, "src/background.ts");
+          }
+
+          return [
+            webextensionPolyfillPathName,
+            path.resolve(dirname, "src/popup.html"),
+            path.resolve(dirname, "src/content-script.ts"),
+            targets({
+              chrome: path.resolve(dirname, "src/background.ts"),
+              firefox: path.resolve(dirname, "src/background-page.html"),
+              safari: null,
+            }),
+          ].filter(Boolean);
+        })(),
         output: {
           minifyInternalExports: false,
+          inlineDynamicImports: build === "safari-background" ? true : false,
           validate: true,
           entryFileNames: `[name].js`,
           assetFileNames: `[name].[ext]`,
@@ -207,7 +247,7 @@ export function getConfig(
       },
     },
     define: {
-      __TARGET__: JSON.stringify(target),
+      __TARGET__: JSON.stringify(getTargetFromBuild(build)),
     },
   };
 }
