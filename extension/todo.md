@@ -17,6 +17,9 @@ safari
 - https://developer.apple.com/videos/play/wwdc2020/10665/
 - https://developer.apple.com/videos/play/wwdc2022/10099/
 - https://developer.apple.com/safari/extensions/
+- https://developer.apple.com/help/app-store-connect/reference/screenshot-specifications
+- privacy policy https://overcast.fm/privacy
+- privacy policy https://underpassapp.com/homecoming/privacy.html
 
 good screenshot sites
 

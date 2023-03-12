@@ -176,24 +176,24 @@ export function getConfig(build: Build, unparsedConfig: ConfigEnv): UserConfig {
               }
             );
 
-            childProcess.spawnSync(
-              "xcodebuild",
-              [
-                "-project",
-                `"${path.resolve(
-                  options.dir,
-                  `${extensionName}`,
-                  `${extensionName}.xcodeproj`
-                )}"`,
-                "-allowProvisioningUpdates",
-                "DEVELOPMENT_TEAM=WLTVAXDPZT",
-                "-quiet",
-              ],
-              {
-                shell: true,
-                stdio: "inherit",
-              }
-            );
+            // childProcess.spawnSync(
+            //   "xcodebuild",
+            //   [
+            //     "-project",
+            //     `"${path.resolve(
+            //       options.dir,
+            //       `${extensionName}`,
+            //       `${extensionName}.xcodeproj`
+            //     )}"`,
+            //     "-allowProvisioningUpdates",
+            //     "DEVELOPMENT_TEAM=WLTVAXDPZT",
+            //     "-quiet",
+            //   ],
+            //   {
+            //     shell: true,
+            //     stdio: "inherit",
+            //   }
+            // );
           },
         },
         "safari-background": null,
