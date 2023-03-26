@@ -13,6 +13,29 @@ getIconState(() => {
   return { state: "off" };
 });
 
+function getHrefProps(href: string): {
+  target: string;
+  onClick(ev: React.MouseEvent<HTMLAnchorElement, MouseEvent>): Promise<void>;
+  href: string;
+} {
+  return {
+    target: "_blank",
+    href: href,
+    async onClick(ev: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
+      ev.preventDefault();
+
+      await browser.tabs.create({
+        url: href,
+        active: !ev.metaKey,
+      });
+
+      if (!ev.metaKey) {
+        window.close();
+      }
+    },
+  };
+}
+
 function Popup() {
   const relMeHrefDataStoreQuery = ReactQuery.useQuery(
     "relMeHrefDataStore",
@@ -46,8 +69,7 @@ function Popup() {
             <p>
               No profiles. Try{" "}
               <a
-                href="https://streetpass.social/"
-                target={"_blank"}
+                {...getHrefProps("https://streetpass.social/")}
                 className="font-medium text-purple"
               >
                 this
@@ -88,8 +110,7 @@ function Popup() {
 
                 <div className="flex flex-col items-start">
                   <a
-                    href={relMeHrefData.profileData.profileUrl}
-                    target="_blank"
+                    {...getHrefProps(relMeHrefData.profileData.profileUrl)}
                     className="break-word font-medium text-purple"
                   >
                     {getDisplayHref(relMeHrefData.profileData.profileUrl)}
@@ -97,8 +118,7 @@ function Popup() {
 
                   <p className="text-gray">
                     <a
-                      href={relMeHrefData.websiteUrl}
-                      target="_blank"
+                      {...getHrefProps(relMeHrefData.websiteUrl)}
                       className="break-word text-inherit"
                     >
                       {getDisplayHref(relMeHrefData.websiteUrl)}

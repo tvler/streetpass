@@ -78,7 +78,7 @@ export function getConfig(build: Build, unparsedConfig: ConfigEnv): UserConfig {
             version: VERSION,
             description: "Find your people on Mastodon",
             homepage_url: "https://streetpass.social/",
-            permissions: ["storage"],
+            permissions: ["storage", "tabs"],
             content_scripts: [
               {
                 matches: ["https://*/*", "http://*/*"],
