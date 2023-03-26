@@ -232,7 +232,7 @@ export const actionActive = {
 export const getIconState = storageFactory({
   storageKey: "icon-state-3",
   parse(storageData) {
-    const iconState: { state: "on" | "off"; unreadCount?: number } =
+    const iconState: { state: "on" | "off"; unreadCount?: number | undefined } =
       storageData ?? { state: "off" };
     return iconState;
   },
