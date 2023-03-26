@@ -23,13 +23,14 @@ function getHrefProps(href: string): {
     href: href,
     async onClick(ev: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
       ev.preventDefault();
+      const { metaKey } = ev;
 
       await browser.tabs.create({
         url: href,
-        active: !ev.metaKey,
+        active: !metaKey,
       });
 
-      if (!ev.metaKey) {
+      if (!metaKey) {
         window.close();
       }
     },
