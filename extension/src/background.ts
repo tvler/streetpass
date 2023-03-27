@@ -20,12 +20,10 @@ browser.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
   const sendRelMeHrefPayload: SendRelMeHrefPayload["SEND_REL_ME_HREF"] =
     msg[SEND_REL_ME_HREF];
 
-  let hasExistingRelMeHrefData: boolean | undefined;
-  await getRelMeHrefDataStore((relMeHrefDataStore) => {
-    hasExistingRelMeHrefData = relMeHrefDataStore.has(
-      sendRelMeHrefPayload.relMeHref
-    );
-  });
+  const hasExistingRelMeHrefData: boolean | undefined = (
+    await getRelMeHrefDataStore()
+  ).has(sendRelMeHrefPayload.relMeHref);
+
   if (hasExistingRelMeHrefData) {
     return;
   }

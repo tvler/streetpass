@@ -6,6 +6,7 @@ import type { Manifest } from "webextension-polyfill";
 import childProcess from "node:child_process";
 import { z } from "zod";
 import assert from "node:assert";
+import ViteReact from "@vitejs/plugin-react";
 
 import { VERSION } from "../constants.js";
 import {
@@ -67,6 +68,7 @@ export function getConfig(build: Build, unparsedConfig: ConfigEnv): UserConfig {
 
   return {
     plugins: [
+      ViteReact(),
       {
         name: "build-manifest",
         generateBundle() {
@@ -216,8 +218,9 @@ export function getConfig(build: Build, unparsedConfig: ConfigEnv): UserConfig {
         resolveDependencies: () => [],
       },
       commonjsOptions: {
-        include: [],
+        exclude: [/node_modules\/webextension-polyfill/],
       },
+
       rollupOptions: {
         strictDeprecations: true,
         preserveEntrySignatures: "strict",

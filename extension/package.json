@@ -10,19 +10,29 @@
     "build:safari:background": "vite build --config vite.config.safari-background.ts"
   },
   "devDependencies": {
+    "@types/react": "^18.0.29",
+    "@types/react-dom": "^18.0.11",
     "@types/webextension-polyfill": "^0.10.0",
     "@typescript-eslint/eslint-plugin": "^5.49.0",
     "@typescript-eslint/parser": "^5.49.0",
+    "@vitejs/plugin-react": "^3.1.0",
     "autoprefixer": "^10.4.13",
     "eslint": "^8.30.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "postcss": "^8.4.21",
     "prettier": "^2.8.3",
+    "prettier-plugin-tailwindcss": "^0.2.5",
     "tailwindcss": "^3.2.4",
     "typescript": "^4.9.4",
     "vite": "^4.1.4",
     "webextension-polyfill": "^0.10.0",
     "zod": "^3.20.6"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-query": "^3.39.3"
   }
 }

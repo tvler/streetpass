@@ -177,14 +177,14 @@ export function storageFactory<T>(args: {
   storageKey: string;
   onChange?(args: { prev: T; curr: T }): void | Promise<void>;
 }): {
-  (cb: (data: Readonly<T>) => void | T): Promise<void>;
+  (cb?: (data: Readonly<T>) => T | void): Promise<T>;
 } {
-  let lastDataPromise = Promise.resolve();
+  let lastDataPromise: Promise<T> = Promise.resolve(args.parse(undefined));
 
   return (cb) => {
     const oldLastDataPromise = lastDataPromise;
     lastDataPromise = new Promise((res) => {
-      oldLastDataPromise.then(async () => {
+      oldLastDataPromise.then(async (oldValue) => {
         try {
           const storageData = (
             await browser.storage.local.get(args.storageKey)
@@ -192,7 +192,7 @@ export function storageFactory<T>(args: {
 
           const data = args.parse(storageData);
 
-          const cbResult = cb(data);
+          const cbResult = cb?.(data);
 
           if (cbResult !== undefined) {
             await browser.storage.local.set({
@@ -203,11 +203,11 @@ export function storageFactory<T>(args: {
               curr: cbResult,
             });
           }
-        } catch (err) {
-          // Nothing
-        }
 
-        res();
+          res(data);
+        } catch (err) {
+          res(oldValue);
+        }
       });
     });
 
@@ -232,7 +232,7 @@ export const actionActive = {
 export const getIconState = storageFactory({
   storageKey: "icon-state-3",
   parse(storageData) {
-    const iconState: { state: "on" | "off"; unreadCount?: number } =
+    const iconState: { state: "on" | "off"; unreadCount?: number | undefined } =
       storageData ?? { state: "off" };
     return iconState;
   },
