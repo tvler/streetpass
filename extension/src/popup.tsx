@@ -6,7 +6,7 @@ import {
   getDisplayHref,
   getIconState,
   getProfiles,
-  getRelMeHrefDataStore,
+  getHrefStore,
 } from "./util";
 
 getIconState(() => {
@@ -38,17 +38,17 @@ function getHrefProps(href: string): {
 }
 
 function Popup() {
-  const relMeHrefDataStoreQuery = ReactQuery.useQuery(
-    "relMeHrefDataStore",
-    React.useCallback(() => getRelMeHrefDataStore(), [])
+  const hrefStoreQuery = ReactQuery.useQuery(
+    "hrefStore",
+    React.useCallback(() => getHrefStore(), [])
   );
 
-  const values = React.useMemo(() => {
-    if (!relMeHrefDataStoreQuery.data) {
+  const profiles = React.useMemo(() => {
+    if (!hrefStoreQuery.data) {
       return [];
     }
-    return Array.from(getProfiles(relMeHrefDataStoreQuery.data).values());
-  }, [relMeHrefDataStoreQuery.data]);
+    return Array.from(getProfiles(hrefStoreQuery.data).values());
+  }, [hrefStoreQuery.data]);
 
   return (
     <>
@@ -59,13 +59,13 @@ function Popup() {
       </div>
 
       <div className="flex flex-col gap-18 px-12 pb-18 text-13 leading-[1.45]">
-        {!!values.length && (
+        {!!profiles.length && (
           <span className="absolute top-12 right-12 rounded-6 bg-purple-light py-[0.18em] px-[0.45em] text-11 font-medium leading-[1.3] text-purple">
-            {values.length}
+            {profiles.length}
           </span>
         )}
 
-        {!values.length && !relMeHrefDataStoreQuery.isLoading && (
+        {!profiles.length && !hrefStoreQuery.isLoading && (
           <div className="absolute top-0 right-0 bottom-0 left-0 flex items-center justify-center text-13 text-gray">
             <p>
               No profiles. Try{" "}
@@ -80,7 +80,7 @@ function Popup() {
           </div>
         )}
 
-        {values.map((relMeHrefData, index, arr) => {
+        {profiles.map((relMeHrefData, index, arr) => {
           const prevRelMeHrefData = arr[index - 1];
           const prevRelMeHrefDate = prevRelMeHrefData
             ? new Date(prevRelMeHrefData.viewedAt).getDate()

@@ -1,24 +1,18 @@
-export const SEND_REL_ME_HREF = "SEND_REL_ME_HREF";
+/**
+ * =========
+ * CONSTANTS
+ * =========
+ */
 
-export type SendRelMeHrefPayload = {
-  [SEND_REL_ME_HREF]: { relMeHref: string; tabUrl: string };
+export const HREF_PAYLOAD = "HREF_PAYLOAD";
+
+export type HrefPayload = {
+  [HREF_PAYLOAD]: { href: string; tabUrl: string };
 };
 
 export type Target = "chrome" | "firefox" | "safari";
 
 export type Build = "chrome" | "firefox" | "safari" | "safari-background";
-
-export function getTargetFromBuild(build: Build): Target {
-  switch (build) {
-    case "chrome":
-    case "firefox":
-    case "safari":
-      return build;
-
-    case "safari-background":
-      return "safari";
-  }
-}
 
 type Profile = { type: "profile"; profileUrl: string };
 
@@ -26,14 +20,14 @@ type NotProfile = { type: "notProfile" };
 
 type ProfileData = Profile | NotProfile;
 
-type RelMeHrefDataStoreValue = {
+type HrefData = {
   profileData: ProfileData;
   websiteUrl: string;
   viewedAt: number;
   relMeHref: string;
 };
 
-export type RelMeHrefDataStore = Map<string, RelMeHrefDataStoreValue>;
+export type HrefStore = Map<string, HrefData>;
 
 type Webfinger = {
   subject: string;
@@ -47,6 +41,26 @@ type Webfinger = {
     properties?: Record<string, string>;
   }>;
 };
+
+export const actionInactive = {
+  "16": "/action-inactive-16.png",
+  "19": "/action-inactive-19.png",
+  "32": "/action-inactive-32.png",
+  "38": "/action-inactive-38.png",
+} as const satisfies Record<string, string>;
+
+export const actionActive = {
+  "16": "/action-active-16.png",
+  "19": "/action-active-19.png",
+  "32": "/action-active-32.png",
+  "38": "/action-active-38.png",
+} as const satisfies Record<string, string>;
+
+/**
+ * =====
+ * UTILS
+ * =====
+ */
 
 export function getIsUrlHttpOrHttps(uncheckedUrl: string | undefined): boolean {
   if (!uncheckedUrl) {
@@ -64,27 +78,22 @@ export function getIsUrlHttpOrHttps(uncheckedUrl: string | undefined): boolean {
 }
 
 export function getProfiles(
-  relMeHrefDataStore: RelMeHrefDataStore
-): Map<string, { profileData: Profile } & RelMeHrefDataStoreValue> {
-  const profiles: Map<
-    string,
-    { profileData: Profile } & RelMeHrefDataStoreValue
-  > = new Map();
+  hrefStore: HrefStore
+): Map<string, { profileData: Profile } & HrefData> {
+  const profiles: Map<string, { profileData: Profile } & HrefData> = new Map();
 
-  for (const relMeHrefData of Array.from(
-    relMeHrefDataStore.values()
-  ).reverse()) {
-    if (relMeHrefData.profileData.type !== "profile") {
+  for (const hrefData of Array.from(hrefStore.values()).reverse()) {
+    if (hrefData.profileData.type !== "profile") {
       continue;
     }
-    profiles.set(relMeHrefData.profileData.profileUrl, {
+    profiles.set(hrefData.profileData.profileUrl, {
       profileData: {
-        type: relMeHrefData.profileData.type,
-        profileUrl: relMeHrefData.profileData.profileUrl,
+        type: hrefData.profileData.type,
+        profileUrl: hrefData.profileData.profileUrl,
       },
-      websiteUrl: relMeHrefData.websiteUrl,
-      viewedAt: relMeHrefData.viewedAt,
-      relMeHref: relMeHrefData.relMeHref,
+      websiteUrl: hrefData.websiteUrl,
+      viewedAt: hrefData.viewedAt,
+      relMeHref: hrefData.relMeHref,
     });
   }
 
@@ -109,16 +118,16 @@ export async function getUncachedProfileData(
       throw new Error();
     }
 
-    const visitedRelMeHrefResp = await fetch(href);
-    if (!visitedRelMeHrefResp.ok) {
+    const visitedHrefResp = await fetch(href);
+    if (!visitedHrefResp.ok) {
       throw new Error();
     }
 
-    const visitedRelMeUrl = new URL(visitedRelMeHrefResp.url);
+    const visitedUrl = new URL(visitedHrefResp.url);
 
-    const webfingerUrl = new URL(visitedRelMeUrl.origin);
+    const webfingerUrl = new URL(visitedUrl.origin);
     webfingerUrl.pathname = ".well-known/webfinger";
-    webfingerUrl.searchParams.set("resource", visitedRelMeUrl.toString());
+    webfingerUrl.searchParams.set("resource", visitedUrl.toString());
 
     const webfingerResp = await fetch(webfingerUrl);
     if (!webfingerResp.ok) {
@@ -215,20 +224,6 @@ export function storageFactory<T>(args: {
   };
 }
 
-export const actionInactive = {
-  "16": "/action-inactive-16.png",
-  "19": "/action-inactive-19.png",
-  "32": "/action-inactive-32.png",
-  "38": "/action-inactive-38.png",
-} as const satisfies Record<string, string>;
-
-export const actionActive = {
-  "16": "/action-active-16.png",
-  "19": "/action-active-19.png",
-  "32": "/action-active-32.png",
-  "38": "/action-active-38.png",
-} as const satisfies Record<string, string>;
-
 export const getIconState = storageFactory({
   storageKey: "icon-state-3",
   parse(storageData) {
@@ -264,19 +259,19 @@ export const getIconState = storageFactory({
   },
 });
 
-export const getRelMeHrefDataStore = storageFactory({
+export const getHrefStore = storageFactory({
   storageKey: "rel-me-href-data-store-3",
   parse(storageData) {
-    let relMeHrefDataStore: RelMeHrefDataStore;
+    let hrefStore: HrefStore;
     try {
-      relMeHrefDataStore = new Map(storageData);
+      hrefStore = new Map(storageData);
     } catch (err) {
-      relMeHrefDataStore = new Map();
+      hrefStore = new Map();
     }
-    return relMeHrefDataStore;
+    return hrefStore;
   },
-  serialize(relMeHrefDataStore) {
-    return Array.from(relMeHrefDataStore.entries());
+  serialize(hrefStore) {
+    return Array.from(hrefStore.entries());
   },
   async onChange({ prev, curr }) {
     const prevProfiles = getProfiles(prev);
@@ -291,6 +286,18 @@ export const getRelMeHrefDataStore = storageFactory({
     }
   },
 });
+
+export function getTargetFromBuild(build: Build): Target {
+  switch (build) {
+    case "chrome":
+    case "firefox":
+    case "safari":
+      return build;
+
+    case "safari-background":
+      return "safari";
+  }
+}
 
 /**
  * Test the safe storage
