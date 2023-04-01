@@ -1,67 +1,44 @@
 import "webextension-polyfill";
 import {
   getUncachedProfileData,
-  getRelMeHrefDataStore,
-  SEND_REL_ME_HREF,
+  getHrefStore,
+  HREF_PAYLOAD,
   getIconState,
 } from "./util.js";
-import type { SendRelMeHrefPayload } from "./util.js";
+import type { HrefPayload } from "./util.js";
 
 browser.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
   if (
     !msg ||
     typeof msg !== "object" ||
-    !(SEND_REL_ME_HREF in msg) ||
-    !msg[SEND_REL_ME_HREF]
+    !(HREF_PAYLOAD in msg) ||
+    !msg[HREF_PAYLOAD]
   ) {
     return;
   }
 
-  const sendRelMeHrefPayload: SendRelMeHrefPayload["SEND_REL_ME_HREF"] =
-    msg[SEND_REL_ME_HREF];
+  const hrefPayload: HrefPayload[typeof HREF_PAYLOAD] = msg[HREF_PAYLOAD];
 
-  const hasExistingRelMeHrefData: boolean | undefined = (
-    await getRelMeHrefDataStore()
-  ).has(sendRelMeHrefPayload.relMeHref);
+  const hasExistingHrefData: boolean | undefined = (await getHrefStore()).has(
+    hrefPayload.href
+  );
 
-  if (hasExistingRelMeHrefData) {
+  if (hasExistingHrefData) {
     return;
   }
 
-  const profileData = await getUncachedProfileData(
-    sendRelMeHrefPayload.relMeHref
-  );
+  const profileData = await getUncachedProfileData(hrefPayload.href);
 
-  await getRelMeHrefDataStore((relMeHrefDataStore) => {
-    if (!profileData) {
-      return;
-    }
-
-    relMeHrefDataStore.set(sendRelMeHrefPayload.relMeHref, {
+  await getHrefStore((hrefStore) => {
+    hrefStore.set(hrefPayload.href, {
       profileData: profileData,
       viewedAt: Date.now(),
-      websiteUrl: sendRelMeHrefPayload.tabUrl,
-      relMeHref: sendRelMeHrefPayload.relMeHref,
+      websiteUrl: hrefPayload.tabUrl,
+      relMeHref: hrefPayload.href,
     });
 
-    return relMeHrefDataStore;
+    return hrefStore;
   });
-
-  // getRelMeHrefDataStore((profiles) => {
-  //   console.table(
-  //     Object.fromEntries(
-  //       Array.from(profiles.entries()).map(([key, val]) => {
-  //         return [
-  //           key,
-  //           val.profileData.type === "profile"
-  //             ? val.profileData.profileUrl
-  //             : val.profileData.type,
-  //         ];
-  //       })
-  //     ),
-  //     ["profileData"]
-  //   );
-  // });
 });
 
 browser.runtime.onInstalled.addListener((details) => {

@@ -1,6 +1,6 @@
 /* eslint-env browser */
 
-import type { SendRelMeHrefPayload } from "./util.js";
+import type { HrefPayload } from "./util.js";
 
 function getCurrentUrlWithNoHash() {
   const url = new URL(window.location.toString());
@@ -9,23 +9,23 @@ function getCurrentUrlWithNoHash() {
 }
 
 let currentUrlWithNoHash = getCurrentUrlWithNoHash();
-const relMeHrefs: Set<string> = new Set();
+const hrefs: Set<string> = new Set();
 
-function sendRelMeHrefs() {
+function sendHrefs() {
   const elements = document.querySelectorAll(":is(link, a)[rel~=me]");
 
   for (const element of elements) {
-    const relMeHref = element.getAttribute("href");
-    if (relMeHref && !relMeHrefs.has(relMeHref)) {
-      relMeHrefs.add(relMeHref);
+    const href = element.getAttribute("href");
+    if (href && !hrefs.has(href)) {
+      hrefs.add(href);
 
-      const sendRelMeHrefPayload: SendRelMeHrefPayload = {
-        SEND_REL_ME_HREF: {
+      const hrefPayload: HrefPayload = {
+        HREF_PAYLOAD: {
           tabUrl: currentUrlWithNoHash,
-          relMeHref: relMeHref,
+          href: href,
         },
       };
-      browser.runtime.sendMessage(sendRelMeHrefPayload);
+      browser.runtime.sendMessage(hrefPayload);
     }
   }
 }
@@ -34,14 +34,14 @@ new MutationObserver(() => {
   const testCurrentUrlWithNoHash = getCurrentUrlWithNoHash();
   if (currentUrlWithNoHash !== testCurrentUrlWithNoHash) {
     currentUrlWithNoHash = testCurrentUrlWithNoHash;
-    relMeHrefs.clear();
+    hrefs.clear();
   }
 
-  sendRelMeHrefs();
+  sendHrefs();
 }).observe(document.documentElement, {
   subtree: true,
   childList: true,
   attributeFilter: ["rel"],
 });
 
-sendRelMeHrefs();
+sendHrefs();
