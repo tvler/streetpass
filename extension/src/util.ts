@@ -194,7 +194,7 @@ export function storageFactory<T extends NotNullNotUndefined>(args: {
   storageKey: string;
   onChange?(args: { prev: T; curr: T }): void | Promise<void>;
 }): {
-  (cb?: (data: T) => T | void): Promise<T>;
+  (cb?: (data: T) => T): Promise<T>;
 } {
   let lastDataPromise: Promise<T> = Promise.resolve(
     args.parse(undefined).value
