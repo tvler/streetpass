@@ -21,7 +21,7 @@ function getHrefProps(href: string): {
   return {
     target: "_blank",
     href: href,
-    async onClick(ev: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
+    async onClick(ev) {
       ev.preventDefault();
       const { metaKey } = ev;
 

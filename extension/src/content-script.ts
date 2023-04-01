@@ -1,6 +1,6 @@
 /* eslint-env browser */
 
-import { HREF_PAYLOAD, HrefPayload } from "./util.js";
+import type { HrefPayload } from "./util.js";
 
 function getCurrentUrlWithNoHash() {
   const url = new URL(window.location.toString());
@@ -20,7 +20,7 @@ function sendHrefs() {
       hrefs.add(href);
 
       const hrefPayload: HrefPayload = {
-        [HREF_PAYLOAD]: {
+        HREF_PAYLOAD: {
           tabUrl: currentUrlWithNoHash,
           href: href,
         },

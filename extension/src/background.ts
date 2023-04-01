@@ -30,10 +30,6 @@ browser.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
   const profileData = await getUncachedProfileData(hrefPayload.href);
 
   await getHrefStore((hrefStore) => {
-    if (!profileData) {
-      return;
-    }
-
     hrefStore.set(hrefPayload.href, {
       profileData: profileData,
       viewedAt: Date.now(),

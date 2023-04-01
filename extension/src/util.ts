@@ -56,6 +56,8 @@ export const actionActive = {
   "38": "/action-active-38.png",
 } as const satisfies Record<string, string>;
 
+const timeToExpireNotProfile = 20 * 60 * 1000; // 20min in milliseconds
+
 /**
  * =====
  * UTILS
@@ -115,6 +117,10 @@ export async function getUncachedProfileData(
 ): Promise<ProfileData> {
   try {
     if (!getIsUrlHttpOrHttps(href)) {
+      throw new Error();
+    }
+
+    if (href.startsWith("https://twitter.com")) {
       throw new Error();
     }
 
@@ -181,14 +187,16 @@ export function getDisplayHref(href: string): string {
 }
 
 export function storageFactory<T>(args: {
-  parse(storageData: any): T;
+  parse(storageData: any): { value: T; changedDuringParse?: boolean };
   serialize(data: T): any;
   storageKey: string;
   onChange?(args: { prev: T; curr: T }): void | Promise<void>;
 }): {
   (cb?: (data: Readonly<T>) => T | void): Promise<T>;
 } {
-  let lastDataPromise: Promise<T> = Promise.resolve(args.parse(undefined));
+  let lastDataPromise: Promise<T> = Promise.resolve(
+    args.parse(undefined).value
+  );
 
   return (cb) => {
     const oldLastDataPromise = lastDataPromise;
@@ -201,19 +209,21 @@ export function storageFactory<T>(args: {
 
           const data = args.parse(storageData);
 
-          const cbResult = cb?.(data);
+          const changedData =
+            cb?.(data.value) ??
+            (data.changedDuringParse ? data.value : undefined);
 
-          if (cbResult !== undefined) {
+          if (changedData !== undefined) {
             await browser.storage.local.set({
-              [args.storageKey]: args.serialize(cbResult),
+              [args.storageKey]: args.serialize(changedData),
             });
             await args.onChange?.({
-              prev: args.parse(storageData),
-              curr: cbResult,
+              prev: args.parse(storageData).value,
+              curr: changedData,
             });
           }
 
-          res(data);
+          res(data.value);
         } catch (err) {
           res(oldValue);
         }
@@ -229,7 +239,7 @@ export const getIconState = storageFactory({
   parse(storageData) {
     const iconState: { state: "on" | "off"; unreadCount?: number | undefined } =
       storageData ?? { state: "off" };
-    return iconState;
+    return { value: iconState };
   },
   serialize(iconState) {
     return iconState;
@@ -263,12 +273,22 @@ export const getHrefStore = storageFactory({
   storageKey: "rel-me-href-data-store-3",
   parse(storageData) {
     let hrefStore: HrefStore;
+    let changedDuringParse = false;
     try {
       hrefStore = new Map(storageData);
+      hrefStore.forEach((hrefData, key) => {
+        if (
+          hrefData.profileData.type === "notProfile" &&
+          hrefData.viewedAt + timeToExpireNotProfile < Date.now()
+        ) {
+          hrefStore.delete(key);
+          changedDuringParse = true;
+        }
+      });
     } catch (err) {
       hrefStore = new Map();
     }
-    return hrefStore;
+    return { value: hrefStore, changedDuringParse };
   },
   serialize(hrefStore) {
     return Array.from(hrefStore.entries());
