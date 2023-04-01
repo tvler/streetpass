@@ -20,6 +20,8 @@ type NotProfile = { type: "notProfile" };
 
 type ProfileData = Profile | NotProfile;
 
+type NotNullNotUndefined = {};
+
 type HrefData = {
   profileData: ProfileData;
   websiteUrl: string;
@@ -56,7 +58,7 @@ export const actionActive = {
   "38": "/action-active-38.png",
 } as const satisfies Record<string, string>;
 
-const timeToExpireNotProfile = 20 * 60 * 1000; // 20min in milliseconds
+const timeToExpireNotProfile = 10 * 60 * 1000; // 10 min in milliseconds
 
 /**
  * =====
@@ -186,13 +188,13 @@ export function getDisplayHref(href: string): string {
   return strippedUrl;
 }
 
-export function storageFactory<T>(args: {
+export function storageFactory<T extends NotNullNotUndefined>(args: {
   parse(storageData: any): { value: T; changedDuringParse?: boolean };
   serialize(data: T): any;
   storageKey: string;
   onChange?(args: { prev: T; curr: T }): void | Promise<void>;
 }): {
-  (cb?: (data: Readonly<T>) => T | void): Promise<T>;
+  (cb?: (data: T) => T | void): Promise<T>;
 } {
   let lastDataPromise: Promise<T> = Promise.resolve(
     args.parse(undefined).value
@@ -207,23 +209,23 @@ export function storageFactory<T>(args: {
             await browser.storage.local.get(args.storageKey)
           )?.[args.storageKey];
 
-          const data = args.parse(storageData);
+          const parseReturn = args.parse(storageData);
 
           const changedData =
-            cb?.(data.value) ??
-            (data.changedDuringParse ? data.value : undefined);
+            cb?.(args.parse(storageData).value) ??
+            (parseReturn.changedDuringParse ? parseReturn.value : undefined);
 
           if (changedData !== undefined) {
             await browser.storage.local.set({
               [args.storageKey]: args.serialize(changedData),
             });
             await args.onChange?.({
-              prev: args.parse(storageData).value,
+              prev: parseReturn.value,
               curr: changedData,
             });
           }
 
-          res(data.value);
+          res(changedData ?? parseReturn.value);
         } catch (err) {
           res(oldValue);
         }
