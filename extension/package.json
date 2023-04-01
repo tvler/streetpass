@@ -2,7 +2,7 @@
   "type": "module",
   "packageManager": "yarn@3.3.1",
   "scripts": {
-    "build": "tsc && yarn build:chrome && yarn build:firefox",
+    "build": "tsc && yarn build:chrome && yarn build:firefox && yarn build:safari",
     "build:chrome": "vite build --config vite.config.chrome.ts",
     "build:firefox": "vite build --config vite.config.firefox.ts",
     "build:safari": "yarn build:safari:background && yarn build:safari:main",

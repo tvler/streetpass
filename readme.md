@@ -13,3 +13,14 @@ StreetPass is a browser extension that helps you find your people on Mastodon. H
 3. Browse the web as usual. StreetPass will build a list of Mastodon users made up of the websites you go to.
 
 ❤️ StreetPass is made possible by open web [identity verification standards](http://microformats.org/wiki/rel-me).
+
+# How to build locally
+
+- Install `yarn`
+- `cd` into the extension directory
+- Run `yarn`
+- Build command
+  - Chrome: `yarn build:chrome` -> Out dir: `dist-chrome`
+  - Firefox: `yarn build:firefox` -> Out dir: `dist-firefox`
+  - Safari: `yarn build:safari` -> Out dir: `dist-safari`
+  - All: `yarn build`
