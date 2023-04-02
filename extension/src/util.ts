@@ -1,3 +1,5 @@
+import type { DeepReadonly } from "ts-essentials";
+
 /**
  * =========
  * CONSTANTS
@@ -82,7 +84,7 @@ export function getIsUrlHttpOrHttps(uncheckedUrl: string | undefined): boolean {
 }
 
 export function getProfiles(
-  hrefStore: HrefStore
+  hrefStore: DeepReadonly<HrefStore>
 ): Map<string, { profileData: Profile } & HrefData> {
   const profiles: Map<string, { profileData: Profile } & HrefData> = new Map();
 
@@ -189,14 +191,20 @@ export function getDisplayHref(href: string): string {
 }
 
 export function storageFactory<T extends NotNullNotUndefined>(args: {
-  parse(storageData: any): { value: T; changedDuringParse?: boolean };
-  serialize(data: T): any;
+  parse(storageData: any): {
+    value: DeepReadonly<T>;
+    changedDuringParse?: boolean;
+  };
+  serialize(data: DeepReadonly<T>): any;
   storageKey: string;
-  onChange?(args: { prev: T; curr: T }): void | Promise<void>;
+  onChange?(args: {
+    prev: DeepReadonly<T>;
+    curr: DeepReadonly<T>;
+  }): void | Promise<void>;
 }): {
-  (cb?: (data: T) => T): Promise<T>;
+  (cb?: (data: DeepReadonly<T>) => DeepReadonly<T>): Promise<DeepReadonly<T>>;
 } {
-  let lastDataPromise: Promise<T> = Promise.resolve(
+  let lastDataPromise: Promise<DeepReadonly<T>> = Promise.resolve(
     args.parse(undefined).value
   );
 
@@ -212,7 +220,7 @@ export function storageFactory<T extends NotNullNotUndefined>(args: {
           const parseReturn = args.parse(storageData);
 
           const changedData =
-            cb?.(args.parse(storageData).value) ??
+            cb?.(parseReturn.value) ??
             (parseReturn.changedDuringParse ? parseReturn.value : undefined);
 
           if (changedData !== undefined) {
