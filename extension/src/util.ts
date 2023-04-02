@@ -60,7 +60,7 @@ export const actionActive = {
   "38": "/action-active-38.png",
 } as const satisfies Record<string, string>;
 
-const timeToExpireNotProfile = 10 * 60 * 1000; // 10 min in milliseconds
+export const timeToExpireNotProfile = 10 * 60 * 1000; // 10 min in milliseconds
 
 /**
  * =====
@@ -128,6 +128,14 @@ export async function getUncachedProfileData(
       throw new Error();
     }
 
+    if (href.startsWith("https://instagram.com")) {
+      throw new Error();
+    }
+
+    if (href.startsWith("https://github.com")) {
+      throw new Error();
+    }
+
     const visitedHrefResp = await fetch(href);
     if (!visitedHrefResp.ok) {
       throw new Error();
@@ -191,10 +199,7 @@ export function getDisplayHref(href: string): string {
 }
 
 export function storageFactory<T extends NotNullNotUndefined>(args: {
-  parse(storageData: any): {
-    value: DeepReadonly<T>;
-    changedDuringParse?: boolean;
-  };
+  parse(storageData: any): DeepReadonly<T>;
   serialize(data: DeepReadonly<T>): any;
   storageKey: string;
   onChange?(args: {
@@ -205,7 +210,7 @@ export function storageFactory<T extends NotNullNotUndefined>(args: {
   (cb?: (data: DeepReadonly<T>) => DeepReadonly<T>): Promise<DeepReadonly<T>>;
 } {
   let lastDataPromise: Promise<DeepReadonly<T>> = Promise.resolve(
-    args.parse(undefined).value
+    args.parse(undefined)
   );
 
   return (cb) => {
@@ -217,23 +222,20 @@ export function storageFactory<T extends NotNullNotUndefined>(args: {
             await browser.storage.local.get(args.storageKey)
           )?.[args.storageKey];
 
-          const parseReturn = args.parse(storageData);
-
-          const changedData =
-            cb?.(parseReturn.value) ??
-            (parseReturn.changedDuringParse ? parseReturn.value : undefined);
+          const data = args.parse(storageData);
+          const changedData = cb?.(data);
 
           if (changedData !== undefined) {
             await browser.storage.local.set({
               [args.storageKey]: args.serialize(changedData),
             });
             await args.onChange?.({
-              prev: parseReturn.value,
+              prev: data,
               curr: changedData,
             });
           }
 
-          res(changedData ?? parseReturn.value);
+          res(changedData ?? data);
         } catch (err) {
           res(oldValue);
         }
@@ -249,7 +251,7 @@ export const getIconState = storageFactory({
   parse(storageData) {
     const iconState: { state: "on" | "off"; unreadCount?: number | undefined } =
       storageData ?? { state: "off" };
-    return { value: iconState };
+    return iconState;
   },
   serialize(iconState) {
     return iconState;
@@ -283,22 +285,12 @@ export const getHrefStore = storageFactory({
   storageKey: "rel-me-href-data-store-3",
   parse(storageData) {
     let hrefStore: HrefStore;
-    let changedDuringParse = false;
     try {
       hrefStore = new Map(storageData);
-      hrefStore.forEach((hrefData, key) => {
-        if (
-          hrefData.profileData.type === "notProfile" &&
-          hrefData.viewedAt + timeToExpireNotProfile < Date.now()
-        ) {
-          hrefStore.delete(key);
-          changedDuringParse = true;
-        }
-      });
     } catch (err) {
       hrefStore = new Map();
     }
-    return { value: hrefStore, changedDuringParse };
+    return hrefStore;
   },
   serialize(hrefStore) {
     return Array.from(hrefStore.entries());
