@@ -226,13 +226,15 @@ export function storageFactory<T extends NotNullNotUndefined>(args: {
           const changedData = cb?.(data);
 
           if (changedData !== undefined) {
-            await browser.storage.local.set({
-              [args.storageKey]: args.serialize(changedData),
-            });
-            await args.onChange?.({
-              prev: data,
-              curr: changedData,
-            });
+            await Promise.all([
+              browser.storage.local.set({
+                [args.storageKey]: args.serialize(changedData),
+              }),
+              args.onChange?.({
+                prev: data,
+                curr: changedData,
+              }),
+            ]);
           }
 
           res(changedData ?? data);
