@@ -7,6 +7,13 @@
 - https://mastodon.social/@DLX
 - https://www.presscheck.org/journalists
 
+activitypub
+
+- https://blog.joinmastodon.org/2018/06/how-to-implement-a-basic-activitypub-server/
+- https://docs.joinmastodon.org/spec/security/
+- https://docs.joinmastodon.org/spec/activitypub/#publicKey
+- https://blog.joinmastodon.org/2018/07/how-to-make-friends-and-verify-requests/
+
 cross browser
 
 - https://akoskm.com/building-a-cross-browser-extension#heading-bundlers

@@ -22,6 +22,7 @@
     "zod": "^3.20.2"
   },
   "devDependencies": {
+    "activitypub-core-types": "^0.2.71",
     "autoprefixer": "^10.4.13",
     "cheerio": "^1.0.0-rc.12",
     "eslint-config-prettier": "^8.6.0",
