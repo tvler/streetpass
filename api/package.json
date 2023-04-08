@@ -2,6 +2,9 @@
   "name": "webfinger",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "18.x"
+  },
   "scripts": {
     "dev": "vercel env pull && next dev",
     "build": "next build",
