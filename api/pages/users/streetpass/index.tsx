@@ -118,8 +118,7 @@ export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
   );
   const publicKeyString = publicKeyObject
     .export({ format: "pem", type: "spki" })
-    .toString()
-    .replaceAll("\n", "\\n");
+    .toString();
 
   const actor: AP.Application = {
     "@context": [
