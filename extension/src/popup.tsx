@@ -80,22 +80,22 @@ function Popup() {
           </div>
         )}
 
-        {profiles.map((relMeHrefData, index, arr) => {
-          const prevRelMeHrefData = arr[index - 1];
-          const prevRelMeHrefDate = prevRelMeHrefData
-            ? new Date(prevRelMeHrefData.viewedAt).getDate()
+        {profiles.map((hrefData, index, arr) => {
+          const prevHrefData = arr[index - 1];
+          const prevHrefDate = prevHrefData
+            ? new Date(prevHrefData.viewedAt).getDate()
             : new Date().getDate();
           const previousItemWasDayBefore =
-            prevRelMeHrefDate !== new Date(relMeHrefData.viewedAt).getDate();
+            prevHrefDate !== new Date(hrefData.viewedAt).getDate();
 
           return (
-            <React.Fragment key={`${index}.${relMeHrefData.relMeHref}`}>
+            <React.Fragment key={`${index}.${hrefData.relMeHref}`}>
               {previousItemWasDayBefore && (
                 <p className="shrink-0 text-gray">
                   {new Intl.DateTimeFormat(undefined, {
                     day: "numeric",
                     month: "short",
-                  }).format(relMeHrefData.viewedAt)}
+                  }).format(hrefData.viewedAt)}
                 </p>
               )}
 
@@ -104,25 +104,25 @@ function Popup() {
                   {new Intl.DateTimeFormat(undefined, {
                     timeStyle: "short",
                   })
-                    .format(relMeHrefData.viewedAt)
+                    .format(hrefData.viewedAt)
                     .toLowerCase()
                     .replace(/\s+/g, "")}
                 </p>
 
                 <div className="flex flex-col items-start">
                   <a
-                    {...getHrefProps(relMeHrefData.profileData.profileUrl)}
+                    {...getHrefProps(hrefData.profileData.profileUrl)}
                     className="break-word font-medium text-purple"
                   >
-                    {getDisplayHref(relMeHrefData.profileData.profileUrl)}
+                    {getDisplayHref(hrefData.profileData.profileUrl)}
                   </a>
 
                   <p className="text-gray">
                     <a
-                      {...getHrefProps(relMeHrefData.websiteUrl)}
+                      {...getHrefProps(hrefData.websiteUrl)}
                       className="break-word text-inherit"
                     >
-                      {getDisplayHref(relMeHrefData.websiteUrl)}
+                      {getDisplayHref(hrefData.websiteUrl)}
                     </a>
                   </p>
                 </div>
