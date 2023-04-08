@@ -113,7 +113,9 @@ export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
     throw new Error();
   }
 
-  const publicKeyObject = crypto.createPublicKey(process.env.PRIVATE_KEY);
+  const publicKeyObject = crypto.createPublicKey(
+    process.env.PRIVATE_KEY.split(String.raw`\n`).join("\n")
+  );
   const publicKeyString = publicKeyObject
     .export({ format: "pem", type: "spki" })
     .toString()
