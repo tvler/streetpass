@@ -1,6 +1,7 @@
 import { GetServerSideProps } from "next";
 import * as crypto from "node:crypto";
 import type { AP } from "activitypub-core-types";
+import { getPrivateKey } from "../../../util";
 
 export default function Page() {
   return null;
@@ -109,13 +110,7 @@ export default function Page() {
 */
 
 export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
-  if (!process.env.PRIVATE_KEY) {
-    throw new Error();
-  }
-
-  const publicKeyObject = crypto.createPublicKey(
-    process.env.PRIVATE_KEY.split(String.raw`\n`).join("\n")
-  );
+  const publicKeyObject = crypto.createPublicKey(getPrivateKey());
   const publicKeyString = publicKeyObject
     .export({ format: "pem", type: "spki" })
     .toString();

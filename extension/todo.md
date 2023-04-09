@@ -14,6 +14,7 @@ activitypub
 - https://docs.joinmastodon.org/spec/activitypub/#publicKey
 - https://blog.joinmastodon.org/2018/07/how-to-make-friends-and-verify-requests/
 - https://github.com/michaelcpuckett/activitypub-core/blob/1cca3bb1355fffd56a67f6672712a2b133d8d79e/packages/activitypub-core-crypto-node/src/getHttpSignature.ts#L27
+- https://github.com/michaelcpuckett/activitypub-core/blob/1cca3bb1355fffd56a67f6672712a2b133d8d79e/packages/activitypub-core-db-d1/src/fetchEntityById.ts#L48
 
 cross browser
 
