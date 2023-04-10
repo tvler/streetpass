@@ -1,6 +1,7 @@
 import { GetServerSideProps } from "next";
 import * as crypto from "node:crypto";
 import type { AP } from "activitypub-core-types";
+import { getPrivateKey, MAX_CACHE_TIME } from "../../../util";
 
 export default function Page() {
   return null;
@@ -109,13 +110,7 @@ export default function Page() {
 */
 
 export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
-  if (!process.env.PRIVATE_KEY) {
-    throw new Error();
-  }
-
-  const publicKeyObject = crypto.createPublicKey(
-    process.env.PRIVATE_KEY.split(String.raw`\n`).join("\n")
-  );
+  const publicKeyObject = crypto.createPublicKey(getPrivateKey());
   const publicKeyString = publicKeyObject
     .export({ format: "pem", type: "spki" })
     .toString();
@@ -138,6 +133,10 @@ export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
     outbox: new URL("https://streetpass.social/users/streetpass/outbox"),
   };
 
+  context.res.setHeader(
+    "Cache-Control",
+    `public, s-maxage=${MAX_CACHE_TIME}, must-revalidate, max-age=0`
+  );
   context.res.setHeader("Content-Type", "application/json");
   context.res.write(JSON.stringify(actor));
   context.res.end();
