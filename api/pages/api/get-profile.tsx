@@ -15,6 +15,7 @@ type GetProfile = null | {
   avatarUrl: URL | null;
   username: string | null;
   name: string | null;
+  url: URL;
 };
 
 export default async function handler(
@@ -108,11 +109,19 @@ export default async function handler(
 
     let name: NonNullable<GetProfile>["name"] = entity.name ?? null;
 
+    let url: NonNullable<GetProfile>["url"];
+    if ("url" in entity && entity.url instanceof URL) {
+      url = entity.url;
+    } else {
+      url = entity.id;
+    }
+
     res.json({
       id: entity.id,
       avatarUrl,
       username,
       name,
+      url,
     });
   } catch (err) {
     res.json(null);
