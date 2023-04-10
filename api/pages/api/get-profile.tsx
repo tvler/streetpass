@@ -10,7 +10,7 @@ export const config = {
   runtime: "nodejs",
 };
 
-type GetProfile = {
+type GetProfile = null | {
   id: URL;
   avatarUrl: URL | null;
   username: string | null;
@@ -21,6 +21,12 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<GetProfile>
 ) {
+  const maxAge = 30 * 60; // 30 min
+  res.setHeader(
+    "Cache-Control",
+    `public, s-maxage=${maxAge}, stale-while-revalidate=${MAX_CACHE_TIME}, must-revalidate, max-age=0`
+  );
+
   try {
     if (typeof req.query.url !== "string") {
       throw new Error();
@@ -82,7 +88,7 @@ export default async function handler(
       throw new Error();
     }
 
-    let avatarUrl: GetProfile["avatarUrl"] = null;
+    let avatarUrl: NonNullable<GetProfile>["avatarUrl"] = null;
     if ("icon" in entity && !!entity.icon) {
       if (entity.icon instanceof URL) {
         avatarUrl = entity.icon;
@@ -95,18 +101,13 @@ export default async function handler(
       }
     }
 
-    let username: GetProfile["username"] = null;
+    let username: NonNullable<GetProfile>["username"] = null;
     if ("preferredUsername" in entity && entity.preferredUsername) {
       username = `@${entity.preferredUsername}@${entity.id.hostname}`;
     }
 
-    let name: GetProfile["name"] = entity.name ?? null;
+    let name: NonNullable<GetProfile>["name"] = entity.name ?? null;
 
-    const maxAge = 30 * 60; // 30 min
-    res.setHeader(
-      "Cache-Control",
-      `public, s-maxage=${maxAge}, stale-while-revalidate=${MAX_CACHE_TIME}, must-revalidate, max-age=0`
-    );
     res.json({
       id: entity.id,
       avatarUrl,
@@ -114,6 +115,6 @@ export default async function handler(
       name,
     });
   } catch (err) {
-    res.status(500).end();
+    res.json(null);
   }
 }
