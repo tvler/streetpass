@@ -1,7 +1,10 @@
-import type { AP } from "activitypub-core-types";
 import type { NextApiRequest, NextApiResponse } from "next";
 import * as crypto from "node:crypto";
-import { convertStringsToUrls, getPrivateKey } from "../../util";
+import {
+  convertStringsToUrls,
+  getPrivateKey,
+  MAX_CACHE_TIME,
+} from "../../util";
 
 export const config = {
   runtime: "nodejs",
@@ -11,7 +14,7 @@ type GetProfile = {
   id: URL;
   avatarUrl: URL | null;
   username: string | null;
-  displayName: string | null;
+  name: string | null;
 };
 
 export default async function handler(
@@ -19,8 +22,11 @@ export default async function handler(
   res: NextApiResponse<GetProfile>
 ) {
   try {
-    const foreignTarget = new URL("https://social.chriswb.dev/@chrisw_b");
-    // const foreignTarget = new URL("https://mastodon.social/@tvler");
+    if (typeof req.query.url !== "string") {
+      throw new Error();
+    }
+
+    const foreignTarget = new URL(req.query.url);
 
     // https://github.com/michaelcpuckett/activitypub-core/blob/1cca3bb1355fffd56a67f6672712a2b133d8d79e/packages/activitypub-core-crypto-node/src/getHttpSignature.ts#L5
     const httpSignature = ((): {
@@ -94,13 +100,18 @@ export default async function handler(
       username = `@${entity.preferredUsername}@${entity.id.hostname}`;
     }
 
-    let displayName: GetProfile["displayName"] = entity.name ?? null;
+    let name: GetProfile["name"] = entity.name ?? null;
 
+    const maxAge = 30 * 60; // 30 min
+    res.setHeader(
+      "Cache-Control",
+      `public, s-maxage=${maxAge}, stale-while-revalidate=${MAX_CACHE_TIME}, must-revalidate, max-age=0`
+    );
     res.json({
       id: entity.id,
       avatarUrl,
       username,
-      displayName,
+      name,
     });
   } catch (err) {
     res.status(500).end();

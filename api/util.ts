@@ -2,6 +2,7 @@ import { AP } from "activitypub-core-types";
 
 export const ACTIVITYSTREAMS_CONTEXT = "https://www.w3.org/ns/activitystreams";
 const PUBLIC_ACTOR = `${ACTIVITYSTREAMS_CONTEXT}#Public`;
+export const MAX_CACHE_TIME = 31 * 24 * 60 * 60; // 31 days is the max cache time https://vercel.com/docs/concepts/edge-network/caching
 
 export function getPrivateKey(): string {
   if (!process.env.PRIVATE_KEY) {
