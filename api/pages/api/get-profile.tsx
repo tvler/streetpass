@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import * as crypto from "node:crypto";
-import type { GetProfile } from "../../../constants";
 import {
   convertStringsToUrls,
   getPrivateKey,
@@ -9,6 +8,13 @@ import {
 
 export const config = {
   runtime: "nodejs",
+};
+
+type GetProfile = {
+  id: URL;
+  avatarUrl: URL | null;
+  username: string | null;
+  name: string | null;
 };
 
 export default async function handler(
