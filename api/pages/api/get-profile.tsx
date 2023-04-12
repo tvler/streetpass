@@ -11,11 +11,11 @@ export const config = {
 };
 
 export type GetProfile = null | {
-  id: URL;
-  avatarUrl: URL | null;
+  id: string;
+  avatarUrl: string | null;
   username: string | null;
   name: string | null;
-  url: URL;
+  url: string;
 };
 
 export default async function handler(
@@ -93,13 +93,13 @@ export default async function handler(
     let avatarUrl: NonNullable<GetProfile>["avatarUrl"] = null;
     if ("icon" in entity && !!entity.icon) {
       if (entity.icon instanceof URL) {
-        avatarUrl = entity.icon;
+        avatarUrl = entity.icon.toString();
       } else if (
         "type" in entity.icon &&
         entity.icon.type === "Image" &&
         entity.icon.url instanceof URL
       ) {
-        avatarUrl = entity.icon.url;
+        avatarUrl = entity.icon.url.toString();
       }
     }
 
@@ -115,13 +115,15 @@ export default async function handler(
 
     let url: NonNullable<GetProfile>["url"];
     if ("url" in entity && entity.url instanceof URL) {
-      url = entity.url;
+      url = entity.url.toString();
     } else {
-      url = entity.id;
+      url = entity.id.toString();
     }
 
+    console.log(entity);
+
     res.json({
-      id: entity.id,
+      id: entity.id.toString(),
       avatarUrl,
       username,
       name,
