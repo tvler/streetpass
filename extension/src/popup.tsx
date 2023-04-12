@@ -62,7 +62,16 @@ function Profile(props: { hrefData: (typeof profiles)[number] }) {
   console.log(profileQuery);
 
   return (
-    <div className="flex flex-row justify-between gap-x-12">
+    <div className="flex flex-row items-start gap-x-12">
+      {!!profileQuery.data?.avatarUrl && (
+        <img
+          width={20}
+          height={20}
+          src={profileQuery.data.avatarUrl}
+          className="inline-block rounded-full"
+        />
+      )}
+
       <div className="flex min-w-0 flex-grow basis-0 flex-col items-start">
         <a
           {...getHrefProps(props.hrefData.profileData.profileUrl)}
@@ -100,9 +109,7 @@ function Profile(props: { hrefData: (typeof profiles)[number] }) {
 function Popup() {
   return (
     <>
-      <div className="flex flex-col items-center pt-[9px]">
-        <img src="/icon-128.png" width="48" height="48" />
-
+      <div className="flex flex-col items-center pt-[20px]">
         <h1 className="text-14 font-medium leading-[1.21]">StreetPass</h1>
       </div>
 
