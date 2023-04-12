@@ -57,9 +57,10 @@ export default async function handler(
       };
     })();
 
+    // https://github.com/michaelcpuckett/activitypub-core/blob/1cca3bb1355fffd56a67f6672712a2b133d8d79e/packages/activitypub-core-db-sqlite/src/fetchEntityById.ts#L11
     const fetchedEntityResp = await fetch(foreignTarget, {
       headers: {
-        Accept: `application/ld+json; profile="https://www.w3.org/ns/activitystreams"`,
+        Accept: `application/activity+json`,
         date: httpSignature.dateHeader,
         signature: httpSignature.signatureHeader,
       },
