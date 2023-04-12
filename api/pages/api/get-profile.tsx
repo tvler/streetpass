@@ -108,10 +108,14 @@ export default async function handler(
       username = `@${entity.preferredUsername}@${entity.id.hostname}`;
     }
 
-    let name: NonNullable<GetProfile>["name"] =
-      entity.name ??
-      ("preferredUsername" in entity ? entity.preferredUsername : null) ??
-      null;
+    let name: NonNullable<GetProfile>["name"];
+    if (entity.name) {
+      name = entity.name;
+    } else if ("preferredUsername" in entity && entity.preferredUsername) {
+      name = entity.preferredUsername;
+    } else {
+      name = null;
+    }
 
     let url: NonNullable<GetProfile>["url"];
     if ("url" in entity && entity.url instanceof URL) {
