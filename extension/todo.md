@@ -16,6 +16,16 @@ activitypub
 - https://github.com/michaelcpuckett/activitypub-core/blob/1cca3bb1355fffd56a67f6672712a2b133d8d79e/packages/activitypub-core-crypto-node/src/getHttpSignature.ts#L27
 - https://github.com/michaelcpuckett/activitypub-core/blob/1cca3bb1355fffd56a67f6672712a2b133d8d79e/packages/activitypub-core-db-d1/src/fetchEntityById.ts#L48
 
+get-profiles to test
+
+- https://streetpass.social/api/get-profile?url=https://mastodon.social/@tvler
+- https://streetpass.social/api/get-profile?url=https://social.chriswb.dev/@chrisw_b
+- https://streetpass.social/api/get-profile?url=https://mastodon.social/@Gargron
+- https://streetpass.social/api/get-profile?url=https://calckey.social/@panos
+- https://streetpass.social/api/get-profile?url=https://social.panic.com/@panic
+- pixelfed https://streetpass.social/api/get-profile?url=https://pixtagram.social/jcrabapple
+- https://streetpass.social/api/get-profile?url=https://google.com
+
 cross browser
 
 - https://akoskm.com/building-a-cross-browser-extension#heading-bundlers
