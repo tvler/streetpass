@@ -8,6 +8,7 @@ import {
   getProfiles,
   getHrefStore,
 } from "./util";
+import type { GetProfile } from "../../api/pages/api/get-profile";
 
 getIconState(() => {
   return { state: "off" };
@@ -37,19 +38,66 @@ function getHrefProps(href: string): {
   };
 }
 
-function Popup() {
-  const hrefStoreQuery = ReactQuery.useQuery(
-    "hrefStore",
-    React.useCallback(() => getHrefStore(), [])
+const profilesMap = getProfiles(await getHrefStore());
+const profiles = Array.from(profilesMap.values());
+
+function Profile(props: { hrefData: (typeof profiles)[number] }) {
+  const profileQuery = ReactQuery.useQuery({
+    queryKey: ["get-profile", props.hrefData.relMeHref],
+    async queryFn(context): Promise<GetProfile> {
+      try {
+        const getProfileUrl = new URL(
+          "https://streetpass.social/api/get-profile"
+        );
+        getProfileUrl.searchParams.set("url", props.hrefData.relMeHref);
+        const resp = await fetch(getProfileUrl);
+        const profile: GetProfile = await resp.json();
+        return profile;
+      } catch (err) {
+        return null;
+      }
+    },
+  });
+
+  console.log(profileQuery);
+
+  return (
+    <div className="flex flex-row justify-between gap-x-12">
+      <div className="flex min-w-0 flex-grow basis-0 flex-col items-start">
+        <a
+          {...getHrefProps(props.hrefData.profileData.profileUrl)}
+          className="w-full overflow-hidden text-ellipsis whitespace-nowrap text-gray"
+        >
+          <span className="font-medium text-purple">
+            {profileQuery.data?.name}
+          </span>
+          &nbsp;
+          <span>{profileQuery.data?.username}</span>
+        </a>
+
+        <p className="text-gray">
+          <a
+            {...getHrefProps(props.hrefData.websiteUrl)}
+            className="break-word"
+          >
+            {getDisplayHref(props.hrefData.websiteUrl)}
+          </a>
+        </p>
+      </div>
+
+      <p className="shrink-0 text-gray">
+        {new Intl.DateTimeFormat(undefined, {
+          timeStyle: "short",
+        })
+          .format(props.hrefData.viewedAt)
+          .toLowerCase()
+          .replace(/\s+/g, "")}
+      </p>
+    </div>
   );
+}
 
-  const profiles = React.useMemo(() => {
-    if (!hrefStoreQuery.data) {
-      return [];
-    }
-    return Array.from(getProfiles(hrefStoreQuery.data).values());
-  }, [hrefStoreQuery.data]);
-
+function Popup() {
   return (
     <>
       <div className="flex flex-col items-center pt-[9px]">
@@ -65,7 +113,7 @@ function Popup() {
           </span>
         )}
 
-        {!profiles.length && !hrefStoreQuery.isLoading && (
+        {!profiles.length && (
           <div className="absolute top-0 right-0 bottom-0 left-0 flex items-center justify-center text-13 text-gray">
             <p>
               No profiles. Try{" "}
@@ -99,34 +147,7 @@ function Popup() {
                 </p>
               )}
 
-              <div className="flex flex-row items-start">
-                <p className="w-[65px] shrink-0 text-gray">
-                  {new Intl.DateTimeFormat(undefined, {
-                    timeStyle: "short",
-                  })
-                    .format(hrefData.viewedAt)
-                    .toLowerCase()
-                    .replace(/\s+/g, "")}
-                </p>
-
-                <div className="flex flex-col items-start">
-                  <a
-                    {...getHrefProps(hrefData.profileData.profileUrl)}
-                    className="break-word font-medium text-purple"
-                  >
-                    {getDisplayHref(hrefData.profileData.profileUrl)}
-                  </a>
-
-                  <p className="text-gray">
-                    <a
-                      {...getHrefProps(hrefData.websiteUrl)}
-                      className="break-word text-inherit"
-                    >
-                      {getDisplayHref(hrefData.websiteUrl)}
-                    </a>
-                  </p>
-                </div>
-              </div>
+              <Profile hrefData={hrefData} />
             </React.Fragment>
           );
         })}
@@ -142,10 +163,68 @@ if (!rootNode) {
 
 const root = ReactDom.createRoot(rootNode);
 
-const queryClient = new ReactQuery.QueryClient();
+const queryClient = new ReactQuery.QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      cacheTime: Infinity,
+      refetchOnReconnect: false,
+      staleTime: Infinity,
+    },
+  },
+});
 
 root.render(
   <ReactQuery.QueryClientProvider client={queryClient}>
     <Popup />
   </ReactQuery.QueryClientProvider>
 );
+
+type IntersectionObserverBoxProps<
+  RefType extends Element,
+  IDType,
+  ComponentProps
+> = {
+  componentProps: ComponentProps;
+  options?: IntersectionObserverInit;
+  Component: React.ComponentType<
+    ComponentProps & {
+      ref: React.Ref<RefType>;
+    }
+  >;
+  id: IDType;
+  callback: (id: IDType) => IntersectionObserverCallback;
+  skip?: boolean;
+};
+
+function IntersectionObserverBox<
+  RefType extends HTMLElement,
+  IDType,
+  ComponentProps
+>({
+  options,
+  Component,
+  id,
+  callback,
+  skip = false,
+  componentProps,
+}: IntersectionObserverBoxProps<RefType, IDType, ComponentProps>): JSX.Element {
+  const componentRef = React.useRef<RefType>(null);
+
+  React.useEffect(() => {
+    let observer: IntersectionObserver | undefined;
+
+    if (!skip && componentRef.current) {
+      observer = new window.IntersectionObserver(callback(id), options);
+      observer.observe(componentRef.current);
+    }
+
+    return () => {
+      if (observer) {
+        observer.disconnect();
+      }
+    };
+  }, [callback, id, options, skip]);
+
+  return <Component {...componentProps} ref={componentRef} />;
+}
