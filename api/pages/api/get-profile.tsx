@@ -10,7 +10,7 @@ export const config = {
   runtime: "nodejs",
 };
 
-type GetProfile = null | {
+export type GetProfile = null | {
   id: URL;
   avatarUrl: URL | null;
   username: string | null;
@@ -108,7 +108,10 @@ export default async function handler(
       username = `@${entity.preferredUsername}@${entity.id.hostname}`;
     }
 
-    let name: NonNullable<GetProfile>["name"] = entity.name ?? null;
+    let name: NonNullable<GetProfile>["name"] =
+      entity.name ??
+      ("preferredUsername" in entity ? entity.preferredUsername : null) ??
+      null;
 
     let url: NonNullable<GetProfile>["url"];
     if ("url" in entity && entity.url instanceof URL) {
