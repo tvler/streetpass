@@ -12,27 +12,27 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@next/font": "13.1.1",
-    "@types/node": "18.11.18",
-    "@types/react": "18.0.26",
-    "@types/react-dom": "18.0.10",
-    "eslint": "8.30.0",
-    "eslint-config-next": "13.1.1",
-    "next": "13.1.1",
+    "@next/font": "13.3.1",
+    "@types/node": "18.16.0",
+    "@types/react": "18.0.38",
+    "@types/react-dom": "18.0.11",
+    "eslint": "8.39.0",
+    "eslint-config-next": "13.3.1",
+    "next": "13.3.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "typescript": "4.9.4",
+    "typescript": "5.0.4",
     "zod": "^3.21.4"
   },
   "devDependencies": {
-    "activitypub-core-types": "^0.2.71",
-    "autoprefixer": "^10.4.13",
+    "activitypub-core-types": "^0.3.2",
+    "autoprefixer": "^10.4.14",
     "cheerio": "^1.0.0-rc.12",
-    "eslint-config-prettier": "^8.6.0",
-    "postcss": "^8.4.21",
-    "prettier": "^2.8.2",
-    "prettier-plugin-tailwindcss": "^0.2.1",
-    "tailwindcss": "^3.2.4",
-    "vercel": "^28.18.4"
+    "eslint-config-prettier": "^8.8.0",
+    "postcss": "^8.4.23",
+    "prettier": "^2.8.8",
+    "prettier-plugin-tailwindcss": "^0.2.7",
+    "tailwindcss": "^3.3.1",
+    "vercel": "^28.20.0"
   }
 }
