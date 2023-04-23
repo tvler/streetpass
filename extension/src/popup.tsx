@@ -115,13 +115,13 @@ function Popup() {
 
       <div className="flex flex-col gap-18 px-12 pb-18 text-13 leading-[1.45]">
         {!!profiles.length && (
-          <span className="absolute top-12 right-12 rounded-6 bg-purple-light py-[0.18em] px-[0.45em] text-11 font-medium leading-[1.3] text-purple">
+          <span className="absolute right-12 top-12 rounded-6 bg-purple-light px-[0.45em] py-[0.18em] text-11 font-medium leading-[1.3] text-purple">
             {profiles.length}
           </span>
         )}
 
         {!profiles.length && (
-          <div className="absolute top-0 right-0 bottom-0 left-0 flex items-center justify-center text-13 text-gray">
+          <div className="absolute bottom-0 left-0 right-0 top-0 flex items-center justify-center text-13 text-gray">
             <p>
               No profiles. Try{" "}
               <a
