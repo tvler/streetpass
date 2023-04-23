@@ -9,12 +9,7 @@ import assert from "node:assert";
 import ViteReact from "@vitejs/plugin-react";
 
 import { VERSION } from "../constants.js";
-import {
-  actionActive,
-  actionInactive,
-  Build,
-  getTargetFromBuild,
-} from "./src/util.js";
+import { actionActive, actionInactive, Target } from "./src/util.js";
 
 const dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
@@ -24,32 +19,16 @@ const configSchema = z.object({
   mode: z.union([z.literal("dev"), z.literal("production")]),
 });
 
-export function getConfig(build: Build, unparsedConfig: ConfigEnv): UserConfig {
+export function getConfig(
+  target: Target,
+  unparsedConfig: ConfigEnv
+): UserConfig {
   const config = configSchema.parse(unparsedConfig);
 
-  function targets<Value>(args: {
-    chrome: Value;
-    firefox: Value;
-    safari: Value;
-  }): Value;
-  function targets<Value>(args: {
-    chrome: Value;
-    firefox: Value;
-    safari: Value;
-    "safari-background": Value;
-  }): Value;
-  function targets<Value>(args: {
-    chrome: Value;
-    firefox: Value;
-    safari: Value;
-    "safari-background"?: Value;
-  }): Value {
-    const resolvedSafariBackground: Value =
-      "safari-background" in args ? args["safari-background"] : args.safari;
-
-    return build === "safari-background"
-      ? resolvedSafariBackground
-      : args[build];
+  function targets<Value>(
+    args: Record<Target, Value>
+  ): (typeof args)[keyof typeof args] {
+    return args[target];
   }
 
   const extensionName = `StreetPass for Mastodon${
@@ -133,25 +112,33 @@ export function getConfig(build: Build, unparsedConfig: ConfigEnv): UserConfig {
               },
               safari: {
                 service_worker: "background.js",
+                type: "module",
               },
             }),
           };
-          if (build === "firefox") {
-            // Chrome doesn't support this yet
+          if (target === "firefox") {
             manifest.browser_specific_settings = {
               gecko: {
                 id: "streetpass@streetpass.social",
               },
             };
           }
-
-          if (build !== "safari-background") {
-            this.emitFile({
-              type: "asset",
-              fileName: "manifest.json",
-              source: JSON.stringify(manifest),
-            });
+          if (target === "safari") {
+            // @ts-expect-error types aren't updated https://developer.apple.com/documentation/safariservices/safari_web_extensions/optimizing_your_web_extension_for_safari#3743239
+            const SAFARI: keyof Manifest.BrowserSpecificSettings = "safari";
+            manifest.browser_specific_settings = {
+              [SAFARI]: {
+                // Only safari 16.4 supports background modules https://webkit.org/blog/13966/webkit-features-in-safari-16-4/
+                strict_min_version: "16.4",
+              },
+            };
           }
+
+          this.emitFile({
+            type: "asset",
+            fileName: "manifest.json",
+            source: JSON.stringify(manifest),
+          });
         },
       },
       targets<PluginOption>({
@@ -200,10 +187,9 @@ export function getConfig(build: Build, unparsedConfig: ConfigEnv): UserConfig {
             }
           },
         },
-        "safari-background": null,
       }),
     ],
-    publicDir: build === "safari-background" ? false : "public",
+    publicDir: "public",
     build: {
       outDir: targets({
         firefox: path.resolve(dirname, "dist-firefox"),
@@ -211,7 +197,7 @@ export function getConfig(build: Build, unparsedConfig: ConfigEnv): UserConfig {
         safari: path.resolve(dirname, "dist-safari"),
       }),
       target: "esnext",
-      emptyOutDir: build === "safari" ? false : true,
+      emptyOutDir: true,
       minify: false,
       modulePreload: {
         polyfill: false,
@@ -225,10 +211,6 @@ export function getConfig(build: Build, unparsedConfig: ConfigEnv): UserConfig {
         strictDeprecations: true,
         preserveEntrySignatures: "strict",
         input: (() => {
-          if (build === "safari-background") {
-            return path.resolve(dirname, "src/background.ts");
-          }
-
           return [
             webextensionPolyfillPathName,
             path.resolve(dirname, "src/popup.html"),
@@ -236,13 +218,13 @@ export function getConfig(build: Build, unparsedConfig: ConfigEnv): UserConfig {
             targets({
               chrome: path.resolve(dirname, "src/background.ts"),
               firefox: path.resolve(dirname, "src/background-page.html"),
-              safari: null,
+              safari: path.resolve(dirname, "src/background.ts"),
             }),
-          ].filter(Boolean);
+          ];
         })(),
         output: {
           minifyInternalExports: false,
-          inlineDynamicImports: build === "safari-background" ? true : false,
+          inlineDynamicImports: false,
           validate: true,
           entryFileNames: `[name].js`,
           assetFileNames: `[name].[ext]`,
@@ -252,7 +234,7 @@ export function getConfig(build: Build, unparsedConfig: ConfigEnv): UserConfig {
       },
     },
     define: {
-      __TARGET__: JSON.stringify(getTargetFromBuild(build)),
+      __TARGET__: JSON.stringify(target),
     },
   };
 }

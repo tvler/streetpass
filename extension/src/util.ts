@@ -14,8 +14,6 @@ export type HrefPayload = {
 
 export type Target = "chrome" | "firefox" | "safari";
 
-export type Build = "chrome" | "firefox" | "safari" | "safari-background";
-
 type Profile = { type: "profile"; profileUrl: string };
 
 type NotProfile = { type: "notProfile" };
@@ -310,18 +308,6 @@ export const getHrefStore = storageFactory({
     }
   },
 });
-
-export function getTargetFromBuild(build: Build): Target {
-  switch (build) {
-    case "chrome":
-    case "firefox":
-    case "safari":
-      return build;
-
-    case "safari-background":
-      return "safari";
-  }
-}
 
 /**
  * Test the safe storage
