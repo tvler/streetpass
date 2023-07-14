@@ -75,7 +75,7 @@ export default function Page() {
               firefox:
                 "https://addons.mozilla.org/en-US/firefox/addon/streetpass-for-mastodon/",
               safari:
-                "https://addons.mozilla.org/en-US/firefox/addon/streetpass-for-mastodon/",
+                "https://apps.apple.com/us/app/streetpass-for-mastodon/id6446224821",
             }[browser];
 
             const imageSrc = {
@@ -95,10 +95,7 @@ export default function Page() {
                 key={title}
                 href={link}
                 className={
-                  "flex flex-col items-center text-center text-sm font-medium text-purple underline" +
-                  (browser === "safari"
-                    ? " pointer-events-none opacity-50 grayscale"
-                    : "")
+                  "flex flex-col items-center text-center text-sm font-medium text-purple underline"
                 }
               >
                 <Image
@@ -108,14 +105,7 @@ export default function Page() {
                   alt=""
                   height={62}
                 />
-                <span className="relative mt-1 inline-block">
-                  {title}
-                  {browser === "safari" && (
-                    <span className="absolute top-[3px] text-xs">
-                      &nbsp;(soon!)
-                    </span>
-                  )}
-                </span>
+                <span className="relative mt-1 inline-block">{title}</span>
               </a>
             );
           })}
