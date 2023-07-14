@@ -1,3 +1,8 @@
+# 2023.10
+
+- New icon
+- [Safari](https://apps.apple.com/us/app/streetpass-for-mastodon/id6446224821)
+
 # 2023.9
 
 - Retries rel=me links that don't return a mastodon profile after 10 minutes

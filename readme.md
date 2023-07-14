@@ -2,6 +2,8 @@
 
 [Download for Chrome](https://chrome.google.com/webstore/detail/streetpass-for-mastodon/fphjfedjhinpnjblomfebcjjpdpakhhn)
 
+[Download for Safari](https://apps.apple.com/us/app/streetpass-for-mastodon/id6446224821)
+
 [Download for Firefox](https://addons.mozilla.org/en-US/firefox/addon/streetpass-for-mastodon/)
 
 # StreetPass for Mastodon
