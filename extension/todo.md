@@ -68,3 +68,14 @@ xcodebuild -project dist-safari/StreetPass\ for\ Mastodon/StreetPass\ for\ Masto
 xcodebuild -project dist-safari/StreetPass\ for\ Mastodon/StreetPass\ for\ Mastodon.xcodeproj -allowProvisioningUpdates DEVELOPMENT_TEAM=WLTVAXDPZT -quiet
 
 https://en.wikipedia.org/wiki/Axonometric_projection#Three_types
+
+# How to create xcode build
+
+- run yarn build:safari
+- open generated xcode project
+- go to targets -> streetpass for mastodon
+- set version to correct version
+- set App category to social networking
+- Go to Product -> Archive
+- In archives window, press Distribute App -> App store connect -> Upload -> Dev Team: Tyler Deitz
+- Go to app store connect -> testflight. make sure it works
