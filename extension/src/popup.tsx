@@ -40,7 +40,7 @@ function getHrefProps(href: string): {
 function Popup() {
   const hrefStoreQuery = ReactQuery.useQuery(
     "hrefStore",
-    React.useCallback(() => getHrefStore(), [])
+    React.useCallback(() => getHrefStore(), []),
   );
 
   const profiles = React.useMemo(() => {
@@ -147,5 +147,5 @@ const queryClient = new ReactQuery.QueryClient();
 root.render(
   <ReactQuery.QueryClientProvider client={queryClient}>
     <Popup />
-  </ReactQuery.QueryClientProvider>
+  </ReactQuery.QueryClientProvider>,
 );
