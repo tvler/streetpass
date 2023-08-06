@@ -1,6 +1,5 @@
 import { MAX_CACHE_TIME } from "@/constants";
 import { convertJsonToEntity } from "@/util/convertJsonToEntity";
-import { getEntity } from "@/util/getEntity";
 import { getPrivateKey } from "@/util/getPrivateKey";
 import { NextResponse } from "next/server";
 import * as crypto from "node:crypto";
