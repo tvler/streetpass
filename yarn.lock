@@ -12,6 +12,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@activity-kit/types@npm:^0.4.56":
+  version: 0.4.56
+  resolution: "@activity-kit/types@npm:0.4.56"
+  dependencies:
+    formidable: ^2.1.1
+  checksum: 43d906fa75c6f6ccee23938d511cfeb496cbdc524ada8a68ead64f4de60e4840b5ee0c899db8561ef026ce1b136ceee9998d53cee5f80395e14c33de29453b5a
+  languageName: node
+  linkType: hard
+
 "@alloc/quick-lru@npm:^5.2.0":
   version: 5.2.0
   resolution: "@alloc/quick-lru@npm:5.2.0"
@@ -1937,15 +1946,6 @@ __metadata:
   bin:
     acorn: bin/acorn
   checksum: 538ba38af0cc9e5ef983aee196c4b8b4d87c0c94532334fa7e065b2c8a1f85863467bb774231aae91613fcda5e68740c15d97b1967ae3394d20faddddd8af61d
-  languageName: node
-  linkType: hard
-
-"activitypub-core-types@npm:^0.3.2":
-  version: 0.3.2
-  resolution: "activitypub-core-types@npm:0.3.2"
-  dependencies:
-    formidable: ^2.1.1
-  checksum: 2615f4c2c6fdde65c191658827d31fa181b2785d803805a24d4d2a144511ccb1dc9af68e0d148ec6d832700b04770915bd3e9618f97c099e16141205fb2a93fe
   languageName: node
   linkType: hard
 
@@ -7161,10 +7161,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "webfinger@workspace:api"
   dependencies:
+    "@activity-kit/types": ^0.4.56
     "@types/node": ^18.16.0
     "@types/react": 18.2.18
     "@types/react-dom": 18.2.7
-    activitypub-core-types: ^0.3.2
     autoprefixer: ^10.4.14
     cheerio: ^1.0.0-rc.12
     eslint: 8.46.0
