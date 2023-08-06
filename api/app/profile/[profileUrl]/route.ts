@@ -13,7 +13,7 @@ type Profile = {
   url: string;
 };
 
-// export const revalidate = 30;
+export const revalidate = 3600;
 
 export async function GET(
   _request: Request,
@@ -63,7 +63,7 @@ export async function GET(
 
       return fetchedEntityResp.json();
     },
-    [foreignTarget.toString()],
+    [params.profileUrl],
     {
       revalidate: 3600,
     },
