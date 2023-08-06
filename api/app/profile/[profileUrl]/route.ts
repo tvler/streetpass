@@ -1,4 +1,6 @@
+import { MAX_CACHE_TIME } from "@/constants";
 import { convertJsonToEntity } from "@/util/convertJsonToEntity";
+import { getEntity } from "@/util/getEntity";
 import { getPrivateKey } from "@/util/getPrivateKey";
 import { NextResponse } from "next/server";
 import * as crypto from "node:crypto";
@@ -11,7 +13,7 @@ type Profile = {
   url: string;
 };
 
-export const revalidate = 30;
+// export const revalidate = 30;
 
 export async function GET(
   _request: Request,
@@ -65,6 +67,8 @@ export async function GET(
 
   const entity = convertJsonToEntity(fetchedEntity as Record<string, unknown>);
 
+  // const entity = await getEntity(params.profileUrl);
+
   if (!entity?.id) {
     throw new Error();
   }
@@ -98,11 +102,20 @@ export async function GET(
     url = entity.id.toString();
   }
 
-  return NextResponse.json({
-    id: entity.id.toString(),
-    avatarUrl,
-    username,
-    name,
-    url,
-  });
+  return NextResponse.json(
+    {
+      id: entity.id.toString(),
+      avatarUrl,
+      username,
+      name,
+      url,
+    },
+    {
+      headers: {
+        "Cache-Control": `public, s-maxage=${
+          30 * 60
+        }, stale-while-revalidate=${MAX_CACHE_TIME}, must-revalidate, max-age=0`,
+      },
+    },
+  );
 }
