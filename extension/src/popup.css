@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-:focus:not(:focus-visible) {
-  outline: none;
-}
-
 @layer base {
   :root {
     @apply text-cool-black;
@@ -14,6 +10,10 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-size: 16px;
+  }
+
+  :focus:not(:focus-visible) {
+    outline: none;
   }
 
   button,

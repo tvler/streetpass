@@ -2,11 +2,13 @@ import "webextension-polyfill";
 import * as React from "react";
 import * as ReactDom from "react-dom/client";
 import * as ReactQuery from "react-query";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import {
   getDisplayHref,
   getIconState,
   getProfiles,
   getHrefStore,
+  exportProfiles,
 } from "./util";
 
 getIconState(() => {
@@ -37,6 +39,9 @@ function getHrefProps(href: string): {
   };
 }
 
+const navButtonClassName =
+  "inline-block rounded-6 bg-purple-light px-[0.35em] py-[0.18em] text-11 leading-[1.3] text-purple focus-visible:outline-none";
+
 function Popup() {
   const hrefStoreQuery = ReactQuery.useQuery(
     "hrefStore",
@@ -58,13 +63,37 @@ function Popup() {
         <h1 className="text-14 font-medium leading-[1.21]">StreetPass</h1>
       </div>
 
-      <div className="flex flex-col gap-18 px-12 pb-18 text-13 leading-[1.45]">
+      <div className="absolute right-12 top-12 flex gap-8">
         {!!profiles.length && (
-          <span className="absolute right-12 top-12 rounded-6 bg-purple-light px-[0.45em] py-[0.18em] text-11 font-medium leading-[1.3] text-purple">
+          <span className={navButtonClassName + " font-medium"}>
             {profiles.length}
           </span>
         )}
 
+        <DropdownMenu.Root>
+          <DropdownMenu.Trigger asChild>
+            <button className={navButtonClassName + " font-black"}>⋯</button>
+          </DropdownMenu.Trigger>
+
+          <DropdownMenu.Portal>
+            <DropdownMenu.Content
+              align="end"
+              sideOffset={6}
+              onCloseAutoFocus={(ev) => {
+                ev.preventDefault();
+              }}
+            >
+              <DropdownMenu.Item asChild onSelect={exportProfiles}>
+                <span className={navButtonClassName + " font-medium"}>
+                  Export (.csv)
+                </span>
+              </DropdownMenu.Item>
+            </DropdownMenu.Content>
+          </DropdownMenu.Portal>
+        </DropdownMenu.Root>
+      </div>
+
+      <div className="flex flex-col gap-18 px-12 pb-18 text-13 leading-[1.45]">
         {!profiles.length && !hrefStoreQuery.isLoading && (
           <div className="absolute bottom-0 left-0 right-0 top-0 flex items-center justify-center text-13 text-gray">
             <p>

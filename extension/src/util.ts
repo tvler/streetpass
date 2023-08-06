@@ -1,4 +1,5 @@
 import type { DeepReadonly } from "ts-essentials";
+import { stringify } from "csv-stringify/browser/esm/sync";
 
 /**
  * =========
@@ -82,7 +83,7 @@ export function getIsUrlHttpOrHttps(uncheckedUrl: string | undefined): boolean {
 }
 
 export function getProfiles(
-  hrefStore: DeepReadonly<HrefStore>
+  hrefStore: DeepReadonly<HrefStore>,
 ): Map<string, { profileData: Profile } & HrefData> {
   const profiles: Map<string, { profileData: Profile } & HrefData> = new Map();
 
@@ -115,7 +116,7 @@ function getIsRelWebfingerProfilePageRel(href: string) {
 }
 
 export async function getUncachedProfileData(
-  href: string
+  href: string,
 ): Promise<ProfileData> {
   try {
     if (!getIsUrlHttpOrHttps(href)) {
@@ -182,7 +183,7 @@ export function getDisplayHref(href: string): string {
   if (pathnameWithStrippedTrailingSlash.endsWith(trailingSlash)) {
     pathnameWithStrippedTrailingSlash = pathnameWithStrippedTrailingSlash.slice(
       0,
-      -trailingSlash.length
+      -trailingSlash.length,
     );
   }
 
@@ -208,7 +209,7 @@ export function storageFactory<T extends NotNullNotUndefined>(args: {
   (cb?: (data: DeepReadonly<T>) => DeepReadonly<T>): Promise<DeepReadonly<T>>;
 } {
   let lastDataPromise: Promise<DeepReadonly<T>> = Promise.resolve(
-    args.parse(undefined)
+    args.parse(undefined),
   );
 
   return (cb) => {
@@ -308,6 +309,29 @@ export const getHrefStore = storageFactory({
     }
   },
 });
+
+/**
+ * Note: need to get username. not profileUrl
+ */
+export async function exportProfiles() {
+  const profiles = Array.from(getProfiles(await getHrefStore()).values()).map(
+    (profile) => [profile.profileData.profileUrl, "true", "false"],
+  );
+  const csvText = stringify([
+    ["Account address", "Show boosts", "Notify on new posts", "Languages"],
+    ...profiles,
+  ]);
+  const link = document.createElement("a");
+  link.setAttribute(
+    "href",
+    "data:text/csv;charset=utf-8," + encodeURIComponent(csvText),
+  );
+  link.setAttribute("download", "streetpass.csv");
+  link.hidden = true;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
 
 /**
  * Test the safe storage
