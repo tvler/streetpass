@@ -1,4 +1,3 @@
-import { cast } from "@/activity-kit-type-utils";
 import { convertJsonToEntity } from "@/util/convertJsonToEntity";
 import { getPrivateKey } from "@/util/getPrivateKey";
 import { NextResponse } from "next/server";
@@ -11,6 +10,8 @@ type Profile = {
   name: string | null;
   url: string;
 };
+
+export const revalidate = 30;
 
 export async function GET(
   _request: Request,
@@ -47,6 +48,9 @@ export async function GET(
       date: httpSignature.dateHeader,
       signature: httpSignature.signatureHeader,
     },
+    // next: {
+    //   revalidate: 30, // seconds
+    // },
   });
 
   if (!fetchedEntityResp.ok) {
