@@ -50,6 +50,7 @@ export async function GET(
         date: httpSignature.dateHeader,
         signature: httpSignature.signatureHeader,
       },
+      cache: "no-store",
     });
 
     if (!fetchedEntityResp.ok) {
