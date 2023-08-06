@@ -3,6 +3,7 @@ import { convertJsonToEntity } from "@/util/convertJsonToEntity";
 import { getPrivateKey } from "@/util/getPrivateKey";
 import { NextResponse } from "next/server";
 import * as crypto from "node:crypto";
+import { unstable_cache } from "next/cache";
 
 type Profile = {
   id: string;
@@ -20,45 +21,53 @@ export async function GET(
 ): Promise<NextResponse<Profile>> {
   const foreignTarget = new URL(params.profileUrl);
 
-  // https://github.com/michaelcpuckett/activity-kit/blob/master/packages/crypto-node/src/getHttpSignature.ts#L4
-  const httpSignature = ((): {
-    dateHeader: string;
-    signatureHeader: string;
-  } => {
-    const foreignDomain = foreignTarget.hostname;
-    const foreignPathName = foreignTarget.pathname;
-    const dateString = new Date().toUTCString();
-    const signer = crypto.createSign("sha256");
-    const stringToSign = `(request-target): get ${foreignPathName}\nhost: ${foreignDomain}\ndate: ${dateString}`;
-    signer.update(stringToSign);
-    signer.end();
-    const signature = signer.sign(getPrivateKey());
-    const signature_b64 = signature.toString("base64");
-    const signatureHeader = `keyId="${"https://streetpass.social/users/streetpass"}#main-key",algorithm="rsa-sha256",headers="(request-target) host date",signature="${signature_b64}"`;
+  const fetchedEntity = await unstable_cache(
+    async (): Promise<unknown> => {
+      // https://github.com/michaelcpuckett/activity-kit/blob/master/packages/crypto-node/src/getHttpSignature.ts#L4
+      const httpSignature = ((): {
+        dateHeader: string;
+        signatureHeader: string;
+      } => {
+        const foreignDomain = foreignTarget.hostname;
+        const foreignPathName = foreignTarget.pathname;
+        const dateString = new Date().toUTCString();
+        const signer = crypto.createSign("sha256");
+        const stringToSign = `(request-target): get ${foreignPathName}\nhost: ${foreignDomain}\ndate: ${dateString}`;
+        signer.update(stringToSign);
+        signer.end();
+        const signature = signer.sign(getPrivateKey());
+        const signature_b64 = signature.toString("base64");
+        const signatureHeader = `keyId="${"https://streetpass.social/users/streetpass"}#main-key",algorithm="rsa-sha256",headers="(request-target) host date",signature="${signature_b64}"`;
 
-    return {
-      dateHeader: dateString,
-      signatureHeader,
-    };
-  })();
+        return {
+          dateHeader: dateString,
+          signatureHeader,
+        };
+      })();
 
-  // https://github.com/michaelcpuckett/activity-kit/blob/cc44d46da703d072fee5c5449770cc450e74b331/packages/core/src/queryById.ts#L66
-  const fetchedEntityResp = await fetch(foreignTarget, {
-    headers: {
-      Accept: `application/activity+json`,
-      date: httpSignature.dateHeader,
-      signature: httpSignature.signatureHeader,
+      // https://github.com/michaelcpuckett/activity-kit/blob/cc44d46da703d072fee5c5449770cc450e74b331/packages/core/src/queryById.ts#L66
+      const fetchedEntityResp = await fetch(foreignTarget, {
+        headers: {
+          Accept: `application/activity+json`,
+          date: httpSignature.dateHeader,
+          signature: httpSignature.signatureHeader,
+        },
+        // next: {
+        //   revalidate: 30, // seconds
+        // },
+      });
+
+      if (!fetchedEntityResp.ok) {
+        throw new Error();
+      }
+
+      return fetchedEntityResp.json();
     },
-    // next: {
-    //   revalidate: 30, // seconds
-    // },
-  });
-
-  if (!fetchedEntityResp.ok) {
-    throw new Error();
-  }
-
-  const fetchedEntity: unknown = await fetchedEntityResp.json();
+    [foreignTarget.toString()],
+    {
+      revalidate: 3600,
+    },
+  )();
 
   if (!fetchedEntity) {
     throw new Error();
@@ -109,12 +118,12 @@ export async function GET(
       name,
       url,
     },
-    {
-      headers: {
-        "Cache-Control": `public, s-maxage=${
-          30 * 60
-        }, stale-while-revalidate=${MAX_CACHE_TIME}, must-revalidate, max-age=0`,
-      },
-    },
+    // {
+    //   headers: {
+    //     "Cache-Control": `public, s-maxage=${
+    //       30 * 60
+    //     }, stale-while-revalidate=${MAX_CACHE_TIME}, must-revalidate, max-age=0`,
+    //   },
+    // },
   );
 }
