@@ -331,7 +331,7 @@ function getDataUrlFromFile(file: Blob): Promise<string> {
   });
 }
 
-export async function exportProfiles() {
+export async function exportProfiles(): Promise<void> {
   const profiles = Array.from(getProfiles(await getHrefStore()).values());
 
   const blob = new Blob([JSON.stringify(profiles)], {
