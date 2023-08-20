@@ -40,7 +40,7 @@ function getHrefProps(href: string): {
 }
 
 const navButtonClassName =
-  "h-[1.68em] min-w-[1.68em] flex items-center justify-center rounded-6 bg-purple-light px-[0.38em] text-11 text-purple focus-visible:outline-none font-medium";
+  "h-[1.68em] min-w-[1.4em] flex items-center justify-center rounded-6 bg-purple-light px-[0.38em] text-11 text-purple focus-visible:outline-none font-medium";
 
 function Popup() {
   const profilesQuery = ReactQuery.useQuery(
