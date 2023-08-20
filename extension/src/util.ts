@@ -309,9 +309,28 @@ export const getHrefStore = storageFactory({
   },
 });
 
-/**
- * Note: need to get username. not profileUrl
- */
+function getDataUrlFromFile(file: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.addEventListener(
+      "load",
+      () => {
+        if (typeof reader.result === "string") {
+          resolve(reader.result);
+        } else {
+          reject();
+        }
+      },
+      false,
+    );
+    reader.addEventListener("error", () => {
+      reject();
+    });
+
+    reader.readAsDataURL(file);
+  });
+}
+
 export async function exportProfiles() {
   const profiles = Array.from(getProfiles(await getHrefStore()).values());
 
@@ -319,14 +338,19 @@ export async function exportProfiles() {
     type: "application/json",
   });
 
-  const link = document.createElement("a");
-  link.hidden = true;
-  link.href = URL.createObjectURL(blob);
-  link.download = "streetpass.json";
+  browser.tabs.create({
+    url:
+      /**
+       * Chrome needs to use this method, because otherwise the blob isn't
+       * recognized as a JSON file and won't allow downloading via command + s.
+       * the opened tab will have a url blob:chrome-extension instead of data:application/json
+       */
+      __TARGET__ === "chrome"
+        ? await getDataUrlFromFile(blob)
+        : URL.createObjectURL(blob),
+  });
 
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  window.close();
 }
 
 /**
