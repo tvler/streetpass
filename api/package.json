@@ -6,13 +6,12 @@
     "node": "18.x"
   },
   "scripts": {
-    "dev": "vercel env pull && next dev",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
-    "@activity-kit/types": "^0.4.56",
     "@types/node": "^18.16.0",
     "@types/react": "18.2.18",
     "@types/react-dom": "18.2.7",
@@ -26,7 +25,6 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.14",
-    "cheerio": "^1.0.0-rc.12",
     "eslint-config-prettier": "^9.0.0",
     "postcss": "^8.4.27",
     "prettier": "^3.0.1",
