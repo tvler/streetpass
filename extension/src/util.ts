@@ -1,5 +1,4 @@
 import type { DeepReadonly } from "ts-essentials";
-import { stringify } from "csv-stringify/browser/esm/sync";
 
 /**
  * =========
@@ -314,20 +313,17 @@ export const getHrefStore = storageFactory({
  * Note: need to get username. not profileUrl
  */
 export async function exportProfiles() {
-  const profiles = Array.from(getProfiles(await getHrefStore()).values()).map(
-    (profile) => [profile.profileData.profileUrl, "true", "false"],
-  );
-  const csvText = stringify([
-    ["Account address", "Show boosts", "Notify on new posts", "Languages"],
-    ...profiles,
-  ]);
+  const profiles = Array.from(getProfiles(await getHrefStore()).values());
+
+  const blob = new Blob([JSON.stringify(profiles)], {
+    type: "application/json",
+  });
+
   const link = document.createElement("a");
-  link.setAttribute(
-    "href",
-    "data:text/csv;charset=utf-8," + encodeURIComponent(csvText),
-  );
-  link.setAttribute("download", "streetpass.csv");
   link.hidden = true;
+  link.href = URL.createObjectURL(blob);
+  link.download = "streetpass.json";
+
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

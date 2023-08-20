@@ -2634,13 +2634,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"csv-stringify@npm:^6.4.0":
-  version: 6.4.0
-  resolution: "csv-stringify@npm:6.4.0"
-  checksum: 4d68c34a8f9ec52ec7b2da8a67c2c4b658431f4ba8f816a5e9b4664dc09ec37e5cf65a41dae13500488d38bd8b416b1dc179aad8275ba54e7b1735e21bbf2830
-  languageName: node
-  linkType: hard
-
 "damerau-levenshtein@npm:^1.0.8":
   version: 1.0.8
   resolution: "damerau-levenshtein@npm:1.0.8"
@@ -3679,7 +3672,6 @@ __metadata:
     "@typescript-eslint/parser": ^6.2.1
     "@vitejs/plugin-react": ^4.0.4
     autoprefixer: ^10.4.14
-    csv-stringify: ^6.4.0
     eslint: ^8.46.0
     eslint-config-prettier: ^9.0.0
     eslint-plugin-import: ^2.28.0
