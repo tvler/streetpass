@@ -6939,9 +6939,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webfinger@workspace:api":
+"webfinger@workspace:site":
   version: 0.0.0-use.local
-  resolution: "webfinger@workspace:api"
+  resolution: "webfinger@workspace:site"
   dependencies:
     "@types/node": ^18.16.0
     "@types/react": 18.2.18

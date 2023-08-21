@@ -11,7 +11,7 @@
   },
   "workspaces": [
     "extension",
-    "api"
+    "site"
   ],
   "author": "",
   "license": "MIT",
