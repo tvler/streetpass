@@ -1,6 +1,7 @@
+import { NextPage } from "next";
 import Link from "next/link";
 
-export default function Page() {
+const Page: NextPage = () => {
   return (
     <div className="flex max-w-prose flex-col gap-y-1 p-3">
       <h1 className="text-lg font-semibold">StreetPass privacy policy</h1>
@@ -32,4 +33,6 @@ export default function Page() {
       </p>
     </div>
   );
-}
+};
+
+export default Page;

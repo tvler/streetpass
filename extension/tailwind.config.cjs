@@ -6,6 +6,7 @@ module.exports = {
       inherit: "inherit",
       transparent: "transparent",
       white: "#fff",
+      current: "currentColor",
       purple: {
         light: "#EFEDFC",
         DEFAULT: "#5F55EC",
@@ -24,7 +25,7 @@ module.exports = {
       6: "6px",
     },
     lineHeight: {},
-    spacing: { 0: "0", 12: "12px", 18: "18px" },
+    spacing: { 0: "0", 8: "8px", 12: "12px", 18: "18px" },
     extend: {},
   },
   plugins: [],

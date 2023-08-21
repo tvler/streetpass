@@ -2,11 +2,13 @@ import "webextension-polyfill";
 import * as React from "react";
 import * as ReactDom from "react-dom/client";
 import * as ReactQuery from "react-query";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import {
   getDisplayHref,
   getIconState,
   getProfiles,
   getHrefStore,
+  exportProfiles,
 } from "./util";
 
 getIconState(() => {
@@ -37,18 +39,19 @@ function getHrefProps(href: string): {
   };
 }
 
-function Popup() {
-  const hrefStoreQuery = ReactQuery.useQuery(
-    "hrefStore",
-    React.useCallback(() => getHrefStore(), [])
-  );
+const navButtonClassName =
+  "h-[1.68em] min-w-[1.4em] flex items-center justify-center rounded-6 bg-purple-light px-[0.38em] text-11 text-purple focus-visible:outline-none font-medium";
 
-  const profiles = React.useMemo(() => {
-    if (!hrefStoreQuery.data) {
-      return [];
-    }
-    return Array.from(getProfiles(hrefStoreQuery.data).values());
-  }, [hrefStoreQuery.data]);
+function Popup() {
+  const profilesQuery = ReactQuery.useQuery(
+    "hrefStore",
+    React.useCallback(() => getHrefStore(), []),
+    {
+      select(hrefStore) {
+        return Array.from(getProfiles(hrefStore).values());
+      },
+    },
+  );
 
   return (
     <>
@@ -59,13 +62,7 @@ function Popup() {
       </div>
 
       <div className="flex flex-col gap-18 px-12 pb-18 text-13 leading-[1.45]">
-        {!!profiles.length && (
-          <span className="absolute right-12 top-12 rounded-6 bg-purple-light px-[0.45em] py-[0.18em] text-11 font-medium leading-[1.3] text-purple">
-            {profiles.length}
-          </span>
-        )}
-
-        {!profiles.length && !hrefStoreQuery.isLoading && (
+        {profilesQuery.data?.length === 0 && (
           <div className="absolute bottom-0 left-0 right-0 top-0 flex items-center justify-center text-13 text-gray">
             <p>
               No profiles. Try{" "}
@@ -80,7 +77,7 @@ function Popup() {
           </div>
         )}
 
-        {profiles.map((hrefData, index, arr) => {
+        {profilesQuery.data?.map((hrefData, index, arr) => {
           const prevHrefData = arr[index - 1];
           const prevHrefDate = prevHrefData
             ? new Date(prevHrefData.viewedAt).getDate()
@@ -131,6 +128,40 @@ function Popup() {
           );
         })}
       </div>
+
+      <div className="absolute right-12 top-12 flex gap-8">
+        {!!profilesQuery.data?.length && (
+          <span className={navButtonClassName}>
+            {profilesQuery.data.length}
+          </span>
+        )}
+
+        <DropdownMenu.Root>
+          <DropdownMenu.Trigger className={navButtonClassName}>
+            <svg
+              fill="currentColor"
+              className="aspect-square w-[1em]"
+              viewBox="0 0 100 100"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle cx="15" cy="50" r="9" />
+              <circle cx="50" cy="50" r="9" />
+              <circle cx="85" cy="50" r="9" />
+            </svg>
+          </DropdownMenu.Trigger>
+
+          <DropdownMenu.Portal>
+            <DropdownMenu.Content align="end" side="bottom" sideOffset={6}>
+              <DropdownMenu.Item
+                onSelect={exportProfiles}
+                className={navButtonClassName}
+              >
+                Export (.json)
+              </DropdownMenu.Item>
+            </DropdownMenu.Content>
+          </DropdownMenu.Portal>
+        </DropdownMenu.Root>
+      </div>
     </>
   );
 }
@@ -142,10 +173,12 @@ if (!rootNode) {
 
 const root = ReactDom.createRoot(rootNode);
 
-const queryClient = new ReactQuery.QueryClient();
+const queryClient = new ReactQuery.QueryClient({
+  defaultOptions: { queries: { staleTime: Infinity } },
+});
 
 root.render(
   <ReactQuery.QueryClientProvider client={queryClient}>
     <Popup />
-  </ReactQuery.QueryClientProvider>
+  </ReactQuery.QueryClientProvider>,
 );

@@ -82,7 +82,7 @@ export function getIsUrlHttpOrHttps(uncheckedUrl: string | undefined): boolean {
 }
 
 export function getProfiles(
-  hrefStore: DeepReadonly<HrefStore>
+  hrefStore: DeepReadonly<HrefStore>,
 ): Map<string, { profileData: Profile } & HrefData> {
   const profiles: Map<string, { profileData: Profile } & HrefData> = new Map();
 
@@ -115,7 +115,7 @@ function getIsRelWebfingerProfilePageRel(href: string) {
 }
 
 export async function getUncachedProfileData(
-  href: string
+  href: string,
 ): Promise<ProfileData> {
   try {
     if (!getIsUrlHttpOrHttps(href)) {
@@ -182,7 +182,7 @@ export function getDisplayHref(href: string): string {
   if (pathnameWithStrippedTrailingSlash.endsWith(trailingSlash)) {
     pathnameWithStrippedTrailingSlash = pathnameWithStrippedTrailingSlash.slice(
       0,
-      -trailingSlash.length
+      -trailingSlash.length,
     );
   }
 
@@ -208,7 +208,7 @@ export function storageFactory<T extends NotNullNotUndefined>(args: {
   (cb?: (data: DeepReadonly<T>) => DeepReadonly<T>): Promise<DeepReadonly<T>>;
 } {
   let lastDataPromise: Promise<DeepReadonly<T>> = Promise.resolve(
-    args.parse(undefined)
+    args.parse(undefined),
   );
 
   return (cb) => {
@@ -308,6 +308,50 @@ export const getHrefStore = storageFactory({
     }
   },
 });
+
+function getDataUrlFromFile(file: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.addEventListener(
+      "load",
+      () => {
+        if (typeof reader.result === "string") {
+          resolve(reader.result);
+        } else {
+          reject();
+        }
+      },
+      false,
+    );
+    reader.addEventListener("error", () => {
+      reject();
+    });
+
+    reader.readAsDataURL(file);
+  });
+}
+
+export async function exportProfiles(): Promise<void> {
+  const profiles = Array.from(getProfiles(await getHrefStore()).values());
+
+  const blob = new Blob([JSON.stringify(profiles)], {
+    type: "application/json",
+  });
+
+  browser.tabs.create({
+    url:
+      /**
+       * Chrome needs to use this method, because otherwise the blob isn't
+       * recognized as a JSON file and won't allow downloading via command + s.
+       * the opened tab will have a url blob:chrome-extension instead of data:application/json
+       */
+      __TARGET__ === "chrome"
+        ? await getDataUrlFromFile(blob)
+        : URL.createObjectURL(blob),
+  });
+
+  window.close();
+}
 
 /**
  * Test the safe storage
