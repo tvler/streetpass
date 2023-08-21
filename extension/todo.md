@@ -1,3 +1,10 @@
+# Todo
+
+- Separate action icons at build time between chrome and safari
+- currentUrlWithNoHash bug https://post.lurk.org/@gwil/110724232962858081
+
+# Notes
+
 - good ones to check
 - https://gnu.tiflolinux.org/avefenix
 - https://themarkup.org/people/dan-phiffer
