@@ -1,3 +1,7 @@
+# 2023.11
+
+- Export profile data
+
 # 2023.10
 
 - New icon
