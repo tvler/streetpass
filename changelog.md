@@ -1,3 +1,7 @@
+# 2023.12
+
+- Remove tracking params from website urls
+
 # 2023.11
 
 - Export profile data
