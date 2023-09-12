@@ -21,12 +21,12 @@ const configSchema = z.object({
 
 export function getConfig(
   target: Target,
-  unparsedConfig: ConfigEnv
+  unparsedConfig: ConfigEnv,
 ): UserConfig {
   const config = configSchema.parse(unparsedConfig);
 
   function targets<Value>(
-    args: Record<Target, Value>
+    args: Record<Target, Value>,
   ): (typeof args)[keyof typeof args] {
     return args[target];
   }
@@ -162,7 +162,7 @@ export function getConfig(
               {
                 shell: true,
                 stdio: "inherit",
-              }
+              },
             );
 
             if (config.mode === "dev") {
@@ -173,7 +173,7 @@ export function getConfig(
                   `"${path.resolve(
                     options.dir,
                     `${extensionName}`,
-                    `${extensionName}.xcodeproj`
+                    `${extensionName}.xcodeproj`,
                   )}"`,
                   "-allowProvisioningUpdates",
                   "DEVELOPMENT_TEAM=WLTVAXDPZT",
@@ -182,7 +182,7 @@ export function getConfig(
                 {
                   shell: true,
                   stdio: "inherit",
-                }
+                },
               );
             }
           },
@@ -210,18 +210,16 @@ export function getConfig(
       rollupOptions: {
         strictDeprecations: true,
         preserveEntrySignatures: "strict",
-        input: (() => {
-          return [
-            webextensionPolyfillPathName,
-            path.resolve(dirname, "src/popup.html"),
-            path.resolve(dirname, "src/content-script.ts"),
-            targets({
-              chrome: path.resolve(dirname, "src/background.ts"),
-              firefox: path.resolve(dirname, "src/background-page.html"),
-              safari: path.resolve(dirname, "src/background.ts"),
-            }),
-          ];
-        })(),
+        input: [
+          webextensionPolyfillPathName,
+          path.resolve(dirname, "src/popup.html"),
+          path.resolve(dirname, "src/content-script.ts"),
+          targets({
+            chrome: path.resolve(dirname, "src/background.ts"),
+            firefox: path.resolve(dirname, "src/background-page.html"),
+            safari: path.resolve(dirname, "src/background.ts"),
+          }),
+        ],
         output: {
           minifyInternalExports: false,
           inlineDynamicImports: false,

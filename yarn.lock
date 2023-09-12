@@ -1307,10 +1307,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/webextension-polyfill@npm:^0.10.1":
-  version: 0.10.1
-  resolution: "@types/webextension-polyfill@npm:0.10.1"
-  checksum: 7315dcb1943aedf2e18fd0c536406a3b3b9a8dc11ad380e66cf810e700cd7cc0a2ac08c2b017b6c17aba8a71782efc55158e1cb93497f3b680ac90a8d7b6635d
+"@types/webextension-polyfill@npm:^0.10.2":
+  version: 0.10.2
+  resolution: "@types/webextension-polyfill@npm:0.10.2"
+  checksum: 913233023f74835aa19ba18c9aab6819c9f13e3a1a2bcc0591292b2b7413404ea62261ae699025db5a89607508300f677cae712a55f6fd0366283445eb2c7837
   languageName: node
   linkType: hard
 
@@ -2897,7 +2897,7 @@ __metadata:
     "@radix-ui/react-dropdown-menu": ^2.0.5
     "@types/react": ^18.2.21
     "@types/react-dom": ^18.2.7
-    "@types/webextension-polyfill": ^0.10.1
+    "@types/webextension-polyfill": ^0.10.2
     "@typescript-eslint/eslint-plugin": ^6.2.1
     "@typescript-eslint/parser": ^6.2.1
     "@vitejs/plugin-react": ^4.0.4
@@ -2915,7 +2915,7 @@ __metadata:
     tailwindcss: ^3.3.3
     ts-essentials: ^9.4.0
     typescript: 5.1.6
-    vite: ^4.4.8
+    vite: ^4.4.9
     webextension-polyfill: ^0.10.0
     zod: ^3.21.4
   languageName: unknown
@@ -4648,7 +4648,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.4.23, postcss@npm:^8.4.26, postcss@npm:^8.4.29":
+"postcss@npm:^8.4.23, postcss@npm:^8.4.27, postcss@npm:^8.4.29":
   version: 8.4.29
   resolution: "postcss@npm:8.4.29"
   dependencies:
@@ -5013,9 +5013,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rollup@npm:^3.25.2":
-  version: 3.27.2
-  resolution: "rollup@npm:3.27.2"
+"rollup@npm:^3.27.1":
+  version: 3.29.1
+  resolution: "rollup@npm:3.29.1"
   dependencies:
     fsevents: ~2.3.2
   dependenciesMeta:
@@ -5023,7 +5023,7 @@ __metadata:
       optional: true
   bin:
     rollup: dist/bin/rollup
-  checksum: 524477e73885bafd2df395c12db330f3893e1f8eca67e811fb1423a4f6318451987e978607c75f8115bd9ce7fa834460969b0c39b797d45da87fa42fef9bafa8
+  checksum: eb92dbb83842f46782257c93e864dd12e9eef72eb98485a70a08026e50f7b557cfff7da71f677a4bd62906e597cc99284bf152b876f814a95b61f5a618a0f43e
   languageName: node
   linkType: hard
 
@@ -5732,14 +5732,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:^4.4.8":
-  version: 4.4.8
-  resolution: "vite@npm:4.4.8"
+"vite@npm:^4.4.9":
+  version: 4.4.9
+  resolution: "vite@npm:4.4.9"
   dependencies:
     esbuild: ^0.18.10
     fsevents: ~2.3.2
-    postcss: ^8.4.26
-    rollup: ^3.25.2
+    postcss: ^8.4.27
+    rollup: ^3.27.1
   peerDependencies:
     "@types/node": ">= 14"
     less: "*"
@@ -5768,7 +5768,7 @@ __metadata:
       optional: true
   bin:
     vite: bin/vite.js
-  checksum: e8ffe688f8a7396b1357778f00cb06d1f3dadad200823c47a1955cf52774a0cbff5ac4d6a8f8d09e26c1d4e588e5815956f9eba02ae301e77a36c3d181a1bc86
+  checksum: c511024ceae39c68c7dbf2ac4381ee655cd7bb62cf43867a14798bc835d3320b8fa7867a336143c30825c191c1fb4e9aa3348fce831ab617e96203080d3d2908
   languageName: node
   linkType: hard
 
