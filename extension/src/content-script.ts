@@ -2,13 +2,23 @@
 
 import type { HrefPayload } from "./util.js";
 
-function getCurrentUrlWithNoHash() {
+function getCurrentUrlSanitized() {
   const url = new URL(window.location.toString());
+
+  // Delete hash
   url.hash = "";
+
+  // Delete UTM parameters https://en.wikipedia.org/wiki/UTM_parameters#UTM_parameters
+  url.searchParams.delete("utm_source");
+  url.searchParams.delete("utm_medium");
+  url.searchParams.delete("utm_campaign");
+  url.searchParams.delete("utm_term");
+  url.searchParams.delete("utm_content");
+
   return url.toString();
 }
 
-let currentUrlWithNoHash = getCurrentUrlWithNoHash();
+let currentUrlSanitized = getCurrentUrlSanitized();
 const hrefs: Set<string> = new Set();
 
 function sendHrefs() {
@@ -21,7 +31,7 @@ function sendHrefs() {
 
       const hrefPayload: HrefPayload = {
         HREF_PAYLOAD: {
-          tabUrl: currentUrlWithNoHash,
+          tabUrl: currentUrlSanitized,
           href: href,
         },
       };
@@ -31,9 +41,9 @@ function sendHrefs() {
 }
 
 new MutationObserver(() => {
-  const testCurrentUrlWithNoHash = getCurrentUrlWithNoHash();
-  if (currentUrlWithNoHash !== testCurrentUrlWithNoHash) {
-    currentUrlWithNoHash = testCurrentUrlWithNoHash;
+  const testCurrentUrlSanitized = getCurrentUrlSanitized();
+  if (currentUrlSanitized !== testCurrentUrlSanitized) {
+    currentUrlSanitized = testCurrentUrlSanitized;
     hrefs.clear();
   }
 
