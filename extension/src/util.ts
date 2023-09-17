@@ -27,6 +27,7 @@ type HrefData = {
   websiteUrl: string;
   viewedAt: number;
   relMeHref: string;
+  updatedAt?: number;
 };
 
 export type HrefStore = Map<string, HrefData>;
