@@ -2908,12 +2908,14 @@ __metadata:
     prettier-plugin-tailwindcss: ^0.5.4
     react: ^18.2.0
     react-dom: ^18.2.0
+    react-intersection-observer: ^9.5.2
+    react-query-kit: ^2.0.0
     tailwindcss: ^3.3.3
     ts-essentials: ^9.4.0
     typescript: 5.1.6
     vite: ^4.4.9
     webextension-polyfill: ^0.10.0
-    zod: ^3.21.4
+    zod: ^3.22.2
   languageName: unknown
   linkType: soft
 
@@ -4738,10 +4740,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-intersection-observer@npm:^9.5.2":
+  version: 9.5.2
+  resolution: "react-intersection-observer@npm:9.5.2"
+  peerDependencies:
+    react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+  checksum: cdbe40544930d59fc3820bce017fb688910cbecd7baaf382387a3d60d98a36e1d1e4bc27a876775e99b2a9f86762286a29d7bca21f3345f653cff29850c2641d
+  languageName: node
+  linkType: hard
+
 "react-is@npm:^16.13.1":
   version: 16.13.1
   resolution: "react-is@npm:16.13.1"
   checksum: f7a19ac3496de32ca9ae12aa030f00f14a3d45374f1ceca0af707c831b2a6098ef0d6bdae51bd437b0a306d7f01d4677fcc8de7c0d331eb47ad0f46130e53c5f
+  languageName: node
+  linkType: hard
+
+"react-query-kit@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "react-query-kit@npm:2.0.0"
+  peerDependencies:
+    "@tanstack/react-query": ">= 4.0.0"
+  checksum: e0db5d324c11e376ede7573a0e28052e0c3483733ea93527758e8cc170396a98d97f9cda6d030b9e03786670a8ed5a90dde8d9b99c372ea325d1a755b6e3e689
   languageName: node
   linkType: hard
 
@@ -5845,5 +5865,12 @@ __metadata:
   version: 3.21.4
   resolution: "zod@npm:3.21.4"
   checksum: f185ba87342ff16f7a06686767c2b2a7af41110c7edf7c1974095d8db7a73792696bcb4a00853de0d2edeb34a5b2ea6a55871bc864227dace682a0a28de33e1f
+  languageName: node
+  linkType: hard
+
+"zod@npm:^3.22.2":
+  version: 3.22.2
+  resolution: "zod@npm:3.22.2"
+  checksum: 231e2180c8eabb56e88680d80baff5cf6cbe6d64df3c44c50ebe52f73081ecd0229b1c7215b9552537f537a36d9e36afac2737ddd86dc14e3519bdbc777e82b9
   languageName: node
   linkType: hard

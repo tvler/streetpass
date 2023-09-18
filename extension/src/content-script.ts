@@ -1,6 +1,6 @@
 /* eslint-env browser */
 
-import type { HrefPayload } from "./util.js";
+import type { Message } from "./util.js";
 
 function getCurrentUrlSanitized() {
   const url = new URL(window.location.toString());
@@ -29,13 +29,14 @@ function sendHrefs() {
     if (href && !hrefs.has(href)) {
       hrefs.add(href);
 
-      const hrefPayload: HrefPayload = {
-        HREF_PAYLOAD: {
+      const message: Message = {
+        name: "HREF_PAYLOAD",
+        args: {
           tabUrl: currentUrlSanitized,
           href: href,
         },
       };
-      browser.runtime.sendMessage(hrefPayload);
+      browser.runtime.sendMessage(message);
     }
   }
 }

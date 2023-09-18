@@ -1,14 +1,19 @@
 import "webextension-polyfill";
 import * as React from "react";
 import * as ReactDom from "react-dom/client";
-import * as ReactQuery from "react-query";
+import * as ReactQuery from "@tanstack/react-query";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { createQuery } from "react-query-kit";
+import { InView } from "react-intersection-observer";
 import {
   getDisplayHref,
   getIconState,
   getProfiles,
   getHrefStore,
   exportProfiles,
+  MapValue,
+  getUncachedProfileData,
+  Message,
 } from "./util";
 
 getIconState(() => {
@@ -39,19 +44,22 @@ function getHrefProps(href: string): {
   };
 }
 
+const useProfilesQuery = createQuery<
+  Array<MapValue<ReturnType<typeof getProfiles>>>,
+  never
+>({
+  primaryKey: "profiles",
+  async queryFn() {
+    console.log("cool");
+    return Array.from(getProfiles(await getHrefStore()).values());
+  },
+});
+
 const navButtonClassName =
   "h-[1.68em] min-w-[1.4em] flex items-center justify-center rounded-6 bg-purple-light px-[0.38em] text-11 text-purple focus-visible:outline-none font-medium";
 
 function Popup() {
-  const profilesQuery = ReactQuery.useQuery(
-    "hrefStore",
-    React.useCallback(() => getHrefStore(), []),
-    {
-      select(hrefStore) {
-        return Array.from(getProfiles(hrefStore).values());
-      },
-    },
-  );
+  const profilesQuery = useProfilesQuery();
 
   return (
     <>
@@ -96,7 +104,28 @@ function Popup() {
                 </p>
               )}
 
-              <div className="flex flex-row items-start">
+              <InView
+                as="div"
+                className="flex flex-row items-start"
+                triggerOnce
+                onChange={async (inView) => {
+                  console.log("inView", inView, hrefData);
+                  try {
+                    const message: Message = {
+                      name: "FETCH_PROFILE_UPDATE",
+                      args: {
+                        href: hrefData.relMeHref,
+                      },
+                    };
+                    const test = await browser.runtime.sendMessage(message);
+                    console.log(test);
+                    // const test = await fetch(hrefData.relMeHref);
+                    // console.log(test);
+                  } catch (err) {
+                    console.log(err);
+                  }
+                }}
+              >
                 <p className="w-[65px] shrink-0 text-gray">
                   {new Intl.DateTimeFormat(undefined, {
                     timeStyle: "short",
@@ -123,7 +152,7 @@ function Popup() {
                     </a>
                   </p>
                 </div>
-              </div>
+              </InView>
             </React.Fragment>
           );
         })}
