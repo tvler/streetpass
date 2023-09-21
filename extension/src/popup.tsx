@@ -110,7 +110,6 @@ function Popup() {
                 triggerOnce
                 skip
                 onChange={async (inView) => {
-                  console.log("here");
                   if (!inView) {
                     return;
                   }
