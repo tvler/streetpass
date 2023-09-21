@@ -51,7 +51,6 @@ const useProfilesQuery = createQuery<
 >({
   primaryKey: "profiles",
   async queryFn() {
-    console.log("cool");
     return Array.from(getProfiles(await getHrefStore()).values());
   },
 });
@@ -109,7 +108,9 @@ function Popup() {
                 as="div"
                 className="flex flex-row items-start"
                 triggerOnce
+                skip
                 onChange={async (inView) => {
+                  console.log("here");
                   if (!inView) {
                     return;
                   }
