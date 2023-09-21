@@ -1,4 +1,5 @@
 import type { DeepReadonly } from "ts-essentials";
+import { z } from "zod";
 
 /**
  * =========
@@ -6,11 +7,103 @@ import type { DeepReadonly } from "ts-essentials";
  * =========
  */
 
-export const HREF_PAYLOAD = "HREF_PAYLOAD";
+export const Message = z.discriminatedUnion("name", [
+  z.object({
+    name: z.literal("HREF_PAYLOAD"),
+    args: z.object({
+      relMeHref: z.string(),
+      tabUrl: z.string(),
+    }),
+  }),
+  z.object({
+    name: z.literal("FETCH_PROFILE_UPDATE"),
+    args: z.object({
+      relMeHref: z.string(),
+    }),
+  }),
+]);
 
-export type HrefPayload = {
-  [HREF_PAYLOAD]: { href: string; tabUrl: string };
+export const MessageReturn = {
+  HREF_PAYLOAD: z.void(),
+  FETCH_PROFILE_UPDATE: z.promise(z.boolean()),
+} satisfies Record<Message["name"], unknown>;
+
+export type Message = z.infer<typeof Message>;
+
+type ArgMap = {
+  [Key in Message["name"]]: Extract<Message, { name: Key }>["args"];
 };
+
+export const messageCallbacks: {
+  [K in keyof ArgMap]: (value: ArgMap[K]) => z.infer<(typeof MessageReturn)[K]>;
+} = {
+  async HREF_PAYLOAD(args) {
+    const hasExistingHrefData = (
+      await getHrefStore((prev) => {
+        const hrefStore = new Map(prev);
+        for (const [key, hrefData] of hrefStore) {
+          if (
+            hrefData.profileData.type === "notProfile" &&
+            hrefData.viewedAt + timeToExpireNotProfile < Date.now()
+          ) {
+            hrefStore.delete(key);
+          }
+        }
+
+        return hrefStore;
+      })
+    ).has(args.relMeHref);
+
+    if (hasExistingHrefData) {
+      return;
+    }
+
+    const profileData = await getUncachedProfileData(args.relMeHref);
+
+    await getHrefStore((hrefStore) => {
+      const newHrefStore = new Map(hrefStore);
+      newHrefStore.set(args.relMeHref, {
+        profileData: profileData,
+        viewedAt: Date.now(),
+        websiteUrl: args.tabUrl,
+        relMeHref: args.relMeHref,
+      });
+
+      return newHrefStore;
+    });
+  },
+  async FETCH_PROFILE_UPDATE(args): Promise<boolean> {
+    try {
+      new URL(args.relMeHref);
+    } catch (err) {
+      return false;
+    }
+
+    const hasExistingHrefData = (await getHrefStore()).has(args.relMeHref);
+    if (!hasExistingHrefData) {
+      return false;
+    }
+
+    const profileData = await getUncachedProfileData(args.relMeHref);
+    if (profileData.type === "notProfile") {
+      return false;
+    }
+    await getHrefStore();
+
+    return true;
+  },
+};
+
+/**
+ * Thanks to https://stackoverflow.com/questions/70598583/argument-of-type-string-number-is-not-assignable-to-parameter-of-type-never
+ * And https://github.com/Microsoft/TypeScript/issues/30581#issuecomment-1008338350
+ * todo look at https://github.com/Microsoft/TypeScript/issues/30581#issuecomment-1080979994
+ */
+export function runMessageCallback<K extends keyof ArgMap>(
+  message: { [P in K]: { name: P; args: ArgMap[P] } }[K],
+): z.infer<(typeof MessageReturn)[K]> {
+  return messageCallbacks[message.name](message.args);
+}
 
 export type Target = "chrome" | "firefox" | "safari";
 
@@ -27,6 +120,7 @@ type HrefData = {
   websiteUrl: string;
   viewedAt: number;
   relMeHref: string;
+  updatedAt?: number;
 };
 
 export type HrefStore = Map<string, HrefData>;
@@ -59,6 +153,8 @@ export const actionActive = {
 } as const satisfies Record<string, string>;
 
 export const timeToExpireNotProfile = 10 * 60 * 1000; // 10 min in milliseconds
+
+export type MapValue<T> = T extends Map<any, infer V> ? V : never;
 
 /**
  * =====
