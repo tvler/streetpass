@@ -7,12 +7,14 @@ browser.runtime.onMessage.addListener(async (msg: unknown) => {
   try {
     message = Message.parse(msg);
   } catch (err) {
+    console.error(err);
     return;
   }
 
   try {
     return runMessageCallback(message);
   } catch (err) {
+    console.error(err);
     return;
   }
 });
