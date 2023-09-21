@@ -154,8 +154,6 @@ export const actionActive = {
 
 export const timeToExpireNotProfile = 10 * 60 * 1000; // 10 min in milliseconds
 
-export type MapValue<T> = T extends Map<any, infer V> ? V : never;
-
 /**
  * =====
  * UTILS
@@ -179,14 +177,14 @@ export function getIsUrlHttpOrHttps(uncheckedUrl: string | undefined): boolean {
 
 export function getProfiles(
   hrefStore: DeepReadonly<HrefStore>,
-): Map<string, { profileData: Profile } & HrefData> {
-  const profiles: Map<string, { profileData: Profile } & HrefData> = new Map();
+): Array<{ profileData: Profile } & HrefData> {
+  const profiles: Array<{ profileData: Profile } & HrefData> = [];
 
-  for (const hrefData of Array.from(hrefStore.values()).reverse()) {
+  for (const hrefData of hrefStore.values()) {
     if (hrefData.profileData.type !== "profile") {
       continue;
     }
-    profiles.set(hrefData.profileData.profileUrl, {
+    profiles.push({
       profileData: {
         type: hrefData.profileData.type,
         profileUrl: hrefData.profileData.profileUrl,
@@ -197,7 +195,7 @@ export function getProfiles(
     });
   }
 
-  return profiles;
+  return profiles.sort((a, b) => b.viewedAt - a.viewedAt);
 }
 
 function getIsRelWebfingerProfilePageRel(href: string) {
@@ -394,12 +392,12 @@ export const getHrefStore = storageFactory({
   async onChange({ prev, curr }) {
     const prevProfiles = getProfiles(prev);
     const currProfiles = getProfiles(curr);
-    if (currProfiles.size > prevProfiles.size) {
+    if (currProfiles.length > prevProfiles.length) {
       getIconState((iconState) => ({
         state: "on",
         unreadCount:
           (iconState.unreadCount ?? 0) +
-          (currProfiles.size - prevProfiles.size),
+          (currProfiles.length - prevProfiles.length),
       }));
     }
   },
@@ -428,7 +426,7 @@ function getDataUrlFromFile(file: Blob): Promise<string> {
 }
 
 export async function exportProfiles(): Promise<void> {
-  const profiles = Array.from(getProfiles(await getHrefStore()).values());
+  const profiles = getProfiles(await getHrefStore());
 
   const blob = new Blob([JSON.stringify(profiles)], {
     type: "application/json",

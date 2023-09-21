@@ -11,7 +11,6 @@ import {
   getProfiles,
   getHrefStore,
   exportProfiles,
-  MapValue,
   getUncachedProfileData,
   Message,
   MessageReturn,
@@ -45,13 +44,11 @@ function getHrefProps(href: string): {
   };
 }
 
-const useProfilesQuery = createQuery<
-  Array<MapValue<ReturnType<typeof getProfiles>>>,
-  never
->({
+const useProfilesQuery = createQuery<ReturnType<typeof getProfiles>, never>({
   primaryKey: "profiles",
   async queryFn() {
-    return Array.from(getProfiles(await getHrefStore()).values());
+    const profiles = getProfiles(await getHrefStore());
+    return profiles;
   },
 });
 
