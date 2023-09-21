@@ -33,7 +33,7 @@ function sendHrefs() {
         name: "HREF_PAYLOAD",
         args: {
           tabUrl: currentUrlSanitized,
-          href: href,
+          relMeHref: href,
         },
       };
       browser.runtime.sendMessage(message);

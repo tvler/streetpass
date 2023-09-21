@@ -14,6 +14,7 @@ import {
   MapValue,
   getUncachedProfileData,
   Message,
+  MessageReturn,
 } from "./util";
 
 getIconState(() => {
@@ -109,20 +110,23 @@ function Popup() {
                 className="flex flex-row items-start"
                 triggerOnce
                 onChange={async (inView) => {
-                  console.log("inView", inView, hrefData);
+                  if (!inView) {
+                    return;
+                  }
+
                   try {
                     const message: Message = {
                       name: "FETCH_PROFILE_UPDATE",
                       args: {
-                        href: hrefData.relMeHref,
+                        relMeHref: hrefData.relMeHref,
                       },
                     };
-                    const test = await browser.runtime.sendMessage(message);
-                    console.log(test);
-                    // const test = await fetch(hrefData.relMeHref);
-                    // console.log(test);
+                    const resp = await MessageReturn.FETCH_PROFILE_UPDATE.parse(
+                      browser.runtime.sendMessage(message),
+                    );
+                    console.log(resp);
                   } catch (err) {
-                    console.log(err);
+                    console.error(err);
                   }
                 }}
               >

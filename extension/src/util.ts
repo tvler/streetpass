@@ -11,17 +11,22 @@ export const Message = z.discriminatedUnion("name", [
   z.object({
     name: z.literal("HREF_PAYLOAD"),
     args: z.object({
-      href: z.string(),
+      relMeHref: z.string(),
       tabUrl: z.string(),
     }),
   }),
   z.object({
     name: z.literal("FETCH_PROFILE_UPDATE"),
     args: z.object({
-      href: z.string(),
+      relMeHref: z.string(),
     }),
   }),
 ]);
+
+export const MessageReturn = {
+  HREF_PAYLOAD: z.void(),
+  FETCH_PROFILE_UPDATE: z.promise(z.boolean()),
+} satisfies Record<Message["name"], unknown>;
 
 export type Message = z.infer<typeof Message>;
 
@@ -30,7 +35,7 @@ type ArgMap = {
 };
 
 export const messageCallbacks: {
-  [K in keyof ArgMap]: (value: ArgMap[K]) => void;
+  [K in keyof ArgMap]: (value: ArgMap[K]) => z.infer<(typeof MessageReturn)[K]>;
 } = {
   async HREF_PAYLOAD(args) {
     const hasExistingHrefData = (
@@ -47,37 +52,43 @@ export const messageCallbacks: {
 
         return hrefStore;
       })
-    ).has(args.href);
+    ).has(args.relMeHref);
 
     if (hasExistingHrefData) {
       return;
     }
 
-    const profileData = await getUncachedProfileData(args.href);
+    const profileData = await getUncachedProfileData(args.relMeHref);
 
     await getHrefStore((hrefStore) => {
       const newHrefStore = new Map(hrefStore);
-      newHrefStore.set(args.href, {
+      newHrefStore.set(args.relMeHref, {
         profileData: profileData,
         viewedAt: Date.now(),
         websiteUrl: args.tabUrl,
-        relMeHref: args.href,
+        relMeHref: args.relMeHref,
       });
 
       return newHrefStore;
     });
   },
   async FETCH_PROFILE_UPDATE(args): Promise<boolean> {
-    const profileData = await getUncachedProfileData(args.href);
+    try {
+      new URL(args.relMeHref);
+    } catch (err) {
+      return false;
+    }
+
+    const hasExistingHrefData = (await getHrefStore()).has(args.relMeHref);
+    if (!hasExistingHrefData) {
+      return false;
+    }
+
+    const profileData = await getUncachedProfileData(args.relMeHref);
     if (profileData.type === "notProfile") {
       return false;
     }
-    // await getHrefStore((prev) => {
-    //   const hrefStore = new Map(prev);
-    //   if (!hrefStore.has(relMeHref)) {
-    //     return undefined;
-    //   }
-    // });
+    await getHrefStore();
 
     return true;
   },
@@ -90,8 +101,8 @@ export const messageCallbacks: {
  */
 export function runMessageCallback<K extends keyof ArgMap>(
   message: { [P in K]: { name: P; args: ArgMap[P] } }[K],
-) {
-  messageCallbacks[message.name](message.args);
+): z.infer<(typeof MessageReturn)[K]> {
+  return messageCallbacks[message.name](message.args);
 }
 
 export type Target = "chrome" | "firefox" | "safari";
