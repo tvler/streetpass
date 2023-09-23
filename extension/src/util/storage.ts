@@ -15,7 +15,7 @@ function storageFactory<T extends NotNullNotUndefined>(args: {
   onChange?(args: {
     prev: DeepReadonly<T>;
     curr: DeepReadonly<T>;
-  }): void | Promise<void>;
+  }): MaybePromise<void>;
 }): {
   (
     cb?: (data: DeepReadonly<T>) => MaybePromise<DeepReadonly<T> | void>,
