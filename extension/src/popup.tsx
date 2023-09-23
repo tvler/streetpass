@@ -11,7 +11,6 @@ import {
   getProfiles,
   getHrefStore,
   exportProfiles,
-  getUncachedProfileData,
   Message,
   MessageReturn,
 } from "./util";
@@ -48,6 +47,7 @@ const useProfilesQuery = createQuery<ReturnType<typeof getProfiles>, never>({
   primaryKey: "profiles",
   async queryFn() {
     const profiles = getProfiles(await getHrefStore());
+    console.log("in useProfilesQuery query", profiles);
     return profiles;
   },
 });
@@ -57,6 +57,7 @@ const navButtonClassName =
 
 function Popup() {
   const profilesQuery = useProfilesQuery();
+  const queryClient = ReactQuery.useQueryClient();
 
   return (
     <>
@@ -105,7 +106,6 @@ function Popup() {
                 as="div"
                 className="flex flex-row items-start"
                 triggerOnce
-                skip
                 onChange={async (inView) => {
                   if (!inView) {
                     return;
@@ -122,6 +122,11 @@ function Popup() {
                       browser.runtime.sendMessage(message),
                     );
                     console.log(resp);
+                    if (!resp) {
+                      return;
+                    }
+
+                    queryClient.refetchQueries();
                   } catch (err) {
                     console.error(err);
                   }
@@ -141,7 +146,8 @@ function Popup() {
                     {...getHrefProps(hrefData.profileData.profileUrl)}
                     className="break-word font-medium text-purple"
                   >
-                    {getDisplayHref(hrefData.profileData.profileUrl)}
+                    {hrefData.profileData.account ||
+                      getDisplayHref(hrefData.profileData.profileUrl)}
                   </a>
 
                   <p className="text-gray">

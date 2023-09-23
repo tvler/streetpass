@@ -60,6 +60,8 @@ export const messageCallbacks: {
 
     const profileData = await getUncachedProfileData(args.relMeHref);
 
+    console.log({ profileData });
+
     await getHrefStore((hrefStore) => {
       const newHrefStore = new Map(hrefStore);
       newHrefStore.set(args.relMeHref, {
@@ -73,23 +75,69 @@ export const messageCallbacks: {
     });
   },
   async FETCH_PROFILE_UPDATE(args): Promise<boolean> {
+    /**
+     * Exit if relMeHref isn't a valid url
+     */
     try {
       new URL(args.relMeHref);
     } catch (err) {
       return false;
     }
 
-    const hasExistingHrefData = (await getHrefStore()).has(args.relMeHref);
-    if (!hasExistingHrefData) {
+    /**
+     * Exit if relMeHref isn't in the hrefStore already
+     */
+    const existingHrefData = (await getHrefStore()).get(args.relMeHref);
+    if (!existingHrefData) {
       return false;
     }
 
+    /**
+     * Exit if existingHrefData isn't a profile
+     */
+    if (existingHrefData.profileData.type === "notProfile") {
+      return false;
+    }
+
+    /**
+     * Exit if fetched profileData is notProfile
+     */
     const profileData = await getUncachedProfileData(args.relMeHref);
     if (profileData.type === "notProfile") {
       return false;
     }
-    await getHrefStore();
 
+    const keys = ["profileUrl", "type", "account", "avatar"] as const;
+    {
+      interface CheckForMissing<
+        Arr extends readonly unknown[],
+        Keys extends Arr[number],
+      > {}
+      interface CheckForExcess<Arr extends readonly Keys[], Keys> {}
+      type _Missing = CheckForMissing<typeof keys, keyof Profile>;
+      type _Excess = CheckForExcess<typeof keys, keyof Profile>;
+    }
+
+    for (const key of keys) {
+      //
+    }
+
+    /**
+     * Set new profileData
+     */
+    await getHrefStore((hrefStore) => {
+      const newHrefStore = new Map(hrefStore);
+      newHrefStore.set(args.relMeHref, {
+        ...existingHrefData,
+        profileData,
+      });
+
+      return newHrefStore;
+    });
+
+    /**
+     * Return true
+     */
     return true;
   },
 };
@@ -107,7 +155,12 @@ export function runMessageCallback<K extends keyof ArgMap>(
 
 export type Target = "chrome" | "firefox" | "safari";
 
-type Profile = { type: "profile"; profileUrl: string };
+type Profile = {
+  type: "profile";
+  profileUrl: string;
+  account?: string | undefined;
+  avatar?: string | undefined;
+};
 
 type NotProfile = { type: "notProfile" };
 
@@ -120,7 +173,6 @@ type HrefData = {
   websiteUrl: string;
   viewedAt: number;
   relMeHref: string;
-  updatedAt?: number;
 };
 
 export type HrefStore = Map<string, HrefData>;
@@ -185,10 +237,7 @@ export function getProfiles(
       continue;
     }
     profiles.push({
-      profileData: {
-        type: hrefData.profileData.type,
-        profileUrl: hrefData.profileData.profileUrl,
-      },
+      profileData: hrefData.profileData,
       websiteUrl: hrefData.websiteUrl,
       viewedAt: hrefData.viewedAt,
       relMeHref: hrefData.relMeHref,
@@ -196,16 +245,6 @@ export function getProfiles(
   }
 
   return profiles.sort((a, b) => b.viewedAt - a.viewedAt);
-}
-
-function getIsRelWebfingerProfilePageRel(href: string) {
-  const webFingerProfilePageRelWithoutProtocol =
-    "//webfinger.net/rel/profile-page";
-
-  return (
-    href === `http:${webFingerProfilePageRelWithoutProtocol}` ||
-    href === `https:${webFingerProfilePageRelWithoutProtocol}`
-  );
 }
 
 export async function getUncachedProfileData(
@@ -245,22 +284,47 @@ export async function getUncachedProfileData(
     }
 
     const webfinger: Webfinger = await webfingerResp.json();
+
+    /**
+     * Account (username) of profile
+     */
+    let account: string | undefined;
+    const acctPrefix = "acct:";
+    if (webfinger.subject.startsWith(acctPrefix)) {
+      account = webfinger.subject.slice(acctPrefix.length);
+    }
+
+    let profileUrl: string | undefined;
+    let avatar: string | undefined;
     for (const webfingerLink of webfinger.links ?? []) {
-      if (
-        getIsRelWebfingerProfilePageRel(webfingerLink.rel) &&
-        !!webfingerLink.href
-      ) {
-        return {
-          type: "profile",
-          profileUrl: webfingerLink.href,
-        };
+      if (!webfingerLink.href) {
+        continue;
+      }
+      switch (webfingerLink.rel) {
+        case "http://webfinger.net/rel/profile-page": {
+          profileUrl = webfingerLink.href;
+          break;
+        }
+        case "http://webfinger.net/rel/avatar": {
+          avatar = webfingerLink.href;
+          break;
+        }
       }
     }
-  } catch (err) {
-    // Nothing
-  }
 
-  return { type: "notProfile" };
+    if (!profileUrl) {
+      throw new Error();
+    }
+
+    return {
+      type: "profile",
+      account,
+      profileUrl,
+      avatar,
+    };
+  } catch (err) {
+    return { type: "notProfile" };
+  }
 }
 
 export function getDisplayHref(href: string): string {
