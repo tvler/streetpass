@@ -114,7 +114,7 @@ export const messageCallbacks: {
       existingHrefData,
       uncachedProfileData,
     });
-    return !!shouldUpdateProfile;
+    return shouldUpdateProfile;
   },
 };
 
