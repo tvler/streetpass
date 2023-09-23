@@ -54,7 +54,6 @@ const useProfilesQuery = createQuery<ReturnType<typeof getProfiles>, never>({
   primaryKey: "profiles",
   async queryFn() {
     const profiles = getProfiles(await getHrefStore());
-    console.log("in useProfilesQuery query", profiles);
     return profiles;
   },
 });
@@ -128,7 +127,6 @@ function Popup() {
                     const resp = await MessageReturn.FETCH_PROFILE_UPDATE.parse(
                       browser.runtime.sendMessage(message),
                     );
-                    console.log(resp);
                     if (!resp) {
                       return;
                     }

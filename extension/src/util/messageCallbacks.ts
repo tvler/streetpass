@@ -39,8 +39,6 @@ export const messageCallbacks: {
 
     const profileData = await getUncachedProfileData(args.relMeHref);
 
-    console.log({ profileData });
-
     await getHrefStore((hrefStore) => {
       const newHrefStore = new Map(hrefStore);
       newHrefStore.set(args.relMeHref, {
@@ -58,7 +56,7 @@ export const messageCallbacks: {
    * Will not add a new profile, only update an existing one.
    */
   async FETCH_PROFILE_UPDATE(args) {
-    console.log("FETCH_PROFILE_UPDATE", args.relMeHref);
+    // console.log("FETCH_PROFILE_UPDATE", args.relMeHref);
 
     /**
      * Exit if relMeHref isn't a valid url
@@ -74,7 +72,7 @@ export const messageCallbacks: {
      */
     const existingHrefData = (await getHrefStore()).get(args.relMeHref);
     if (!existingHrefData) {
-      console.log("not profile type");
+      // console.log("not profile type");
       return false;
     }
 
@@ -84,7 +82,7 @@ export const messageCallbacks: {
     {
       const lastDate = existingHrefData.updatedAt ?? existingHrefData.viewedAt;
       if (lastDate + timeToUpdateProfile > Date.now()) {
-        console.log("has been updated recently", args.relMeHref);
+        // console.log("has been updated recently", args.relMeHref);
         return false;
       }
     }
@@ -109,11 +107,11 @@ export const messageCallbacks: {
       });
     });
 
-    console.log({
-      shouldUpdateProfile,
-      existingHrefData,
-      uncachedProfileData,
-    });
+    // console.log({
+    //   shouldUpdateProfile,
+    //   existingHrefData,
+    //   uncachedProfileData,
+    // });
     return shouldUpdateProfile;
   },
 };
