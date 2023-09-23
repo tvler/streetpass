@@ -107,8 +107,12 @@ export const messageCallbacks: {
       return false;
     }
 
-    const keys = ["profileUrl", "type", "account", "avatar"] as const;
+    /**
+     * Exit if all keys are equal
+     */
     {
+      const keys = ["profileUrl", "type", "account", "avatar"] as const;
+      // Check that all keys are in keys array with no runtime overhead
       interface CheckForMissing<
         Arr extends readonly unknown[],
         Keys extends Arr[number],
@@ -116,10 +120,23 @@ export const messageCallbacks: {
       interface CheckForExcess<Arr extends readonly Keys[], Keys> {}
       type _Missing = CheckForMissing<typeof keys, keyof Profile>;
       type _Excess = CheckForExcess<typeof keys, keyof Profile>;
-    }
 
-    for (const key of keys) {
-      //
+      let allKeysAreEqual = true;
+      for (const key of keys) {
+        if (existingHrefData.profileData[key] !== profileData[key]) {
+          console.log(
+            "different",
+            key,
+            existingHrefData.profileData,
+            profileData,
+          );
+          allKeysAreEqual = false;
+          break;
+        }
+      }
+      if (allKeysAreEqual) {
+        return false;
+      }
     }
 
     /**
@@ -249,7 +266,7 @@ export function getProfiles(
 
 export async function getUncachedProfileData(
   href: string,
-): Promise<ProfileData> {
+): Promise<Required<ProfileData>> {
   try {
     if (!getIsUrlHttpOrHttps(href)) {
       throw new Error();
