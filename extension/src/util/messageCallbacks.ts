@@ -58,7 +58,7 @@ export const messageCallbacks: {
    * Will not add a new profile, only update an existing one.
    */
   async FETCH_PROFILE_UPDATE(args) {
-    console.log("FETCH_PROFILE_UPDATE");
+    console.log("FETCH_PROFILE_UPDATE", args.relMeHref);
 
     /**
      * Exit if relMeHref isn't a valid url
