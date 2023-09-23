@@ -193,7 +193,12 @@ function Popup() {
           </DropdownMenu.Trigger>
 
           <DropdownMenu.Portal>
-            <DropdownMenu.Content align="end" side="bottom" sideOffset={6}>
+            <DropdownMenu.Content
+              align="end"
+              side="bottom"
+              sideOffset={6}
+              avoidCollisions={false}
+            >
               <DropdownMenu.Item
                 onSelect={exportProfiles}
                 className={navButtonClassName}
