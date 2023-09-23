@@ -229,6 +229,52 @@ export const timeToExpireNotProfile = 10 * 60 * 1000; // 10 min in milliseconds
  * =====
  */
 
+function removeSubstring(
+  string: string,
+  substring: string,
+  position: number,
+): { match: boolean; value: string } {
+  const positionStart =
+    position < 0 ? string.length + position + 1 - substring.length : position;
+  const actualSubstring = string.substring(
+    positionStart,
+    positionStart + substring.length,
+  );
+  // console.log({
+  //   string,
+  //   substring,
+  //   positionStart,
+  //   actualSubstring,
+  //   "string.substring(0, positionStart)": string.substring(0, positionStart),
+  //   "string.substring(positionStart + substring.length)": string.substring(
+  //     positionStart + substring.length,
+  //   ),
+  // });
+
+  if (substring !== actualSubstring) {
+    return { match: false, value: string };
+  }
+
+  return {
+    match: true,
+    value:
+      string.substring(0, positionStart) +
+      string.substring(positionStart + substring.length),
+  };
+}
+// console.assert(removeSubstring("abcdefg", "a", 0).value === "bcdefg");
+// console.assert(removeSubstring("abcdefg", "efg", -1).value === "abcd");
+// console.assert(removeSubstring("abcdefg", "xxx", -1).value === "abcdefg");
+// console.assert(removeSubstring("abcdefg", "xxx", 0).value === "abcdefg");
+// console.assert(removeSubstring("abcdefg", "cdef", 2).value === "abg");
+// console.assert(removeSubstring("abcdefg", "cdefg", 2).value === "ab");
+// console.assert(removeSubstring("abcdefg", "abcdefg", 0).value === "");
+// console.assert(removeSubstring("abcdefg", "abcdefg", -1).value === "");
+// console.assert(removeSubstring("abcdefg", "abcdefg", 1).value === "abcdefg");
+// console.assert(removeSubstring("abcdefg", "", 0).value === "abcdefg");
+// console.assert(removeSubstring("abcdefg", "", 1).value === "abcdefg");
+// console.assert(removeSubstring("abcdefg", "", -1).value === "abcdefg");
+
 export function getIsUrlHttpOrHttps(uncheckedUrl: string | undefined): boolean {
   if (!uncheckedUrl) {
     return false;
@@ -306,9 +352,11 @@ export async function getUncachedProfileData(
      * Account (username) of profile
      */
     let account: string | undefined;
-    const acctPrefix = "acct:";
-    if (webfinger.subject.startsWith(acctPrefix)) {
-      account = webfinger.subject.slice(acctPrefix.length);
+    {
+      const subjectAccount = removeSubstring(webfinger.subject, "acct:", 0);
+      if (subjectAccount.match) {
+        account = subjectAccount.value;
+      }
     }
 
     let profileUrl: string | undefined;
@@ -352,21 +400,10 @@ export function getDisplayHref(href: string): string {
     return href;
   }
 
-  let pathnameWithStrippedTrailingSlash = url.pathname;
-  const trailingSlash = "/";
-  if (pathnameWithStrippedTrailingSlash.endsWith(trailingSlash)) {
-    pathnameWithStrippedTrailingSlash = pathnameWithStrippedTrailingSlash.slice(
-      0,
-      -trailingSlash.length,
-    );
-  }
-
-  let strippedUrl = `${url.host}${pathnameWithStrippedTrailingSlash}${url.search}`;
-
-  const wwwDot = "www.";
-  if (strippedUrl.startsWith(wwwDot)) {
-    strippedUrl = strippedUrl.slice(wwwDot.length);
-  }
+  const strippedUrl =
+    removeSubstring(url.host, "www.", 0).value +
+    removeSubstring(url.pathname, "/", -1).value +
+    url.search;
 
   return strippedUrl;
 }
