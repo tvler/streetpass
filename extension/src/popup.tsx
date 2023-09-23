@@ -5,15 +5,11 @@ import * as ReactQuery from "@tanstack/react-query";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { createQuery } from "react-query-kit";
 import { InView } from "react-intersection-observer";
-import {
-  getDisplayHref,
-  getIconState,
-  getProfiles,
-  getHrefStore,
-  exportProfiles,
-  Message,
-  MessageReturn,
-} from "./util";
+import { Message, MessageReturn } from "./util/constants";
+import { getDisplayHref } from "./util/getDisplayHref";
+import { exportProfiles } from "./util/exportProfiles";
+import { getProfiles } from "./util/getProfiles";
+import { getIconState, getHrefStore } from "./util/storage";
 
 getIconState(() => {
   return { state: "off" };

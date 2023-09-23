@@ -1,6 +1,8 @@
 import "webextension-polyfill";
 import { z } from "zod";
-import { getIconState, Message, runMessageCallback } from "./util.js";
+import { Message } from "./util/constants";
+import { runMessageCallback } from "./util/messageCallbacks";
+import { getIconState } from "./util/storage";
 
 browser.runtime.onMessage.addListener(async (msg: unknown) => {
   let message: z.infer<typeof Message>;

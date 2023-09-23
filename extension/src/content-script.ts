@@ -1,6 +1,6 @@
 /* eslint-env browser */
 
-import type { Message } from "./util.js";
+import type { Message } from "./util/constants.js";
 
 function getCurrentUrlSanitized() {
   const url = new URL(window.location.toString());

@@ -9,7 +9,7 @@ import assert from "node:assert";
 import ViteReact from "@vitejs/plugin-react";
 
 import { VERSION } from "../constants.js";
-import { actionActive, actionInactive, Target } from "./src/util.js";
+import { Target, actionInactive, actionActive } from "./src/util/constants.js";
 
 const dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
