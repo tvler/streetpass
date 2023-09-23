@@ -142,8 +142,9 @@ function Popup() {
                     {...getHrefProps(hrefData.profileData.profileUrl)}
                     className="break-word font-medium text-purple"
                   >
-                    {hrefData.profileData.account ||
-                      getDisplayHref(hrefData.profileData.profileUrl)}
+                    {hrefData.profileData.account
+                      ? `@${hrefData.profileData.account}`
+                      : getDisplayHref(hrefData.profileData.profileUrl)}
                   </a>
 
                   <p className="text-gray">
