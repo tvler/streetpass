@@ -206,7 +206,6 @@ export function getConfig(
       commonjsOptions: {
         exclude: [/node_modules\/webextension-polyfill/],
       },
-
       rollupOptions: {
         strictDeprecations: true,
         preserveEntrySignatures: "strict",

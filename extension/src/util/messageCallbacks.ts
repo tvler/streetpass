@@ -57,7 +57,9 @@ export const messageCallbacks: {
    * Update a profile with uncached data. Returns true if updated.
    * Will not add a new profile, only update an existing one.
    */
-  async FETCH_PROFILE_UPDATE(args): Promise<boolean> {
+  async FETCH_PROFILE_UPDATE(args) {
+    console.log("FETCH_PROFILE_UPDATE");
+
     /**
      * Exit if relMeHref isn't a valid url
      */
@@ -67,39 +69,37 @@ export const messageCallbacks: {
       return false;
     }
 
-    const hasUpdated = false;
+    let hasUpdated = false;
     await getHrefStore(async (hrefStore) => {
+      /**
+       * Exit if not profile type
+       */
       const existingHrefData = hrefStore.get(args.relMeHref);
-      if (!existingHrefData) {
+      if (existingHrefData?.profileData.type !== "profile") {
+        console.log("not profile type");
         return;
       }
 
       /**
        * Exit if has been updated recently
        */
-      if (
-        (existingHrefData.updatedAt ?? existingHrefData.viewedAt) +
-          timeToUpdateProfile >
-        Date.now()
-      ) {
-        console.log("has been updated recently", args.relMeHref);
-        return;
+      {
+        const lastDate =
+          existingHrefData.updatedAt ?? existingHrefData.viewedAt;
+        if (lastDate + timeToUpdateProfile > Date.now()) {
+          console.log("has been updated recently", args.relMeHref);
+          return;
+        }
       }
 
       let profileData: Profile | undefined;
       try {
         /**
-         * Exit if existingHrefData isn't a profile
-         */
-        if (existingHrefData.profileData.type === "notProfile") {
-          throw new Error();
-        }
-
-        /**
          * Exit if fetched profileData is notProfile
          */
         const _profileData = await getUncachedProfileData(args.relMeHref);
         if (_profileData.type === "notProfile") {
+          console.log("fetched profileData is notProfile");
           throw new Error();
         }
 
@@ -107,31 +107,24 @@ export const messageCallbacks: {
          * Exit if all keys are equal
          */
         {
-          let allKeysAreEqual = true;
-          for (const key of Profile.keyof().options) {
-            if (existingHrefData.profileData[key] !== _profileData[key]) {
-              console.log(
-                "different",
-                key,
-                existingHrefData.profileData,
-                _profileData,
-              );
-              allKeysAreEqual = false;
-              break;
-            }
-          }
-          if (allKeysAreEqual) {
-            console.log("allKeysAreEqual");
+          const existingProfileData = existingHrefData.profileData;
+          if (
+            Profile.keyof().options.every(
+              (key) => existingProfileData[key] === _profileData[key],
+            )
+          ) {
+            console.log("all keys are equal");
             throw new Error();
           }
         }
 
-        console.log("updating");
         profileData = _profileData;
       } catch (err) {
         // Do nothing
       }
 
+      hasUpdated = !!profileData;
+      console.log({ hasUpdated, profileData });
       return new Map(hrefStore).set(args.relMeHref, {
         ...existingHrefData,
         updatedAt: Date.now(),
@@ -139,10 +132,7 @@ export const messageCallbacks: {
       });
     });
 
-    /**
-     * Return true
-     */
-    return true;
+    return hasUpdated;
   },
 };
 
