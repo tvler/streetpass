@@ -1,3 +1,7 @@
+# 2023.13
+
+- Show usernames in StreetPass list
+
 # 2023.12
 
 - Remove tracking params from website urls
