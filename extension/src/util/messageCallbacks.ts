@@ -70,10 +70,10 @@ export const messageCallbacks: {
     }
 
     /**
-     * Exit if not profile type
+     * Exit if not already in hrefStore
      */
     const existingHrefData = (await getHrefStore()).get(args.relMeHref);
-    if (existingHrefData?.profileData.type !== "profile") {
+    if (!existingHrefData) {
       console.log("not profile type");
       return false;
     }
