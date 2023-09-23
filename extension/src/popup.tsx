@@ -20,6 +20,17 @@ function getHrefProps(href: string): {
   onClick(ev: React.MouseEvent<HTMLAnchorElement, MouseEvent>): Promise<void>;
   href: string;
 } {
+  //   function redirectIfNeeded() {
+  //     if (currentLocation.hash)
+  //         return ;
+
+  //     if (automatic) {
+  //         window.location.replace(`https://tapbots.net/ivory_redirect?url=${encodeURIComponent(currentLocation)}`);
+  //     } else {
+  //         window.location.replace(`com.tapbots.Ivory:///openURL?url=${encodeURIComponent(currentLocation)}`);
+  //     }
+  // }
+
   return {
     target: "_blank",
     href: href,
