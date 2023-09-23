@@ -80,4 +80,4 @@ export const actionActive = {
 } as const satisfies Record<string, string>;
 
 export const timeToExpireNotProfile = 10 * 60 * 1_000; // 10 min in milliseconds
-export const timeToUpdateProfile = 10 * 60 * 1_000; // 10 min in milliseconds
+export const timeToUpdateProfile = 1 * 60 * 60 * 1_000; // 1 hr in milliseconds
