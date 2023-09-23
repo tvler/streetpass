@@ -5,17 +5,11 @@ import * as ReactQuery from "@tanstack/react-query";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { createQuery } from "react-query-kit";
 import { InView } from "react-intersection-observer";
-import {
-  getDisplayHref,
-  getIconState,
-  getProfiles,
-  getHrefStore,
-  exportProfiles,
-  MapValue,
-  getUncachedProfileData,
-  Message,
-  MessageReturn,
-} from "./util";
+import { Message, MessageReturn } from "./util/constants";
+import { getDisplayHref } from "./util/getDisplayHref";
+import { exportProfiles } from "./util/exportProfiles";
+import { getProfiles } from "./util/getProfiles";
+import { getIconState, getHrefStore } from "./util/storage";
 
 getIconState(() => {
   return { state: "off" };
@@ -26,6 +20,17 @@ function getHrefProps(href: string): {
   onClick(ev: React.MouseEvent<HTMLAnchorElement, MouseEvent>): Promise<void>;
   href: string;
 } {
+  //   function redirectIfNeeded() {
+  //     if (currentLocation.hash)
+  //         return ;
+
+  //     if (automatic) {
+  //         window.location.replace(`https://tapbots.net/ivory_redirect?url=${encodeURIComponent(currentLocation)}`);
+  //     } else {
+  //         window.location.replace(`com.tapbots.Ivory:///openURL?url=${encodeURIComponent(currentLocation)}`);
+  //     }
+  // }
+
   return {
     target: "_blank",
     href: href,
@@ -45,13 +50,11 @@ function getHrefProps(href: string): {
   };
 }
 
-const useProfilesQuery = createQuery<
-  Array<MapValue<ReturnType<typeof getProfiles>>>,
-  never
->({
+const useProfilesQuery = createQuery<ReturnType<typeof getProfiles>, never>({
   primaryKey: "profiles",
   async queryFn() {
-    return Array.from(getProfiles(await getHrefStore()).values());
+    const profiles = getProfiles(await getHrefStore());
+    return profiles;
   },
 });
 
@@ -60,6 +63,7 @@ const navButtonClassName =
 
 function Popup() {
   const profilesQuery = useProfilesQuery();
+  const queryClient = ReactQuery.useQueryClient();
 
   return (
     <>
@@ -108,7 +112,6 @@ function Popup() {
                 as="div"
                 className="flex flex-row items-start"
                 triggerOnce
-                skip
                 onChange={async (inView) => {
                   if (!inView) {
                     return;
@@ -124,7 +127,11 @@ function Popup() {
                     const resp = await MessageReturn.FETCH_PROFILE_UPDATE.parse(
                       browser.runtime.sendMessage(message),
                     );
-                    console.log(resp);
+                    if (!resp) {
+                      return;
+                    }
+
+                    queryClient.refetchQueries();
                   } catch (err) {
                     console.error(err);
                   }
@@ -144,7 +151,9 @@ function Popup() {
                     {...getHrefProps(hrefData.profileData.profileUrl)}
                     className="break-word font-medium text-purple"
                   >
-                    {getDisplayHref(hrefData.profileData.profileUrl)}
+                    {hrefData.profileData.account
+                      ? `@${hrefData.profileData.account}`
+                      : getDisplayHref(hrefData.profileData.profileUrl)}
                   </a>
 
                   <p className="text-gray">
