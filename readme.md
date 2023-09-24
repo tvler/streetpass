@@ -1,4 +1,4 @@
-<img width="560" alt="" src="https://raw.githubusercontent.com/tvler/streetpass/main/api/public/screen3.png">
+<img width="560" alt="" src="./site/public/screen3.png">
 
 [Download for Chrome](https://chrome.google.com/webstore/detail/streetpass-for-mastodon/fphjfedjhinpnjblomfebcjjpdpakhhn)
 
