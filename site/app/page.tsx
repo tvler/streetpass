@@ -155,22 +155,41 @@ const Page: NextPage = () => {
 
       <Image
         quality={100}
-        src={screen1}
+        src={screen3}
         alt=""
         width={1296}
         className="mt-8 w-full max-w-xl"
       />
 
-      <Image
-        quality={100}
-        src={screen3}
-        alt=""
-        width={1296}
-        className="mt-5 w-full max-w-xl"
-      />
+      <div className="flex w-full max-w-lg flex-col items-start text-[0.9rem] font-medium leading-[1.57]">
+        <h2 className="mt-12 font-bold">Privacy commitments:</h2>
+
+        <p className="mt-5">
+          <span className="font-bold">Nothing leaves your device.</span>{" "}
+          StreetPass will never collect analytics, and all profile resolution is
+          handled directly in your browser. This means that StreetPass doesn't
+          require any sort of server being up-and-running for you to use it.
+          Once installed, it's yours forever.
+        </p>
+
+        <p className="mt-5">
+          <span className="font-bold">User-inspectable.</span> The code for
+          StreetPass is designed to be readable and auditable. To achieve this,
+          StreetPass uses a modern JavaScript module architecture and doesn't
+          minify any of its source code. You can build the extension from source
+          by reading the instructions in the{" "}
+          <a
+            className="text-purple underline"
+            href="https://github.com/tvler/streetpass"
+          >
+            GitHub repo
+          </a>
+          .
+        </p>
+      </div>
 
       <div className="w-full max-w-lg font-medium">
-        <p className="my-6 text-center">
+        <p className="mb-10 mt-16 text-center">
           Made by{" "}
           <a className="text-purple underline" href="https://tylerdeitz.com/">
             Tyler
