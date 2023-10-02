@@ -26,4 +26,8 @@
   .break-word {
     word-break: break-word;
   }
+
+  [hidden] {
+    @apply hidden;
+  }
 }

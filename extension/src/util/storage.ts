@@ -123,6 +123,16 @@ export const getHrefStore = storageFactory({
   },
 });
 
+export const getProfileUrl = storageFactory({
+  storageKey: "get-profile-url-1",
+  parse(storageData: string) {
+    return storageData ?? "";
+  },
+  serialize(data) {
+    return data;
+  },
+});
+
 /**
  * Test the safe storage
  */
