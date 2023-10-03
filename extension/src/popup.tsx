@@ -20,13 +20,6 @@ import {
   getProfileUrlScheme,
 } from "./util/storage";
 import { cva } from "class-variance-authority";
-import {
-  FormProvider,
-  SubmitHandler,
-  UseFormReturn,
-  useForm,
-  useFormContext,
-} from "react-hook-form";
 import { getProfileUrl } from "./util/getProfileUrl";
 import { getIsUrlHttpOrHttps } from "./util/getIsUrlHttpOrHttps";
 
@@ -77,6 +70,13 @@ const useProfilesQuery = createQuery({
   },
 });
 
+const useProfileUrlSchemeQuery = createQuery({
+  primaryKey: "profileurlscheme",
+  queryFn() {
+    return getProfileUrlScheme();
+  },
+});
+
 const navButtonClassName = cva(
   [
     "h-[1.68em]",
@@ -103,8 +103,10 @@ const navButtonClassName = cva(
 
 function Popup() {
   const profilesQuery = useProfilesQuery();
+  const profileUrlSchemeQuery = useProfileUrlSchemeQuery();
   const queryClient = useQueryClient();
   const popoverCloseRef = React.useRef<HTMLButtonElement>(null);
+  const profileUrlSchemeInputRef = React.useRef<HTMLInputElement>(null);
 
   return (
     <>
@@ -272,10 +274,16 @@ function Popup() {
                   value={Tab.openProfilesWith}
                   className="flex w-[275px] flex-col gap-y-8 pt-8"
                 >
-                  <Form
+                  <form
                     className="contents"
-                    onSubmit={async (form) => {
-                      await getProfileUrlScheme(() => form.url.trim());
+                    onSubmit={async (ev) => {
+                      ev.preventDefault();
+                      await getProfileUrlScheme(
+                        () => profileUrlSchemeInputRef.current?.value.trim(),
+                      );
+                      queryClient.refetchQueries({
+                        queryKey: [useProfileUrlSchemeQuery.getPrimaryKey()],
+                      });
                       popoverCloseRef.current?.click();
                     }}
                   >
@@ -285,16 +293,15 @@ function Popup() {
                         behavior.
                       </span>
 
-                      <FormConsumer>
-                        {(form) => (
-                          <input
-                            spellCheck={false}
-                            type="text"
-                            className="mx-8 rounded-6 border border-purple-light bg-gray-lightest px-6 py-2 text-12 text-cool-black"
-                            {...form.register("url")}
-                          />
-                        )}
-                      </FormConsumer>
+                      <input
+                        autoFocus
+                        spellCheck={false}
+                        type="text"
+                        className="mx-8 rounded-6 border border-purple-light bg-gray-lightest px-6 py-2 text-12 text-cool-black"
+                        ref={profileUrlSchemeInputRef}
+                        defaultValue={profileUrlSchemeQuery.data}
+                        key={profileUrlSchemeQuery.data}
+                      />
                     </label>
 
                     <span className="px-8 text-12 text-gray">
@@ -313,66 +320,65 @@ function Popup() {
                       ).map((item) => {
                         return (
                           <React.Fragment key={item}>
-                            <FormConsumer>
-                              {(form) => (
-                                <button
-                                  type="button"
-                                  className={navButtonClassName()}
-                                  onClick={() => {
-                                    form.setValue(
-                                      "url",
-                                      {
-                                        /**
-                                         * https://tapbots.com/support/ivory/tips/urlschemes
-                                         */
-                                        ivory:
-                                          "ivory://acct/user_profile/{account}",
-                                        elk: "https://elk.zone/@{account}",
-                                        icecubes:
-                                          "icecubesapp:{profileUrl.noProtocol}",
-                                        "mastodon.social":
-                                          "https://mastodon.social/@{account}",
-                                        "mastodon.online":
-                                          "https://mastodon.online/@{account}",
-                                      }[item],
-                                    );
-                                  }}
-                                >
-                                  {
-                                    {
-                                      ivory: "Ivory",
-                                      elk: "Elk",
-                                      icecubes: "Ice Cubes",
-                                      "mastodon.social": "mastodon.social",
-                                      "mastodon.online": "mastodon.online",
-                                    }[item]
-                                  }
-                                </button>
-                              )}
-                            </FormConsumer>
+                            <button
+                              type="button"
+                              className={navButtonClassName()}
+                              onClick={() => {
+                                if (!profileUrlSchemeInputRef.current) {
+                                  return;
+                                }
+
+                                profileUrlSchemeInputRef.current.value = {
+                                  /**
+                                   * https://tapbots.com/support/ivory/tips/urlschemes
+                                   */
+                                  ivory: "ivory://acct/user_profile/{account}",
+                                  elk: "https://elk.zone/@{account}",
+                                  icecubes:
+                                    "icecubesapp:{profileUrl.noProtocol}",
+                                  "mastodon.social":
+                                    "https://mastodon.social/@{account}",
+                                  "mastodon.online":
+                                    "https://mastodon.online/@{account}",
+                                }[item];
+
+                                profileUrlSchemeInputRef.current.focus();
+                              }}
+                            >
+                              {
+                                {
+                                  ivory: "Ivory",
+                                  elk: "Elk",
+                                  icecubes: "Ice Cubes",
+                                  "mastodon.social": "mastodon.social",
+                                  "mastodon.online": "mastodon.online",
+                                }[item]
+                              }
+                            </button>
                           </React.Fragment>
                         );
                       })}
                     </div>
 
                     <div className="flex justify-end gap-x-8 border-t border-purple-light px-8 py-8">
-                      <FormConsumer>
-                        {(form) => (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              form.setValue("url", "");
-                            }}
-                            className={navButtonClassName({ variant: "gray" })}
-                          >
-                            Clear
-                          </button>
-                        )}
-                      </FormConsumer>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!profileUrlSchemeInputRef.current) {
+                            return;
+                          }
+
+                          profileUrlSchemeInputRef.current.value = "";
+                          profileUrlSchemeInputRef.current.focus();
+                        }}
+                        className={navButtonClassName({ variant: "gray" })}
+                      >
+                        Clear
+                      </button>
 
                       <button className={navButtonClassName()}>Save</button>
                     </div>
-                  </Form>
+                  </form>
                 </Tabs.Content>
               </Popover.Content>
             </Tabs.Root>
@@ -381,40 +387,6 @@ function Popup() {
       </div>
     </>
   );
-}
-
-type FormData = { url: string };
-
-function Form(
-  props: React.PropsWithChildren<{
-    onSubmit: SubmitHandler<FormData>;
-    className?: string;
-  }>,
-) {
-  const form = useForm<FormData>({
-    shouldUseNativeValidation: true,
-    defaultValues: React.useCallback(async () => {
-      return { url: await getProfileUrlScheme() };
-    }, []),
-  });
-
-  return (
-    <FormProvider {...form}>
-      <form
-        className={props.className}
-        onSubmit={form.handleSubmit(props.onSubmit)}
-      >
-        {props.children}
-      </form>
-    </FormProvider>
-  );
-}
-
-function FormConsumer(props: {
-  children: (form: UseFormReturn<FormData, any, undefined>) => JSX.Element;
-}) {
-  const form = useFormContext<FormData>();
-  return props.children(form);
 }
 
 const rootNode = document.getElementById("root");

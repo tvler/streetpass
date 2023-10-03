@@ -2924,7 +2924,6 @@ __metadata:
     prettier-plugin-tailwindcss: ^0.5.4
     react: ^18.2.0
     react-dom: ^18.2.0
-    react-hook-form: ^7.46.2
     react-intersection-observer: ^9.5.2
     react-query-kit: ^2.0.0
     tailwindcss: ^3.3.3
@@ -4754,15 +4753,6 @@ __metadata:
   peerDependencies:
     react: ^18.2.0
   checksum: 7d323310bea3a91be2965f9468d552f201b1c27891e45ddc2d6b8f717680c95a75ae0bc1e3f5cf41472446a2589a75aed4483aee8169287909fcd59ad149e8cc
-  languageName: node
-  linkType: hard
-
-"react-hook-form@npm:^7.46.2":
-  version: 7.46.2
-  resolution: "react-hook-form@npm:7.46.2"
-  peerDependencies:
-    react: ^16.8.0 || ^17 || ^18
-  checksum: 5ad2b478337fed3ab1a7bee79844d89a85485626fb1afd4acba54e28adb8f6663d37efefa9000b6ddb33f7de23b765bfac9a1d12e10c63e71463317a307134cf
   languageName: node
   linkType: hard
 

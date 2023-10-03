@@ -36,7 +36,6 @@
     "class-variance-authority": "^0.7.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-hook-form": "^7.46.2",
     "react-intersection-observer": "^9.5.2",
     "react-query-kit": "^2.0.0"
   }
