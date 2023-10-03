@@ -45,17 +45,24 @@ function getHrefProps(
   return {
     async onClick(ev) {
       ev.preventDefault();
-      const { metaKey: metaKeyUnresolved } = ev;
+      const { metaKey } = ev;
 
       const href = typeof hrefOrFn === "string" ? hrefOrFn : await hrefOrFn();
-      const metaKey = getIsUrlHttpOrHttps(href) ? metaKeyUnresolved : false;
 
-      await browser.tabs.create({
-        url: href,
-        active: !metaKey,
-      });
+      if (getIsUrlHttpOrHttps(href)) {
+        await browser.tabs.create({
+          url: href,
+          active: !metaKey,
+        });
 
-      if (!metaKey) {
+        if (!metaKey) {
+          window.close();
+        }
+      } else {
+        await browser.tabs.update({
+          url: href,
+        });
+
         window.close();
       }
     },
@@ -315,6 +322,9 @@ function Popup() {
                                     form.setValue(
                                       "url",
                                       {
+                                        /**
+                                         * https://tapbots.com/support/ivory/tips/urlschemes
+                                         */
                                         ivory:
                                           "ivory://acct/user_profile/{account}",
                                         elk: "https://elk.zone/@{account}",
