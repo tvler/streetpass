@@ -299,40 +299,42 @@ function Popup() {
                         ] as const
                       ).map((item) => {
                         return (
-                          <FormConsumer>
-                            {(form) => (
-                              <button
-                                type="button"
-                                className={navButtonClassName()}
-                                onClick={() => {
-                                  form.setValue(
-                                    "url",
-                                    {
-                                      ivory:
-                                        "ivory://acct/user_profile/{account}",
-                                      elk: "https://elk.zone/@{account}",
-                                      icecubes:
-                                        "icecubesapp:{profileUrl.noProtocol}",
-                                      "mastodon.social":
-                                        "https://mastodon.social/@{account}",
-                                      "mastodon.online":
-                                        "https://mastodon.online/@{account}",
-                                    }[item],
-                                  );
-                                }}
-                              >
-                                {
+                          <React.Fragment key={item}>
+                            <FormConsumer>
+                              {(form) => (
+                                <button
+                                  type="button"
+                                  className={navButtonClassName()}
+                                  onClick={() => {
+                                    form.setValue(
+                                      "url",
+                                      {
+                                        ivory:
+                                          "ivory://acct/user_profile/{account}",
+                                        elk: "https://elk.zone/@{account}",
+                                        icecubes:
+                                          "icecubesapp:{profileUrl.noProtocol}",
+                                        "mastodon.social":
+                                          "https://mastodon.social/@{account}",
+                                        "mastodon.online":
+                                          "https://mastodon.online/@{account}",
+                                      }[item],
+                                    );
+                                  }}
+                                >
                                   {
-                                    ivory: "Ivory",
-                                    elk: "Elk",
-                                    icecubes: "Ice Cubes",
-                                    "mastodon.social": "mastodon.social",
-                                    "mastodon.online": "mastodon.online",
-                                  }[item]
-                                }
-                              </button>
-                            )}
-                          </FormConsumer>
+                                    {
+                                      ivory: "Ivory",
+                                      elk: "Elk",
+                                      icecubes: "Ice Cubes",
+                                      "mastodon.social": "mastodon.social",
+                                      "mastodon.online": "mastodon.online",
+                                    }[item]
+                                  }
+                                </button>
+                              )}
+                            </FormConsumer>
+                          </React.Fragment>
                         );
                       })}
                     </div>
