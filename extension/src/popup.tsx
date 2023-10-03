@@ -281,9 +281,7 @@ function Popup() {
                       await getProfileUrlScheme(
                         () => profileUrlSchemeInputRef.current?.value.trim(),
                       );
-                      queryClient.refetchQueries({
-                        queryKey: [useProfileUrlSchemeQuery.getPrimaryKey()],
-                      });
+                      queryClient.refetchQueries();
                       popoverCloseRef.current?.click();
                     }}
                   >
@@ -294,7 +292,6 @@ function Popup() {
                       </span>
 
                       <input
-                        autoFocus
                         spellCheck={false}
                         type="text"
                         className="mx-8 rounded-6 border border-purple-light bg-gray-lightest px-6 py-2 text-12 text-cool-black"
