@@ -1,16 +1,16 @@
 import { Profile } from "./constants";
 import { getIsUrlHttpOrHttps } from "./getIsUrlHttpOrHttps";
 import { removeSubstring } from "./removeSubstring";
-import { getProfileUrlScheme } from "./storage";
 
-export async function getProfileUrl(profile: Profile): Promise<string> {
-  const scheme = await getProfileUrlScheme();
-
-  if (!scheme) {
+export function getProfileUrl(
+  profile: Profile,
+  profileUrlScheme: string | undefined,
+): string {
+  if (!profileUrlScheme) {
     return profile.profileUrl;
   }
 
-  let returnUrl = scheme;
+  let returnUrl = profileUrlScheme;
   if (returnUrl.includes("{account}")) {
     returnUrl = profile.account
       ? returnUrl.replaceAll("{account}", `${profile.account}`)

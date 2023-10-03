@@ -33,14 +33,14 @@ enum Tab {
 }
 
 function getHrefProps(
-  hrefOrFn: string | (() => Promise<string>),
+  hrefOrFn: string | (() => string),
 ): React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> {
   return {
     async onClick(ev) {
       ev.preventDefault();
       const { metaKey } = ev;
 
-      const href = typeof hrefOrFn === "string" ? hrefOrFn : await hrefOrFn();
+      const href = typeof hrefOrFn === "string" ? hrefOrFn : hrefOrFn();
 
       if (getIsUrlHttpOrHttps(href)) {
         await browser.tabs.create({
@@ -191,7 +191,12 @@ function Popup() {
 
                 <div className="flex flex-col items-start">
                   <span
-                    {...getHrefProps(() => getProfileUrl(hrefData.profileData))}
+                    {...getHrefProps(() =>
+                      getProfileUrl(
+                        hrefData.profileData,
+                        profileUrlSchemeQuery.data,
+                      ),
+                    )}
                     className="break-word cursor-pointer font-medium text-purple"
                   >
                     {hrefData.profileData.account
