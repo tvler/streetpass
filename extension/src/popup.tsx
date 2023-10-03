@@ -45,13 +45,19 @@ function getHrefProps(
   return {
     async onClick(ev) {
       ev.preventDefault();
+      const { metaKey: metaKeyUnresolved } = ev;
 
       const href = typeof hrefOrFn === "string" ? hrefOrFn : await hrefOrFn();
+      const metaKey = getIsUrlHttpOrHttps(href) ? metaKeyUnresolved : false;
 
       await browser.tabs.create({
         url: href,
-        active: getIsUrlHttpOrHttps(href) ? !ev.metaKey : true,
+        active: !metaKey,
       });
+
+      if (!metaKey) {
+        window.close();
+      }
     },
   };
 }
