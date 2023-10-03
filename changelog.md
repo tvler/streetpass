@@ -1,3 +1,7 @@
+# 2023.14
+
+- Set url to open profiles with
+
 # 2023.13
 
 - Show usernames in StreetPass list

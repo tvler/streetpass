@@ -292,7 +292,7 @@ function Popup() {
                   >
                     <label className="contents">
                       <span className="px-8 text-12 text-gray">
-                        Custom URL for profiles. Set as empty for default
+                        URL to open profiles with. Set as empty for default
                         behavior.
                       </span>
 
