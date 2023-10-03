@@ -123,13 +123,13 @@ export const getHrefStore = storageFactory({
   },
 });
 
-export const getProfileUrl = storageFactory({
-  storageKey: "get-profile-url-1",
+export const getProfileUrlScheme = storageFactory({
+  storageKey: "profile-url-scheme-1",
   parse(storageData: string) {
     return storageData ?? "";
   },
   serialize(data) {
-    return data;
+    return data ?? "";
   },
 });
 

@@ -1,7 +1,11 @@
 import "webextension-polyfill";
 import * as React from "react";
 import * as ReactDom from "react-dom/client";
-import * as ReactQuery from "@tanstack/react-query";
+import {
+  useQueryClient,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 import * as Popover from "@radix-ui/react-popover";
 import * as Tabs from "@radix-ui/react-tabs";
 import { createQuery } from "react-query-kit";
@@ -10,7 +14,11 @@ import { Message, MessageReturn } from "./util/constants";
 import { getDisplayHref } from "./util/getDisplayHref";
 import { exportProfiles } from "./util/exportProfiles";
 import { getProfiles } from "./util/getProfiles";
-import { getIconState, getHrefStore, getProfileUrl } from "./util/storage";
+import {
+  getIconState,
+  getHrefStore,
+  getProfileUrlScheme,
+} from "./util/storage";
 import { cva } from "class-variance-authority";
 import {
   FormProvider,
@@ -19,6 +27,8 @@ import {
   useForm,
   useFormContext,
 } from "react-hook-form";
+import { getProfileUrl } from "./util/getProfileUrl";
+import { getIsUrlHttpOrHttps } from "./util/getIsUrlHttpOrHttps";
 
 getIconState(() => {
   return { state: "off" };
@@ -30,63 +40,23 @@ enum Tab {
 }
 
 function getHrefProps(
-  href: string,
-): React.AnchorHTMLAttributes<HTMLAnchorElement> {
-  //   function redirectIfNeeded() {
-  //     if (currentLocation.hash)
-  //         return ;
-
-  //     if (automatic) {
-  //         window.location.replace(`https://tapbots.net/ivory_redirect?url=${encodeURIComponent(currentLocation)}`);
-  //     } else {
-  //         window.location.replace(`com.tapbots.Ivory:///openURL?url=${encodeURIComponent(currentLocation)}`);
-  //     }
-  // }
-
+  hrefOrFn: string | (() => Promise<string>),
+): React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> {
   return {
     async onClick(ev) {
       ev.preventDefault();
 
-      await browser.tabs.create({
-        // url: `com.tapbots.Ivory:///openURL?url=${encodeURIComponent(href)}`,
-        // url: `Ivory://openURL?url=https%3A%2F%2Fmastodon.social%2F%40Gargron`,
-        url: `Ivory:///openURL?url=${encodeURIComponent(href)}`,
-        active: !ev.metaKey,
-      });
-      // console.log("wtf");
-      // window.location.replace(
-      //   `com.tapbots.Ivory:///openURL?url=${encodeURIComponent(href)}`,
-      // );
-      // com.tapbots.ivory/openURL?url=https%3A%2F%2Fmastodon.social%2F%40Gargron
-      // window.location.replace(
-      //   `Ivory:///openURL?url=https%3A%2F%2Fmastodon.social%2F%40Gargron`,
-      // );
-      // window.location.replace(
-      //   `https://tapbots.net/ivory_redirect?url=https%3A%2F%2Fmastodon.social%2F%40Gargron`,
-      // );
-    },
-  };
-
-  return {
-    target: "_blank",
-    href: href,
-    async onClick(ev) {
-      ev.preventDefault();
-      const { metaKey } = ev;
+      const href = typeof hrefOrFn === "string" ? hrefOrFn : await hrefOrFn();
 
       await browser.tabs.create({
         url: href,
-        active: !metaKey,
+        active: getIsUrlHttpOrHttps(href) ? !ev.metaKey : true,
       });
-
-      if (!metaKey) {
-        window.close();
-      }
     },
   };
 }
 
-const useProfilesQuery = createQuery<ReturnType<typeof getProfiles>, never>({
+const useProfilesQuery = createQuery({
   primaryKey: "profiles",
   async queryFn() {
     const profiles = getProfiles(await getHrefStore());
@@ -120,7 +90,7 @@ const navButtonClassName = cva(
 
 function Popup() {
   const profilesQuery = useProfilesQuery();
-  const queryClient = ReactQuery.useQueryClient();
+  const queryClient = useQueryClient();
   const popoverCloseRef = React.useRef<HTMLButtonElement>(null);
 
   return (
@@ -206,7 +176,7 @@ function Popup() {
 
                 <div className="flex flex-col items-start">
                   <span
-                    {...getHrefProps(hrefData.profileData.profileUrl)}
+                    {...getHrefProps(() => getProfileUrl(hrefData.profileData))}
                     className="break-word cursor-pointer font-medium text-purple"
                   >
                     {hrefData.profileData.account
@@ -287,18 +257,17 @@ function Popup() {
 
                 <Tabs.Content
                   value={Tab.openProfilesWith}
-                  className="flex w-[260px] flex-col gap-y-8 pt-8"
+                  className="flex w-[275px] flex-col gap-y-8 pt-8"
                 >
                   <Form
                     className="contents"
                     onSubmit={async (form) => {
-                      await getProfileUrl(() => form.url);
-                      queryClient.refetchQueries();
+                      await getProfileUrlScheme(() => form.url.trim());
                       popoverCloseRef.current?.click();
                     }}
                   >
                     <label className="contents">
-                      <span className="text-12 px-8 text-gray">
+                      <span className="px-8 text-12 text-gray">
                         Custom URL for profiles. Set as empty for default
                         behavior.
                       </span>
@@ -306,25 +275,27 @@ function Popup() {
                       <FormConsumer>
                         {(form) => (
                           <input
+                            spellCheck={false}
                             type="text"
-                            className="px-6 py-2 bg-gray-lightest text-12 mx-8 rounded-6 border border-purple-light text-cool-black"
+                            className="mx-8 rounded-6 border border-purple-light bg-gray-lightest px-6 py-2 text-12 text-cool-black"
                             {...form.register("url")}
                           />
                         )}
                       </FormConsumer>
                     </label>
 
-                    <span className="text-12 px-8 text-gray">
+                    <span className="px-8 text-12 text-gray">
                       …or select a preset:
                     </span>
 
-                    <div className="flex gap-x-8 px-8">
+                    <div className="flex flex-wrap gap-8 px-8">
                       {(
                         [
                           "ivory",
                           "elk",
+                          "icecubes",
                           "mastodon.social",
-                          "social.lol",
+                          "mastodon.online",
                         ] as const
                       ).map((item) => {
                         return (
@@ -338,12 +309,14 @@ function Popup() {
                                     "url",
                                     {
                                       ivory:
-                                        "ivory:///openURL?url=${profileUrl.encoded}",
-                                      elk: "https://elk.zone/${account}",
+                                        "ivory://acct/user_profile/{account}",
+                                      elk: "https://elk.zone/@{account}",
+                                      icecubes:
+                                        "icecubesapp:{profileUrl.noProtocol}",
                                       "mastodon.social":
-                                        "https://mastodon.social/${account}",
-                                      "social.lol":
-                                        "https://social.lol/${account}",
+                                        "https://mastodon.social/@{account}",
+                                      "mastodon.online":
+                                        "https://mastodon.online/@{account}",
                                     }[item],
                                   );
                                 }}
@@ -352,8 +325,9 @@ function Popup() {
                                   {
                                     ivory: "Ivory",
                                     elk: "Elk",
+                                    icecubes: "Ice Cubes",
                                     "mastodon.social": "mastodon.social",
-                                    "social.lol": "social.lol",
+                                    "mastodon.online": "mastodon.online",
                                   }[item]
                                 }
                               </button>
@@ -402,7 +376,7 @@ function Form(
   const form = useForm<FormData>({
     shouldUseNativeValidation: true,
     defaultValues: React.useCallback(async () => {
-      return { url: await getProfileUrl() };
+      return { url: await getProfileUrlScheme() };
     }, []),
   });
 
@@ -432,12 +406,12 @@ if (!rootNode) {
 
 const root = ReactDom.createRoot(rootNode);
 
-const queryClient = new ReactQuery.QueryClient({
+const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: Infinity } },
 });
 
 root.render(
-  <ReactQuery.QueryClientProvider client={queryClient}>
+  <QueryClientProvider client={queryClient}>
     <Popup />
-  </ReactQuery.QueryClientProvider>,
+  </QueryClientProvider>,
 );
