@@ -16,10 +16,6 @@ export async function getProfileUrl(profile: Profile): Promise<string> {
       ? returnUrl.replaceAll("{account}", `${profile.account}`)
       : profile.profileUrl;
   }
-  returnUrl = returnUrl.replaceAll(
-    "{profileUrl.encoded}",
-    encodeURIComponent(profile.profileUrl),
-  );
   if (returnUrl.includes("{profileUrl.noProtocol}")) {
     try {
       const profileUrlNoProtocol = removeSubstring(
@@ -60,6 +56,3 @@ export async function getProfileUrl(profile: Profile): Promise<string> {
 
   return returnUrl;
 }
-
-// https://mastodon.social/@themarkup@mastodon.themarkup.org
-// https://mastodon.social/@themarkup@mastodon.themarkup.org?
