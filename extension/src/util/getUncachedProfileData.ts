@@ -59,11 +59,19 @@ export async function getUncachedProfileData(
       }
       switch (webfingerLink.rel) {
         case "http://webfinger.net/rel/profile-page": {
-          profileUrl = webfingerLink.href;
+          try {
+            profileUrl = new URL(webfingerLink.href).toString();
+          } catch (err) {
+            // Do nothing
+          }
           break;
         }
         case "http://webfinger.net/rel/avatar": {
-          avatar = webfingerLink.href;
+          try {
+            avatar = new URL(webfingerLink.href).toString();
+          } catch (err) {
+            // Do nothing
+          }
           break;
         }
       }

@@ -11,10 +11,8 @@ export function getProfiles(
       continue;
     }
     profiles.push({
+      ...hrefData,
       profileData: hrefData.profileData,
-      websiteUrl: hrefData.websiteUrl,
-      viewedAt: hrefData.viewedAt,
-      relMeHref: hrefData.relMeHref,
     });
   }
 

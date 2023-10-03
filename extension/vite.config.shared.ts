@@ -1,7 +1,7 @@
 import path from "node:path";
 import { createRequire } from "node:module";
 import url from "node:url";
-import type { ConfigEnv, PluginOption, UserConfig } from "vite";
+import { type ConfigEnv, type PluginOption, type UserConfig } from "vite";
 import type { Manifest } from "webextension-polyfill";
 import childProcess from "node:child_process";
 import { z } from "zod";

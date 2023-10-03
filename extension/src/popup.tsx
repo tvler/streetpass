@@ -1,56 +1,68 @@
 import "webextension-polyfill";
 import * as React from "react";
 import * as ReactDom from "react-dom/client";
-import * as ReactQuery from "@tanstack/react-query";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import {
+  useQueryClient,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
+import * as Popover from "@radix-ui/react-popover";
+import * as Tabs from "@radix-ui/react-tabs";
 import { createQuery } from "react-query-kit";
 import { InView } from "react-intersection-observer";
 import { Message, MessageReturn } from "./util/constants";
 import { getDisplayHref } from "./util/getDisplayHref";
 import { exportProfiles } from "./util/exportProfiles";
 import { getProfiles } from "./util/getProfiles";
-import { getIconState, getHrefStore } from "./util/storage";
+import {
+  getIconState,
+  getHrefStore,
+  getProfileUrlScheme,
+} from "./util/storage";
+import { cva } from "class-variance-authority";
+import { getProfileUrl } from "./util/getProfileUrl";
+import { getIsUrlHttpOrHttps } from "./util/getIsUrlHttpOrHttps";
 
 getIconState(() => {
   return { state: "off" };
 });
 
-function getHrefProps(href: string): {
-  target: string;
-  onClick(ev: React.MouseEvent<HTMLAnchorElement, MouseEvent>): Promise<void>;
-  href: string;
-} {
-  //   function redirectIfNeeded() {
-  //     if (currentLocation.hash)
-  //         return ;
+enum Tab {
+  root = "root",
+  openProfilesWith = "openProfilesWith",
+}
 
-  //     if (automatic) {
-  //         window.location.replace(`https://tapbots.net/ivory_redirect?url=${encodeURIComponent(currentLocation)}`);
-  //     } else {
-  //         window.location.replace(`com.tapbots.Ivory:///openURL?url=${encodeURIComponent(currentLocation)}`);
-  //     }
-  // }
-
+function getHrefProps(
+  hrefOrFn: string | (() => string),
+): React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> {
   return {
-    target: "_blank",
-    href: href,
     async onClick(ev) {
       ev.preventDefault();
       const { metaKey } = ev;
 
-      await browser.tabs.create({
-        url: href,
-        active: !metaKey,
-      });
+      const href = typeof hrefOrFn === "string" ? hrefOrFn : hrefOrFn();
 
-      if (!metaKey) {
+      if (getIsUrlHttpOrHttps(href)) {
+        await browser.tabs.create({
+          url: href,
+          active: !metaKey,
+        });
+
+        if (!metaKey) {
+          window.close();
+        }
+      } else {
+        await browser.tabs.update({
+          url: href,
+        });
+
         window.close();
       }
     },
   };
 }
 
-const useProfilesQuery = createQuery<ReturnType<typeof getProfiles>, never>({
+const useProfilesQuery = createQuery({
   primaryKey: "profiles",
   async queryFn() {
     const profiles = getProfiles(await getHrefStore());
@@ -58,12 +70,43 @@ const useProfilesQuery = createQuery<ReturnType<typeof getProfiles>, never>({
   },
 });
 
-const navButtonClassName =
-  "h-[1.68em] min-w-[1.4em] flex items-center justify-center rounded-6 bg-purple-light px-[0.38em] text-11 text-purple focus-visible:outline-none font-medium";
+const useProfileUrlSchemeQuery = createQuery({
+  primaryKey: "profileurlscheme",
+  queryFn() {
+    return getProfileUrlScheme();
+  },
+});
+
+const navButtonClassName = cva(
+  [
+    "h-[1.68em]",
+    "min-w-[1.4em]",
+    "flex",
+    "items-center",
+    "justify-center",
+    "rounded-6",
+    "px-[0.38em]",
+    "text-11",
+    "focus-visible:outline-none",
+    "font-medium",
+  ],
+  {
+    variants: {
+      variant: {
+        purple: ["bg-purple-light", "text-purple"],
+        gray: ["bg-gray-light", "text-gray"],
+      },
+    },
+    defaultVariants: { variant: "purple" },
+  },
+);
 
 function Popup() {
   const profilesQuery = useProfilesQuery();
-  const queryClient = ReactQuery.useQueryClient();
+  const profileUrlSchemeQuery = useProfileUrlSchemeQuery();
+  const queryClient = useQueryClient();
+  const popoverCloseRef = React.useRef<HTMLButtonElement>(null);
+  const profileUrlSchemeInputRef = React.useRef<HTMLInputElement>(null);
 
   return (
     <>
@@ -78,12 +121,12 @@ function Popup() {
           <div className="absolute bottom-0 left-0 right-0 top-0 flex items-center justify-center text-13 text-gray">
             <p>
               No profiles. Try{" "}
-              <a
+              <span
                 {...getHrefProps("https://streetpass.social/")}
-                className="font-medium text-purple"
+                className="cursor-pointer font-medium text-purple"
               >
                 this
-              </a>
+              </span>
               !
             </p>
           </div>
@@ -147,23 +190,26 @@ function Popup() {
                 </p>
 
                 <div className="flex flex-col items-start">
-                  <a
-                    {...getHrefProps(hrefData.profileData.profileUrl)}
-                    className="break-word font-medium text-purple"
+                  <span
+                    {...getHrefProps(() =>
+                      getProfileUrl(
+                        hrefData.profileData,
+                        profileUrlSchemeQuery.data,
+                      ),
+                    )}
+                    className="break-word cursor-pointer font-medium text-purple"
                   >
                     {hrefData.profileData.account
                       ? `@${hrefData.profileData.account}`
                       : getDisplayHref(hrefData.profileData.profileUrl)}
-                  </a>
+                  </span>
 
-                  <p className="text-gray">
-                    <a
-                      {...getHrefProps(hrefData.websiteUrl)}
-                      className="break-word text-inherit"
-                    >
-                      {getDisplayHref(hrefData.websiteUrl)}
-                    </a>
-                  </p>
+                  <span
+                    {...getHrefProps(hrefData.websiteUrl)}
+                    className="break-word cursor-pointer text-gray"
+                  >
+                    {getDisplayHref(hrefData.websiteUrl)}
+                  </span>
                 </div>
               </InView>
             </React.Fragment>
@@ -173,13 +219,15 @@ function Popup() {
 
       <div className="absolute right-12 top-12 flex gap-8">
         {!!profilesQuery.data?.length && (
-          <span className={navButtonClassName}>
+          <span className={navButtonClassName()}>
             {profilesQuery.data.length}
           </span>
         )}
 
-        <DropdownMenu.Root>
-          <DropdownMenu.Trigger className={navButtonClassName}>
+        <Popover.Root modal>
+          <Popover.Close hidden ref={popoverCloseRef} />
+
+          <Popover.Trigger className={navButtonClassName()}>
             <svg
               fill="currentColor"
               className="aspect-square w-[1em]"
@@ -190,24 +238,154 @@ function Popup() {
               <circle cx="50" cy="50" r="9" />
               <circle cx="85" cy="50" r="9" />
             </svg>
-          </DropdownMenu.Trigger>
+          </Popover.Trigger>
 
-          <DropdownMenu.Portal>
-            <DropdownMenu.Content
-              align="end"
-              side="bottom"
-              sideOffset={6}
-              avoidCollisions={false}
-            >
-              <DropdownMenu.Item
-                onSelect={exportProfiles}
-                className={navButtonClassName}
+          <Popover.Portal>
+            <Tabs.Root defaultValue={Tab.root} className="contents">
+              <Popover.Content
+                align="end"
+                side="bottom"
+                sideOffset={6}
+                avoidCollisions={false}
+                className="flex rounded-6 border border-purple-light bg-white"
+                onOpenAutoFocus={(ev) => {
+                  ev.preventDefault();
+                }}
+                onCloseAutoFocus={(ev) => {
+                  ev.preventDefault();
+                }}
               >
-                Export (.json)
-              </DropdownMenu.Item>
-            </DropdownMenu.Content>
-          </DropdownMenu.Portal>
-        </DropdownMenu.Root>
+                <Tabs.Content
+                  value={Tab.root}
+                  className="flex flex-col items-start gap-y-8 p-8"
+                >
+                  <Tabs.List className="contents">
+                    <Tabs.Trigger
+                      value={Tab.openProfilesWith}
+                      className={navButtonClassName()}
+                    >
+                      Open Profiles With…
+                    </Tabs.Trigger>
+                  </Tabs.List>
+                  <Popover.Close
+                    onClick={exportProfiles}
+                    className={navButtonClassName()}
+                  >
+                    Export (.json)
+                  </Popover.Close>
+                </Tabs.Content>
+
+                <Tabs.Content
+                  value={Tab.openProfilesWith}
+                  className="flex w-[275px] flex-col gap-y-8 pt-8"
+                >
+                  <form
+                    className="contents"
+                    onSubmit={async (ev) => {
+                      ev.preventDefault();
+                      await getProfileUrlScheme(
+                        () => profileUrlSchemeInputRef.current?.value.trim(),
+                      );
+                      queryClient.refetchQueries();
+                      popoverCloseRef.current?.click();
+                    }}
+                  >
+                    <label className="contents">
+                      <span className="px-8 text-12 text-gray">
+                        Custom URL for profiles. Set as empty for default
+                        behavior.
+                      </span>
+
+                      <input
+                        spellCheck={false}
+                        type="text"
+                        className="mx-8 rounded-6 border border-purple-light bg-gray-lightest px-6 py-2 text-12 text-cool-black"
+                        ref={profileUrlSchemeInputRef}
+                        defaultValue={profileUrlSchemeQuery.data}
+                        key={profileUrlSchemeQuery.data}
+                      />
+                    </label>
+
+                    <span className="px-8 text-12 text-gray">
+                      …or select a preset:
+                    </span>
+
+                    <div className="flex flex-wrap gap-8 px-8">
+                      {(
+                        [
+                          "ivory",
+                          "elk",
+                          "icecubes",
+                          "mastodon.social",
+                          "mastodon.online",
+                        ] as const
+                      ).map((item) => {
+                        return (
+                          <React.Fragment key={item}>
+                            <button
+                              type="button"
+                              className={navButtonClassName()}
+                              onClick={() => {
+                                if (!profileUrlSchemeInputRef.current) {
+                                  return;
+                                }
+
+                                profileUrlSchemeInputRef.current.value = {
+                                  /**
+                                   * https://tapbots.com/support/ivory/tips/urlschemes
+                                   */
+                                  ivory: "ivory://acct/user_profile/{account}",
+                                  elk: "https://elk.zone/@{account}",
+                                  icecubes:
+                                    "icecubesapp:{profileUrl.noProtocol}",
+                                  "mastodon.social":
+                                    "https://mastodon.social/@{account}",
+                                  "mastodon.online":
+                                    "https://mastodon.online/@{account}",
+                                }[item];
+
+                                profileUrlSchemeInputRef.current.focus();
+                              }}
+                            >
+                              {
+                                {
+                                  ivory: "Ivory",
+                                  elk: "Elk",
+                                  icecubes: "Ice Cubes",
+                                  "mastodon.social": "mastodon.social",
+                                  "mastodon.online": "mastodon.online",
+                                }[item]
+                              }
+                            </button>
+                          </React.Fragment>
+                        );
+                      })}
+                    </div>
+
+                    <div className="flex justify-end gap-x-8 border-t border-purple-light px-8 py-8">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!profileUrlSchemeInputRef.current) {
+                            return;
+                          }
+
+                          profileUrlSchemeInputRef.current.value = "";
+                          profileUrlSchemeInputRef.current.focus();
+                        }}
+                        className={navButtonClassName({ variant: "gray" })}
+                      >
+                        Clear
+                      </button>
+
+                      <button className={navButtonClassName()}>Save</button>
+                    </div>
+                  </form>
+                </Tabs.Content>
+              </Popover.Content>
+            </Tabs.Root>
+          </Popover.Portal>
+        </Popover.Root>
       </div>
     </>
   );
@@ -220,12 +398,12 @@ if (!rootNode) {
 
 const root = ReactDom.createRoot(rootNode);
 
-const queryClient = new ReactQuery.QueryClient({
+const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: Infinity } },
 });
 
 root.render(
-  <ReactQuery.QueryClientProvider client={queryClient}>
+  <QueryClientProvider client={queryClient}>
     <Popup />
-  </ReactQuery.QueryClientProvider>,
+  </QueryClientProvider>,
 );
