@@ -26,6 +26,7 @@ module.exports = {
     },
     borderRadius: {
       6: "6px",
+      full: "9999px",
     },
     lineHeight: {},
     spacing: { 0: "0", 2: "2px", 6: "6px", 8: "8px", 12: "12px", 18: "18px" },
