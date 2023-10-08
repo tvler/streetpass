@@ -1,3 +1,7 @@
+# 2023.15
+
+- StreetPass now displays user avatars
+
 # 2023.14
 
 - Set url to open profiles with
