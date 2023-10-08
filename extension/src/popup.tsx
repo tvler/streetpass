@@ -114,7 +114,7 @@ function Popup() {
         <h1 className="text-14 font-medium leading-[1.21]">StreetPass</h1>
       </div>
 
-      <div className="flex flex-col gap-[20px] px-12 py-[20px]">
+      <div className="flex flex-col gap-[18px] px-12 py-[18px]">
         {profilesQuery.data?.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center text-13 text-gray">
             <p>
@@ -214,10 +214,10 @@ function Popup() {
                 </div>
 
                 <div className="flex min-w-0 grow flex-col">
-                  <div className="flex items-baseline justify-between gap-x-8 leading-[1.45]">
+                  <div className="flex items-baseline justify-between gap-x-6 leading-[1.45]">
                     <span
                       onClick={onClickProfile}
-                      className="cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap text-13 font-medium text-purple"
+                      className="cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-medium text-purple"
                       title={profileDisplayName}
                     >
                       {profileDisplayName}
