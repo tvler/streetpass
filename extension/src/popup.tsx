@@ -235,7 +235,7 @@ function Popup() {
 
                   <span
                     onClick={getOnClickLink(hrefData.websiteUrl)}
-                    className="cursor-pointer self-start break-all text-[12px] leading-[1.5] text-gray"
+                    className="cursor-pointer self-start break-all text-[12.5px] leading-[1.5] text-gray"
                   >
                     {getDisplayHref(hrefData.websiteUrl)}
                   </span>
