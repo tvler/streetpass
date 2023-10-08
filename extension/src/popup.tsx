@@ -32,33 +32,31 @@ enum Tab {
   openProfilesWith = "openProfilesWith",
 }
 
-function getHrefProps(
+function getOnClickLink(
   hrefOrFn: string | (() => string),
-): React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> {
-  return {
-    async onClick(ev) {
-      ev.preventDefault();
-      const { metaKey } = ev;
+): React.DOMAttributes<HTMLElement>["onClick"] {
+  return async (ev) => {
+    ev.preventDefault();
+    const { metaKey } = ev;
 
-      const href = typeof hrefOrFn === "string" ? hrefOrFn : hrefOrFn();
+    const href = typeof hrefOrFn === "string" ? hrefOrFn : hrefOrFn();
 
-      if (getIsUrlHttpOrHttps(href)) {
-        await browser.tabs.create({
-          url: href,
-          active: !metaKey,
-        });
+    if (getIsUrlHttpOrHttps(href)) {
+      await browser.tabs.create({
+        url: href,
+        active: !metaKey,
+      });
 
-        if (!metaKey) {
-          window.close();
-        }
-      } else {
-        await browser.tabs.update({
-          url: href,
-        });
-
+      if (!metaKey) {
         window.close();
       }
-    },
+    } else {
+      await browser.tabs.update({
+        url: href,
+      });
+
+      window.close();
+    }
   };
 }
 
@@ -110,19 +108,19 @@ function Popup() {
 
   return (
     <>
-      <div className="flex flex-col items-center pt-[9px]">
-        <img src="/icon-128.png" width="48" height="48" />
+      <div className="flex flex-col items-center pt-[12px]">
+        <img src="/icon-128.png" width="36" height="36" />
 
         <h1 className="text-14 font-medium leading-[1.21]">StreetPass</h1>
       </div>
 
-      <div className="flex flex-col gap-18 px-12 pb-18 text-13 leading-[1.45]">
+      <div className="flex flex-col gap-[18px] px-12 py-[18px]">
         {profilesQuery.data?.length === 0 && (
-          <div className="absolute bottom-0 left-0 right-0 top-0 flex items-center justify-center text-13 text-gray">
+          <div className="absolute inset-0 flex items-center justify-center text-13 text-gray">
             <p>
               No profiles. Try{" "}
               <span
-                {...getHrefProps("https://streetpass.social/")}
+                onClick={getOnClickLink("https://streetpass.social/")}
                 className="cursor-pointer font-medium text-purple"
               >
                 this
@@ -139,11 +137,17 @@ function Popup() {
             : new Date().getDate();
           const previousItemWasDayBefore =
             prevHrefDate !== new Date(hrefData.viewedAt).getDate();
+          const onClickProfile = getOnClickLink(() =>
+            getProfileUrl(hrefData.profileData, profileUrlSchemeQuery.data),
+          );
+          const profileDisplayName = hrefData.profileData.account
+            ? `@${hrefData.profileData.account}`
+            : getDisplayHref(hrefData.profileData.profileUrl);
 
           return (
             <React.Fragment key={`${index}.${hrefData.relMeHref}`}>
               {previousItemWasDayBefore && (
-                <p className="shrink-0 text-gray">
+                <p className="shrink-0 text-13 text-gray">
                   {new Intl.DateTimeFormat(undefined, {
                     day: "numeric",
                     month: "short",
@@ -153,7 +157,7 @@ function Popup() {
 
               <InView
                 as="div"
-                className="flex flex-row items-start"
+                className="flex items-start"
                 triggerOnce
                 onChange={async (inView) => {
                   if (!inView) {
@@ -180,33 +184,58 @@ function Popup() {
                   }
                 }}
               >
-                <p className="w-[65px] shrink-0 text-gray">
-                  {new Intl.DateTimeFormat(undefined, {
-                    timeStyle: "short",
-                  })
-                    .format(hrefData.viewedAt)
-                    .toLowerCase()
-                    .replace(/\s+/g, "")}
-                </p>
+                <div
+                  className="flex shrink-0 cursor-pointer pr-[7px] pt-[4px]"
+                  onClick={onClickProfile}
+                >
+                  <div className="relative flex aspect-square w-[19px] shrink-0 overflow-hidden rounded-full">
+                    {hrefData.profileData.avatar ? (
+                      <>
+                        <img
+                          src={hrefData.profileData.avatar}
+                          className="w-full object-cover"
+                        />
 
-                <div className="flex flex-col items-start">
-                  <span
-                    {...getHrefProps(() =>
-                      getProfileUrl(
-                        hrefData.profileData,
-                        profileUrlSchemeQuery.data,
-                      ),
+                        <div className="absolute inset-0 rounded-[inherit] border border-cool-black border-opacity-[0.14]" />
+                      </>
+                    ) : (
+                      <div className="flex w-full items-center justify-center bg-purple-light">
+                        <svg
+                          viewBox="0 0 40 37"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="w-[12px] text-purple"
+                        >
+                          {nullIconJsx}
+                        </svg>
+                      </div>
                     )}
-                    className="break-word cursor-pointer font-medium text-purple"
-                  >
-                    {hrefData.profileData.account
-                      ? `@${hrefData.profileData.account}`
-                      : getDisplayHref(hrefData.profileData.profileUrl)}
-                  </span>
+                  </div>
+                </div>
+
+                <div className="flex min-w-0 grow flex-col">
+                  <div className="flex items-baseline justify-between gap-x-6 leading-[1.45]">
+                    <span
+                      onClick={onClickProfile}
+                      className="cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-medium text-purple"
+                      title={profileDisplayName}
+                    >
+                      {profileDisplayName}
+                    </span>
+
+                    <span className="shrink-0 text-[12px] text-gray">
+                      {new Intl.DateTimeFormat(undefined, {
+                        timeStyle: "short",
+                      })
+                        .format(hrefData.viewedAt)
+                        .toLowerCase()
+                        .replace(/\s+/g, "")}
+                    </span>
+                  </div>
 
                   <span
-                    {...getHrefProps(hrefData.websiteUrl)}
-                    className="break-word cursor-pointer text-gray"
+                    onClick={getOnClickLink(hrefData.websiteUrl)}
+                    className="cursor-pointer self-start break-all text-[12.5px] leading-[1.5] text-gray"
                   >
                     {getDisplayHref(hrefData.websiteUrl)}
                   </span>
@@ -390,6 +419,29 @@ function Popup() {
     </>
   );
 }
+
+const nullIconJsx = (
+  <>
+    <rect
+      x="2"
+      y="2"
+      width="36"
+      height="33"
+      rx="3"
+      stroke="currentColor"
+      strokeWidth="4"
+    />
+    <rect x="12" y="10" width="4" height="8" rx="2" fill="currentColor" />
+    <rect x="24" y="10" width="4" height="8" rx="2" fill="currentColor" />
+    <path
+      d="M13 24.5V24.5C16.7854 28.5558 23.2146 28.5558 27 24.5V24.5"
+      stroke="currentColor"
+      strokeWidth="4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </>
+);
 
 const rootNode = document.getElementById("root");
 if (!rootNode) {
