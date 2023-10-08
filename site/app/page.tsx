@@ -4,7 +4,6 @@ import icon from "../public/icon-256.png";
 import chrome from "../public/chrome.png";
 import firefox from "../public/firefox.png";
 import safari from "../public/safari.png";
-import screen1 from "../public/screen1.png";
 import screen3 from "../public/screen3.png";
 import { VERSION } from "../../constants";
 import { Metadata, NextPage } from "next";
