@@ -22,6 +22,7 @@ import {
 import { cva } from "class-variance-authority";
 import { getProfileUrl } from "./util/getProfileUrl";
 import { getIsUrlHttpOrHttps } from "./util/getIsUrlHttpOrHttps";
+import { downloadLink } from "../../constants";
 
 getIconState(() => {
   return { state: "off" };
@@ -304,6 +305,12 @@ function Popup() {
                     className={navButtonClassName()}
                   >
                     Export (.json)
+                  </Popover.Close>
+                  <Popover.Close
+                    className={navButtonClassName()}
+                    onClick={getOnClickLink(downloadLink[__TARGET__])}
+                  >
+                    ♥︎ Rate StreetPass
                   </Popover.Close>
                 </Tabs.Content>
 
