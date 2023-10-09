@@ -5,7 +5,7 @@ import chrome from "../public/chrome.png";
 import firefox from "../public/firefox.png";
 import safari from "../public/safari.png";
 import screen3 from "../public/screen3.png";
-import { VERSION } from "../../constants";
+import { VERSION, downloadLink } from "../../constants";
 import { Metadata, NextPage } from "next";
 
 export const metadata: Metadata = {
@@ -68,15 +68,6 @@ const Page: NextPage = () => {
 
       <div className="mt-4 grid auto-cols-fr grid-flow-col gap-6">
         {(["chrome", "firefox", "safari"] as const).map((browser) => {
-          const link = {
-            chrome:
-              "https://chrome.google.com/webstore/detail/streetpass-for-mastodon/fphjfedjhinpnjblomfebcjjpdpakhhn",
-            firefox:
-              "https://addons.mozilla.org/en-US/firefox/addon/streetpass-for-mastodon/",
-            safari:
-              "https://apps.apple.com/us/app/streetpass-for-mastodon/id6446224821",
-          }[browser];
-
           const imageSrc = {
             chrome: chrome,
             firefox: firefox,
@@ -92,7 +83,7 @@ const Page: NextPage = () => {
           return (
             <a
               key={title}
-              href={link}
+              href={downloadLink[browser]}
               className={
                 "flex flex-col items-center text-center text-sm font-medium text-purple underline"
               }

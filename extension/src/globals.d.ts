@@ -1,5 +1,5 @@
 import type Browser from "webextension-polyfill";
-import type { Target } from "./util.js";
+import type { Target } from "./util/constants";
 
 declare global {
   const browser: Browser.Browser;
