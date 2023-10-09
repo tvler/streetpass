@@ -1,3 +1,7 @@
+# 2023.17
+
+- Add button to rate extension
+
 # 2023.16
 
 - Lazy load avatar images
