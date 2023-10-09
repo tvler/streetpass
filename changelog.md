@@ -1,3 +1,7 @@
+# 2023.16
+
+- Lazy load avatar images
+
 # 2023.15
 
 - StreetPass now displays user avatars
