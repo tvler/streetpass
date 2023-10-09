@@ -310,7 +310,7 @@ function Popup() {
                     className={navButtonClassName()}
                     onClick={getOnClickLink(downloadLink[__TARGET__])}
                   >
-                    ♥︎ Rate StreetPass
+                    Rate StreetPass
                   </Popover.Close>
                 </Tabs.Content>
 
