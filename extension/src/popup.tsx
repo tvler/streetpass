@@ -193,7 +193,10 @@ function Popup() {
                       <>
                         <img
                           src={hrefData.profileData.avatar}
-                          className="w-full object-cover"
+                          width={19}
+                          height={19}
+                          className="object-cover"
+                          loading="lazy"
                         />
 
                         <div className="absolute inset-0 rounded-[inherit] border border-cool-black border-opacity-[0.14]" />
