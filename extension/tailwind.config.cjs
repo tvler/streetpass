@@ -7,9 +7,11 @@ module.exports = {
       transparent: "transparent",
       white: "#fff",
       current: "currentColor",
+      amber: "var(--amber-12)",
       purple: {
         light: "#EFEDFC",
         DEFAULT: "#5F55EC",
+        dark: "#948cff",
       },
       "cool-black": "#333",
       gray: {
@@ -17,6 +19,7 @@ module.exports = {
         light: "#f2f2f2",
         DEFAULT: "#7b7b7b",
       },
+      black: "#000",
     },
     fontSize: {
       11: "11px",

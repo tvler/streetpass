@@ -19,7 +19,7 @@ import {
   getHrefStore,
   getProfileUrlScheme,
 } from "./util/storage";
-import { cva } from "class-variance-authority";
+import { cva, cx } from "class-variance-authority";
 import { getProfileUrl } from "./util/getProfileUrl";
 import { getIsUrlHttpOrHttps } from "./util/getIsUrlHttpOrHttps";
 import { downloadLink } from "../../constants";
@@ -76,6 +76,18 @@ const useProfileUrlSchemeQuery = createQuery({
   },
 });
 
+const text = cva("", {
+  variants: {
+    variant: {
+      primary: ["text-[--gray-12]", "dark:text-white"],
+      secondary: ["text-[--gray-9]"],
+    },
+  },
+  defaultVariants: {
+    variant: "primary",
+  },
+});
+
 const navButtonClassName = cva(
   [
     "h-[1.68em]",
@@ -92,7 +104,7 @@ const navButtonClassName = cva(
   {
     variants: {
       variant: {
-        purple: ["bg-purple-light", "text-purple"],
+        purple: ["bg-[--violet-a3]", "text-[--violet-9]"],
         gray: ["bg-gray-light", "text-gray"],
       },
     },
@@ -108,11 +120,18 @@ function Popup() {
   const profileUrlSchemeInputRef = React.useRef<HTMLInputElement>(null);
 
   return (
-    <>
+    <div className="relative flex h-[600px] w-[350px] flex-col overflow-auto bg-white dark:bg-[--slate-1]">
       <div className="flex flex-col items-center pt-[12px]">
         <img src="/icon-128.png" width="36" height="36" />
 
-        <h1 className="text-14 font-medium leading-[1.21]">StreetPass</h1>
+        <h1
+          className={cx(
+            text({ variant: "primary" }),
+            "text-14 font-medium leading-[1.21]",
+          )}
+        >
+          StreetPass
+        </h1>
       </div>
 
       <div className="flex flex-col gap-[18px] px-12 py-[18px]">
@@ -122,7 +141,7 @@ function Popup() {
               No profiles. Try{" "}
               <span
                 onClick={getOnClickLink("https://streetpass.social/")}
-                className="cursor-pointer font-medium text-purple"
+                className="cursor-pointer font-medium text-[--violet-9]"
               >
                 this
               </span>
@@ -148,7 +167,12 @@ function Popup() {
           return (
             <React.Fragment key={`${index}.${hrefData.relMeHref}`}>
               {previousItemWasDayBefore && (
-                <p className="shrink-0 text-13 text-gray">
+                <p
+                  className={cx(
+                    text({ variant: "secondary" }),
+                    "shrink-0 text-13",
+                  )}
+                >
                   {new Intl.DateTimeFormat(undefined, {
                     day: "numeric",
                     month: "short",
@@ -203,12 +227,12 @@ function Popup() {
                         <div className="absolute inset-0 rounded-[inherit] border border-cool-black border-opacity-[0.14]" />
                       </>
                     ) : (
-                      <div className="flex w-full items-center justify-center bg-purple-light">
+                      <div className="flex w-full items-center justify-center bg-[--violet-3]">
                         <svg
                           viewBox="0 0 40 37"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
-                          className="w-[12px] text-purple"
+                          className={"w-[12px] text-[--violet-9]"}
                         >
                           {nullIconJsx}
                         </svg>
@@ -221,13 +245,18 @@ function Popup() {
                   <div className="flex items-baseline justify-between gap-x-6 leading-[1.45]">
                     <span
                       onClick={onClickProfile}
-                      className="cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-medium text-purple"
+                      className="cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-medium text-[--violet-9]"
                       title={profileDisplayName}
                     >
                       {profileDisplayName}
                     </span>
 
-                    <span className="shrink-0 text-[12px] text-gray">
+                    <span
+                      className={cx(
+                        text({ variant: "secondary" }),
+                        "shrink-0 text-[12px]",
+                      )}
+                    >
                       {new Intl.DateTimeFormat(undefined, {
                         timeStyle: "short",
                       })
@@ -239,7 +268,10 @@ function Popup() {
 
                   <span
                     onClick={getOnClickLink(hrefData.websiteUrl)}
-                    className="cursor-pointer self-start break-all text-[12.5px] leading-[1.5] text-gray"
+                    className={cx(
+                      text({ variant: "secondary" }),
+                      "cursor-pointer self-start break-all text-[12.5px] leading-[1.5]",
+                    )}
                   >
                     {getDisplayHref(hrefData.websiteUrl)}
                   </span>
@@ -426,7 +458,7 @@ function Popup() {
           </Popover.Portal>
         </Popover.Root>
       </div>
-    </>
+    </div>
   );
 }
 

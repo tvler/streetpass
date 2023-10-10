@@ -748,6 +748,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@radix-ui/colors@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@radix-ui/colors@npm:3.0.0"
+  checksum: 5ac1b69df7a77525e2031c2d2948d6ef8d81c6b163809ee8e17a2138c4977678e3a9f67342595d2c88f0300f51fd2c64e24355008cda6c9db8dfd4ed3eaf9e8f
+  languageName: node
+  linkType: hard
+
 "@radix-ui/primitive@npm:1.0.1":
   version: 1.0.1
   resolution: "@radix-ui/primitive@npm:1.0.1"
@@ -2904,6 +2911,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "extension-3b1fc9@workspace:extension"
   dependencies:
+    "@radix-ui/colors": ^3.0.0
     "@radix-ui/react-popover": ^1.0.7
     "@radix-ui/react-tabs": ^1.0.4
     "@tanstack/react-query": ^4.35.3
@@ -2920,6 +2928,7 @@ __metadata:
     eslint-plugin-import: ^2.28.0
     eslint-plugin-react-hooks: ^4.6.0
     postcss: ^8.4.29
+    postcss-import: ^15.1.0
     prettier: ^3.0.3
     prettier-plugin-tailwindcss: ^0.5.5
     react: ^18.2.0
