@@ -331,13 +331,14 @@ function Popup() {
                   >
                     <label className="contents">
                       <span className="px-8 text-12 text-gray">
-                        URL to open profiles with. Set as empty for default
-                        behavior.
+                        URL to open profiles with. Keep empty to open in
+                        the profile's Mastodon instance or fill in your own.
                       </span>
 
                       <input
                         spellCheck={false}
                         type="text"
+                        placeholder="https://mastodon.example/@{account}"
                         className="mx-8 rounded-6 border border-purple-light bg-gray-lightest px-6 py-2 text-12 text-cool-black"
                         ref={profileUrlSchemeInputRef}
                         defaultValue={profileUrlSchemeQuery.data}
