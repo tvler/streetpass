@@ -1,11 +1,15 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* https://tailwindcss.com/docs/using-with-preprocessors#build-time-imports */
+
+@import "tailwindcss/base";
+@import "./colors.css";
+
+@import "tailwindcss/components";
+
+@import "tailwindcss/utilities";
 
 @layer base {
   :root {
-    @apply text-cool-black;
-
+    color-scheme: light dark;
     cursor: default;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -23,10 +27,6 @@
 }
 
 @layer utilities {
-  .break-word {
-    word-break: break-word;
-  }
-
   [hidden] {
     @apply hidden;
   }
