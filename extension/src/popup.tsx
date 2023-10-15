@@ -301,167 +301,169 @@ function Popup() {
               <circle cx="85" cy="50" r="9" />
             </svg>
           </Popover.Trigger>
-
-          <Popover.Content
-            align="end"
-            side="bottom"
-            sideOffset={6}
-            avoidCollisions={false}
-            className={cx(primaryBg, borderColor, "flex rounded-6 border")}
-            onOpenAutoFocus={(ev) => {
-              ev.preventDefault();
-            }}
-            onCloseAutoFocus={(ev) => {
-              ev.preventDefault();
-            }}
-          >
-            <Tabs.Root defaultValue={Tab.root} className="contents">
-              <Tabs.Content
-                value={Tab.root}
-                className="flex flex-col items-start gap-y-8 p-8"
-              >
-                <Tabs.List className="contents">
-                  <Tabs.Trigger
-                    value={Tab.openProfilesWith}
+          <Popover.Portal>
+            <Popover.Content
+              align="end"
+              side="bottom"
+              sideOffset={6}
+              avoidCollisions={false}
+              className={cx(primaryBg, borderColor, "flex rounded-6 border")}
+              onOpenAutoFocus={(ev) => {
+                ev.preventDefault();
+              }}
+              onCloseAutoFocus={(ev) => {
+                ev.preventDefault();
+              }}
+            >
+              <Tabs.Root defaultValue={Tab.root} className="contents">
+                <Tabs.Content
+                  value={Tab.root}
+                  className="flex flex-col items-start gap-y-8 p-8"
+                >
+                  <Tabs.List className="contents">
+                    <Tabs.Trigger
+                      value={Tab.openProfilesWith}
+                      className={cx(accentColor, navButtonClassName)}
+                    >
+                      Open Profiles With…
+                    </Tabs.Trigger>
+                  </Tabs.List>
+                  <Popover.Close
+                    onClick={exportProfiles}
                     className={cx(accentColor, navButtonClassName)}
                   >
-                    Open Profiles With…
-                  </Tabs.Trigger>
-                </Tabs.List>
-                <Popover.Close
-                  onClick={exportProfiles}
-                  className={cx(accentColor, navButtonClassName)}
-                >
-                  Export (.json)
-                </Popover.Close>
-                <Popover.Close
-                  className={cx(accentColor, navButtonClassName)}
-                  onClick={getOnClickLink(downloadLink[__TARGET__])}
-                >
-                  Rate StreetPass
-                </Popover.Close>
-              </Tabs.Content>
+                    Export (.json)
+                  </Popover.Close>
+                  <Popover.Close
+                    className={cx(accentColor, navButtonClassName)}
+                    onClick={getOnClickLink(downloadLink[__TARGET__])}
+                  >
+                    Rate StreetPass
+                  </Popover.Close>
+                </Tabs.Content>
 
-              <Tabs.Content
-                value={Tab.openProfilesWith}
-                className="flex w-[275px] flex-col gap-y-8 pt-8"
-              >
-                <form
-                  className="contents"
-                  onSubmit={async (ev) => {
-                    ev.preventDefault();
-                    await getProfileUrlScheme(
-                      () => profileUrlSchemeInputRef.current?.value.trim(),
-                    );
-                    queryClient.refetchQueries();
-                    popoverCloseRef.current?.click();
-                  }}
+                <Tabs.Content
+                  value={Tab.openProfilesWith}
+                  className="flex w-[275px] flex-col gap-y-8 pt-8"
                 >
-                  <label className="contents">
+                  <form
+                    className="contents"
+                    onSubmit={async (ev) => {
+                      ev.preventDefault();
+                      await getProfileUrlScheme(
+                        () => profileUrlSchemeInputRef.current?.value.trim(),
+                      );
+                      queryClient.refetchQueries();
+                      popoverCloseRef.current?.click();
+                    }}
+                  >
+                    <label className="contents">
+                      <span className={cx(secondaryColor, "px-8 text-12")}>
+                        URL to open profiles with. Set as empty for default
+                        behavior.
+                      </span>
+
+                      <input
+                        spellCheck={false}
+                        type="text"
+                        className={cx(
+                          primaryColor,
+                          secondaryBg,
+                          borderColor,
+                          "mx-8 rounded-6 border px-6 py-2 text-12",
+                        )}
+                        ref={profileUrlSchemeInputRef}
+                        defaultValue={profileUrlSchemeQuery.data}
+                        key={profileUrlSchemeQuery.data}
+                      />
+                    </label>
+
                     <span className={cx(secondaryColor, "px-8 text-12")}>
-                      URL to open profiles with. Set as empty for default
-                      behavior.
+                      …or select a preset:
                     </span>
 
-                    <input
-                      spellCheck={false}
-                      type="text"
-                      className={cx(
-                        primaryColor,
-                        secondaryBg,
-                        borderColor,
-                        "mx-8 rounded-6 border px-6 py-2 text-12",
-                      )}
-                      ref={profileUrlSchemeInputRef}
-                      defaultValue={profileUrlSchemeQuery.data}
-                      key={profileUrlSchemeQuery.data}
-                    />
-                  </label>
+                    <div className="flex flex-wrap gap-8 px-8">
+                      {(
+                        [
+                          "ivory",
+                          "elk",
+                          "icecubes",
+                          "mastodon.social",
+                          "mastodon.online",
+                        ] as const
+                      ).map((item) => {
+                        return (
+                          <React.Fragment key={item}>
+                            <button
+                              type="button"
+                              className={cx(accentColor, navButtonClassName)}
+                              onClick={() => {
+                                if (!profileUrlSchemeInputRef.current) {
+                                  return;
+                                }
 
-                  <span className={cx(secondaryColor, "px-8 text-12")}>
-                    …or select a preset:
-                  </span>
+                                profileUrlSchemeInputRef.current.value = {
+                                  /**
+                                   * https://tapbots.com/support/ivory/tips/urlschemes
+                                   */
+                                  ivory: "ivory://acct/user_profile/{account}",
+                                  elk: "https://elk.zone/@{account}",
+                                  icecubes:
+                                    "icecubesapp:{profileUrl.noProtocol}",
+                                  "mastodon.social":
+                                    "https://mastodon.social/@{account}",
+                                  "mastodon.online":
+                                    "https://mastodon.online/@{account}",
+                                }[item];
 
-                  <div className="flex flex-wrap gap-8 px-8">
-                    {(
-                      [
-                        "ivory",
-                        "elk",
-                        "icecubes",
-                        "mastodon.social",
-                        "mastodon.online",
-                      ] as const
-                    ).map((item) => {
-                      return (
-                        <React.Fragment key={item}>
-                          <button
-                            type="button"
-                            className={cx(accentColor, navButtonClassName)}
-                            onClick={() => {
-                              if (!profileUrlSchemeInputRef.current) {
-                                return;
-                              }
-
-                              profileUrlSchemeInputRef.current.value = {
-                                /**
-                                 * https://tapbots.com/support/ivory/tips/urlschemes
-                                 */
-                                ivory: "ivory://acct/user_profile/{account}",
-                                elk: "https://elk.zone/@{account}",
-                                icecubes: "icecubesapp:{profileUrl.noProtocol}",
-                                "mastodon.social":
-                                  "https://mastodon.social/@{account}",
-                                "mastodon.online":
-                                  "https://mastodon.online/@{account}",
-                              }[item];
-
-                              profileUrlSchemeInputRef.current.focus();
-                            }}
-                          >
-                            {
+                                profileUrlSchemeInputRef.current.focus();
+                              }}
+                            >
                               {
-                                ivory: "Ivory",
-                                elk: "Elk",
-                                icecubes: "Ice Cubes",
-                                "mastodon.social": "mastodon.social",
-                                "mastodon.online": "mastodon.online",
-                              }[item]
-                            }
-                          </button>
-                        </React.Fragment>
-                      );
-                    })}
-                  </div>
+                                {
+                                  ivory: "Ivory",
+                                  elk: "Elk",
+                                  icecubes: "Ice Cubes",
+                                  "mastodon.social": "mastodon.social",
+                                  "mastodon.online": "mastodon.online",
+                                }[item]
+                              }
+                            </button>
+                          </React.Fragment>
+                        );
+                      })}
+                    </div>
 
-                  <div
-                    className={cx(
-                      borderColor,
-                      "flex justify-end gap-x-8 border-t px-8 py-8",
-                    )}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (!profileUrlSchemeInputRef.current) {
-                          return;
-                        }
-
-                        profileUrlSchemeInputRef.current.value = "";
-                        profileUrlSchemeInputRef.current.focus();
-                      }}
-                      className={cx(secondaryColor, navButtonClassName)}
+                    <div
+                      className={cx(
+                        borderColor,
+                        "flex justify-end gap-x-8 border-t px-8 py-8",
+                      )}
                     >
-                      Clear
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!profileUrlSchemeInputRef.current) {
+                            return;
+                          }
 
-                    <button className={cx(accentColor, navButtonClassName)}>
-                      Save
-                    </button>
-                  </div>
-                </form>
-              </Tabs.Content>
-            </Tabs.Root>
-          </Popover.Content>
+                          profileUrlSchemeInputRef.current.value = "";
+                          profileUrlSchemeInputRef.current.focus();
+                        }}
+                        className={cx(secondaryColor, navButtonClassName)}
+                      >
+                        Clear
+                      </button>
+
+                      <button className={cx(accentColor, navButtonClassName)}>
+                        Save
+                      </button>
+                    </div>
+                  </form>
+                </Tabs.Content>
+              </Tabs.Root>
+            </Popover.Content>
+          </Popover.Portal>
         </Popover.Root>
       </div>
     </div>
