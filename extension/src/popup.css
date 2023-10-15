@@ -9,8 +9,7 @@
 
 @layer base {
   :root {
-    @apply text-cool-black;
-
+    color-scheme: light dark;
     cursor: default;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

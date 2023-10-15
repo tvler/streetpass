@@ -17,19 +17,15 @@ function toCssCasing(str) {
 
 const dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const outputDir = path.resolve(dirname, "../src/colors.css");
-const supportsP3AtRule = "@supports (color: color(display-p3 1 1 1))";
-const matchesP3MediaRule = "@media (color-gamut: p3)";
 
 let fileContents = "";
 
 Object.keys(allColorScales)
   .filter((key) => !key.includes("P3"))
   .forEach((key) => {
-    let selector = ":root";
-
-    const mediaSelector = key.includes("Dark")
-      ? `@media (prefers-color-scheme: dark)`
-      : `@media not (prefers-color-scheme: dark)`;
+    const media = key.includes("Dark")
+      ? "@media (prefers-color-scheme: dark)"
+      : "@media not (prefers-color-scheme: dark)";
 
     const srgbValues = Object.entries(allColorScales).find(
       ([name]) => name === key,
@@ -42,7 +38,7 @@ Object.keys(allColorScales)
       .map(([name, value]) => `  --${name}: ${value};`)
       .join("\n");
 
-    const srgbCssRule = `${mediaSelector} { ${selector} { ${srgbCssProperties} } }`;
+    const srgbCssRule = `${media} { :root { ${srgbCssProperties} } }`;
 
     fileContents = `${fileContents} ${srgbCssRule}`;
   });

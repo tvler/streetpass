@@ -1,25 +1,15 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./src/**/*.{js,ts,jsx,tsx,html}"],
+  darkMode: "media",
   theme: {
     colors: {
       inherit: "inherit",
       transparent: "transparent",
       white: "#fff",
       current: "currentColor",
-      amber: "var(--amber-12)",
-      purple: {
-        light: "#EFEDFC",
-        DEFAULT: "#5F55EC",
-        dark: "#948cff",
-      },
-      "cool-black": "#333",
-      gray: {
-        lightest: "#fafafa",
-        light: "#f2f2f2",
-        DEFAULT: "#7b7b7b",
-      },
       black: "#000",
+      faded: "color-mix(in srgb, currentColor 10%, transparent)",
     },
     fontSize: {
       11: "11px",
