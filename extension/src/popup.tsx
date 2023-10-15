@@ -366,11 +366,12 @@ function Popup() {
                       <input
                         spellCheck={false}
                         type="text"
+                        placeholder="https://mastodon.example/@{account}"
                         className={cx(
                           primaryColor,
                           secondaryBg,
                           borderColor,
-                          "mx-8 rounded-6 border px-6 py-2 text-12",
+                          "mx-8 rounded-6 border px-6 py-2 text-12 placeholder:text-[--gray-a10]",
                         )}
                         ref={profileUrlSchemeInputRef}
                         defaultValue={profileUrlSchemeQuery.data}
