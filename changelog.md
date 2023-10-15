@@ -1,3 +1,8 @@
+# 2023.18
+
+- Dark mode
+- Add placeholder text to custom profile url input
+
 # 2023.17
 
 - Add button to rate extension
