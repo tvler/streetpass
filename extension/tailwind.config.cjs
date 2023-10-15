@@ -9,7 +9,7 @@ module.exports = {
       white: "#fff",
       current: "currentColor",
       black: "#000",
-      faded: "color-mix(in srgb, currentColor 11%, transparent)",
+      faded: "color-mix(in srgb, currentColor 12.5%, transparent)",
     },
     fontSize: {
       11: "11px",

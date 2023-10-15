@@ -76,7 +76,7 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: Infinity } },
 });
 
-const accentColor = cva(["text-[--iris-9]", "dark:text-[--iris-11]"])();
+const accentColor = cva(["text-[#5f55ec]", "dark:text-[--iris-11]"])();
 const primaryColor = cva(["text-[--gray-12]", "dark:text-white"])();
 const secondaryColor = cva(["text-[--gray-a11]"])();
 
@@ -106,369 +106,363 @@ function Popup() {
   const profileUrlSchemeInputRef = React.useRef<HTMLInputElement>(null);
 
   return (
-    <div className={"contents"}>
-      <div
-        className={cx(
-          primaryBg,
-          "relative flex h-[600px] w-[350px] flex-col overflow-auto",
-        )}
-      >
-        <div className="flex flex-col items-center pt-[12px]">
-          <img src="/icon-128.png" width="36" height="36" />
+    <div
+      className={cx(
+        primaryBg,
+        "relative flex h-[600px] w-[350px] flex-col overflow-auto",
+      )}
+    >
+      <div className="flex flex-col items-center pt-[12px]">
+        <img src="/icon-128.png" width="36" height="36" />
 
-          <h1
-            className={cx(primaryColor, "text-14 font-medium leading-[1.21]")}
+        <h1 className={cx(primaryColor, "text-14 font-medium leading-[1.21]")}>
+          StreetPass
+        </h1>
+      </div>
+
+      <div className="flex flex-col gap-[18px] px-12 py-[18px]">
+        {profilesQuery.data?.length === 0 && (
+          <div
+            className={cx(
+              secondaryColor,
+              "absolute inset-0 flex items-center justify-center text-13",
+            )}
           >
-            StreetPass
-          </h1>
-        </div>
+            <p>
+              No profiles. Try{" "}
+              <span
+                onClick={getOnClickLink("https://streetpass.social/")}
+                className={cx(accentColor, "cursor-pointer font-medium")}
+              >
+                this
+              </span>
+              !
+            </p>
+          </div>
+        )}
 
-        <div className="flex flex-col gap-[18px] px-12 py-[18px]">
-          {profilesQuery.data?.length === 0 && (
-            <div
-              className={cx(
-                secondaryColor,
-                "absolute inset-0 flex items-center justify-center text-13",
+        {profilesQuery.data?.map((hrefData, index, arr) => {
+          const prevHrefData = arr[index - 1];
+          const prevHrefDate = prevHrefData
+            ? new Date(prevHrefData.viewedAt).getDate()
+            : new Date().getDate();
+          const previousItemWasDayBefore =
+            prevHrefDate !== new Date(hrefData.viewedAt).getDate();
+          const onClickProfile = getOnClickLink(() =>
+            getProfileUrl(hrefData.profileData, profileUrlSchemeQuery.data),
+          );
+          const profileDisplayName = hrefData.profileData.account
+            ? `@${hrefData.profileData.account}`
+            : getDisplayHref(hrefData.profileData.profileUrl);
+
+          return (
+            <React.Fragment key={`${index}.${hrefData.relMeHref}`}>
+              {previousItemWasDayBefore && (
+                <p className={cx(secondaryColor, "shrink-0 text-13")}>
+                  {new Intl.DateTimeFormat(undefined, {
+                    day: "numeric",
+                    month: "short",
+                  }).format(hrefData.viewedAt)}
+                </p>
               )}
-            >
-              <p>
-                No profiles. Try{" "}
-                <span
-                  onClick={getOnClickLink("https://streetpass.social/")}
-                  className={cx(accentColor, "cursor-pointer font-medium")}
-                >
-                  this
-                </span>
-                !
-              </p>
-            </div>
-          )}
 
-          {profilesQuery.data?.map((hrefData, index, arr) => {
-            const prevHrefData = arr[index - 1];
-            const prevHrefDate = prevHrefData
-              ? new Date(prevHrefData.viewedAt).getDate()
-              : new Date().getDate();
-            const previousItemWasDayBefore =
-              prevHrefDate !== new Date(hrefData.viewedAt).getDate();
-            const onClickProfile = getOnClickLink(() =>
-              getProfileUrl(hrefData.profileData, profileUrlSchemeQuery.data),
-            );
-            const profileDisplayName = hrefData.profileData.account
-              ? `@${hrefData.profileData.account}`
-              : getDisplayHref(hrefData.profileData.profileUrl);
+              <InView
+                as="div"
+                className="flex items-start"
+                triggerOnce
+                onChange={async (inView) => {
+                  if (!inView) {
+                    return;
+                  }
 
-            return (
-              <React.Fragment key={`${index}.${hrefData.relMeHref}`}>
-                {previousItemWasDayBefore && (
-                  <p className={cx(secondaryColor, "shrink-0 text-13")}>
-                    {new Intl.DateTimeFormat(undefined, {
-                      day: "numeric",
-                      month: "short",
-                    }).format(hrefData.viewedAt)}
-                  </p>
-                )}
-
-                <InView
-                  as="div"
-                  className="flex items-start"
-                  triggerOnce
-                  onChange={async (inView) => {
-                    if (!inView) {
+                  try {
+                    const message: Message = {
+                      name: "FETCH_PROFILE_UPDATE",
+                      args: {
+                        relMeHref: hrefData.relMeHref,
+                      },
+                    };
+                    const resp = await MessageReturn.FETCH_PROFILE_UPDATE.parse(
+                      browser.runtime.sendMessage(message),
+                    );
+                    if (!resp) {
                       return;
                     }
 
-                    try {
-                      const message: Message = {
-                        name: "FETCH_PROFILE_UPDATE",
-                        args: {
-                          relMeHref: hrefData.relMeHref,
-                        },
-                      };
-                      const resp =
-                        await MessageReturn.FETCH_PROFILE_UPDATE.parse(
-                          browser.runtime.sendMessage(message),
-                        );
-                      if (!resp) {
-                        return;
-                      }
-
-                      queryClient.refetchQueries();
-                    } catch (err) {
-                      console.error(err);
-                    }
-                  }}
+                    queryClient.refetchQueries();
+                  } catch (err) {
+                    console.error(err);
+                  }
+                }}
+              >
+                <div
+                  className="flex shrink-0 cursor-pointer pr-[7px] pt-[4px]"
+                  onClick={onClickProfile}
+                  title={profileDisplayName}
                 >
-                  <div
-                    className="flex shrink-0 cursor-pointer pr-[7px] pt-[4px]"
-                    onClick={onClickProfile}
-                    title={profileDisplayName}
-                  >
-                    <div className="relative flex aspect-square w-[19px] shrink-0 overflow-hidden rounded-full">
-                      {hrefData.profileData.avatar ? (
-                        <>
-                          <img
-                            src={hrefData.profileData.avatar}
-                            width={19}
-                            height={19}
-                            className="object-cover"
-                            loading="lazy"
-                          />
+                  <div className="relative flex aspect-square w-[19px] shrink-0 overflow-hidden rounded-full">
+                    {hrefData.profileData.avatar ? (
+                      <>
+                        <img
+                          src={hrefData.profileData.avatar}
+                          width={19}
+                          height={19}
+                          className="object-cover"
+                          loading="lazy"
+                        />
 
-                          <div
-                            className={cx(
-                              primaryColor,
-                              "pointer-events-none absolute inset-0 rounded-[inherit] border border-current opacity-[0.14]",
-                            )}
-                          />
-                        </>
-                      ) : (
                         <div
                           className={cx(
-                            accentColor,
-                            "flex w-full items-center justify-center bg-faded",
+                            primaryColor,
+                            "pointer-events-none absolute inset-0 rounded-[inherit] border border-current opacity-[0.14]",
                           )}
-                        >
-                          <svg
-                            viewBox="0 0 40 37"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="w-[12px]"
-                          >
-                            {nullIconJsx}
-                          </svg>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex min-w-0 grow flex-col">
-                    <div className="flex items-baseline justify-between gap-x-6 leading-[1.45]">
-                      <span
-                        onClick={onClickProfile}
+                        />
+                      </>
+                    ) : (
+                      <div
                         className={cx(
                           accentColor,
-                          "cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-medium",
+                          "flex w-full items-center justify-center bg-faded",
                         )}
-                        title={profileDisplayName}
                       >
-                        {profileDisplayName}
-                      </span>
+                        <svg
+                          viewBox="0 0 40 37"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="w-[12px]"
+                        >
+                          {nullIconJsx}
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                </div>
 
-                      <span
-                        className={cx(secondaryColor, "shrink-0 text-[12px]")}
-                      >
-                        {new Intl.DateTimeFormat(undefined, {
-                          timeStyle: "short",
-                        })
-                          .format(hrefData.viewedAt)
-                          .toLowerCase()
-                          .replace(/\s+/g, "")}
-                      </span>
-                    </div>
+                <div className="flex min-w-0 grow flex-col">
+                  <div className="flex items-baseline justify-between gap-x-6 leading-[1.45]">
+                    <span
+                      onClick={onClickProfile}
+                      className={cx(
+                        accentColor,
+                        "cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-medium",
+                      )}
+                      title={profileDisplayName}
+                    >
+                      {profileDisplayName}
+                    </span>
 
                     <span
-                      onClick={getOnClickLink(hrefData.websiteUrl)}
-                      className={cx(
-                        secondaryColor,
-                        "cursor-pointer self-start break-all text-[12.5px] leading-[1.5]",
-                      )}
+                      className={cx(secondaryColor, "shrink-0 text-[12px]")}
                     >
-                      {getDisplayHref(hrefData.websiteUrl)}
+                      {new Intl.DateTimeFormat(undefined, {
+                        timeStyle: "short",
+                      })
+                        .format(hrefData.viewedAt)
+                        .toLowerCase()
+                        .replace(/\s+/g, "")}
                     </span>
                   </div>
-                </InView>
-              </React.Fragment>
-            );
-          })}
-        </div>
 
-        <div className="absolute right-12 top-12 flex gap-8">
-          {!!profilesQuery.data?.length && (
-            <span className={cx(accentColor, navButtonClassName)}>
-              {profilesQuery.data.length}
-            </span>
-          )}
+                  <span
+                    onClick={getOnClickLink(hrefData.websiteUrl)}
+                    className={cx(
+                      secondaryColor,
+                      "cursor-pointer self-start break-all text-[12.5px] leading-[1.5]",
+                    )}
+                  >
+                    {getDisplayHref(hrefData.websiteUrl)}
+                  </span>
+                </div>
+              </InView>
+            </React.Fragment>
+          );
+        })}
+      </div>
 
-          <Popover.Root modal>
-            <Popover.Close hidden ref={popoverCloseRef} />
+      <div className="absolute right-12 top-12 flex gap-8">
+        {!!profilesQuery.data?.length && (
+          <span className={cx(accentColor, navButtonClassName)}>
+            {profilesQuery.data.length}
+          </span>
+        )}
 
-            <Popover.Trigger className={cx(accentColor, navButtonClassName)}>
-              <svg
-                fill="currentColor"
-                className="aspect-square w-[1em]"
-                viewBox="0 0 100 100"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <circle cx="15" cy="50" r="9" />
-                <circle cx="50" cy="50" r="9" />
-                <circle cx="85" cy="50" r="9" />
-              </svg>
-            </Popover.Trigger>
+        <Popover.Root modal>
+          <Popover.Close hidden ref={popoverCloseRef} />
 
-            <Popover.Content
-              align="end"
-              side="bottom"
-              sideOffset={6}
-              avoidCollisions={false}
-              className={cx(primaryBg, borderColor, "flex rounded-6 border")}
-              onOpenAutoFocus={(ev) => {
-                ev.preventDefault();
-              }}
-              onCloseAutoFocus={(ev) => {
-                ev.preventDefault();
-              }}
+          <Popover.Trigger className={cx(accentColor, navButtonClassName)}>
+            <svg
+              fill="currentColor"
+              className="aspect-square w-[1em]"
+              viewBox="0 0 100 100"
+              xmlns="http://www.w3.org/2000/svg"
             >
-              <Tabs.Root defaultValue={Tab.root} className="contents">
-                <Tabs.Content
-                  value={Tab.root}
-                  className="flex flex-col items-start gap-y-8 p-8"
-                >
-                  <Tabs.List className="contents">
-                    <Tabs.Trigger
-                      value={Tab.openProfilesWith}
-                      className={cx(accentColor, navButtonClassName)}
-                    >
-                      Open Profiles With…
-                    </Tabs.Trigger>
-                  </Tabs.List>
-                  <Popover.Close
-                    onClick={exportProfiles}
+              <circle cx="15" cy="50" r="9" />
+              <circle cx="50" cy="50" r="9" />
+              <circle cx="85" cy="50" r="9" />
+            </svg>
+          </Popover.Trigger>
+
+          <Popover.Content
+            align="end"
+            side="bottom"
+            sideOffset={6}
+            avoidCollisions={false}
+            className={cx(primaryBg, borderColor, "flex rounded-6 border")}
+            onOpenAutoFocus={(ev) => {
+              ev.preventDefault();
+            }}
+            onCloseAutoFocus={(ev) => {
+              ev.preventDefault();
+            }}
+          >
+            <Tabs.Root defaultValue={Tab.root} className="contents">
+              <Tabs.Content
+                value={Tab.root}
+                className="flex flex-col items-start gap-y-8 p-8"
+              >
+                <Tabs.List className="contents">
+                  <Tabs.Trigger
+                    value={Tab.openProfilesWith}
                     className={cx(accentColor, navButtonClassName)}
                   >
-                    Export (.json)
-                  </Popover.Close>
-                  <Popover.Close
-                    className={cx(accentColor, navButtonClassName)}
-                    onClick={getOnClickLink(downloadLink[__TARGET__])}
-                  >
-                    Rate StreetPass
-                  </Popover.Close>
-                </Tabs.Content>
-
-                <Tabs.Content
-                  value={Tab.openProfilesWith}
-                  className="flex w-[275px] flex-col gap-y-8 pt-8"
+                    Open Profiles With…
+                  </Tabs.Trigger>
+                </Tabs.List>
+                <Popover.Close
+                  onClick={exportProfiles}
+                  className={cx(accentColor, navButtonClassName)}
                 >
-                  <form
-                    className="contents"
-                    onSubmit={async (ev) => {
-                      ev.preventDefault();
-                      await getProfileUrlScheme(
-                        () => profileUrlSchemeInputRef.current?.value.trim(),
-                      );
-                      queryClient.refetchQueries();
-                      popoverCloseRef.current?.click();
-                    }}
-                  >
-                    <label className="contents">
-                      <span className={cx(secondaryColor, "px-8 text-12")}>
-                        URL to open profiles with. Set as empty for default
-                        behavior.
-                      </span>
+                  Export (.json)
+                </Popover.Close>
+                <Popover.Close
+                  className={cx(accentColor, navButtonClassName)}
+                  onClick={getOnClickLink(downloadLink[__TARGET__])}
+                >
+                  Rate StreetPass
+                </Popover.Close>
+              </Tabs.Content>
 
-                      <input
-                        spellCheck={false}
-                        type="text"
-                        className={cx(
-                          primaryColor,
-                          secondaryBg,
-                          borderColor,
-                          "mx-8 rounded-6 border px-6 py-2 text-12",
-                        )}
-                        ref={profileUrlSchemeInputRef}
-                        defaultValue={profileUrlSchemeQuery.data}
-                        key={profileUrlSchemeQuery.data}
-                      />
-                    </label>
-
+              <Tabs.Content
+                value={Tab.openProfilesWith}
+                className="flex w-[275px] flex-col gap-y-8 pt-8"
+              >
+                <form
+                  className="contents"
+                  onSubmit={async (ev) => {
+                    ev.preventDefault();
+                    await getProfileUrlScheme(
+                      () => profileUrlSchemeInputRef.current?.value.trim(),
+                    );
+                    queryClient.refetchQueries();
+                    popoverCloseRef.current?.click();
+                  }}
+                >
+                  <label className="contents">
                     <span className={cx(secondaryColor, "px-8 text-12")}>
-                      …or select a preset:
+                      URL to open profiles with. Set as empty for default
+                      behavior.
                     </span>
 
-                    <div className="flex flex-wrap gap-8 px-8">
-                      {(
-                        [
-                          "ivory",
-                          "elk",
-                          "icecubes",
-                          "mastodon.social",
-                          "mastodon.online",
-                        ] as const
-                      ).map((item) => {
-                        return (
-                          <React.Fragment key={item}>
-                            <button
-                              type="button"
-                              className={cx(accentColor, navButtonClassName)}
-                              onClick={() => {
-                                if (!profileUrlSchemeInputRef.current) {
-                                  return;
-                                }
-
-                                profileUrlSchemeInputRef.current.value = {
-                                  /**
-                                   * https://tapbots.com/support/ivory/tips/urlschemes
-                                   */
-                                  ivory: "ivory://acct/user_profile/{account}",
-                                  elk: "https://elk.zone/@{account}",
-                                  icecubes:
-                                    "icecubesapp:{profileUrl.noProtocol}",
-                                  "mastodon.social":
-                                    "https://mastodon.social/@{account}",
-                                  "mastodon.online":
-                                    "https://mastodon.online/@{account}",
-                                }[item];
-
-                                profileUrlSchemeInputRef.current.focus();
-                              }}
-                            >
-                              {
-                                {
-                                  ivory: "Ivory",
-                                  elk: "Elk",
-                                  icecubes: "Ice Cubes",
-                                  "mastodon.social": "mastodon.social",
-                                  "mastodon.online": "mastodon.online",
-                                }[item]
-                              }
-                            </button>
-                          </React.Fragment>
-                        );
-                      })}
-                    </div>
-
-                    <div
+                    <input
+                      spellCheck={false}
+                      type="text"
                       className={cx(
+                        primaryColor,
+                        secondaryBg,
                         borderColor,
-                        "flex justify-end gap-x-8 border-t px-8 py-8",
+                        "mx-8 rounded-6 border px-6 py-2 text-12",
                       )}
+                      ref={profileUrlSchemeInputRef}
+                      defaultValue={profileUrlSchemeQuery.data}
+                      key={profileUrlSchemeQuery.data}
+                    />
+                  </label>
+
+                  <span className={cx(secondaryColor, "px-8 text-12")}>
+                    …or select a preset:
+                  </span>
+
+                  <div className="flex flex-wrap gap-8 px-8">
+                    {(
+                      [
+                        "ivory",
+                        "elk",
+                        "icecubes",
+                        "mastodon.social",
+                        "mastodon.online",
+                      ] as const
+                    ).map((item) => {
+                      return (
+                        <React.Fragment key={item}>
+                          <button
+                            type="button"
+                            className={cx(accentColor, navButtonClassName)}
+                            onClick={() => {
+                              if (!profileUrlSchemeInputRef.current) {
+                                return;
+                              }
+
+                              profileUrlSchemeInputRef.current.value = {
+                                /**
+                                 * https://tapbots.com/support/ivory/tips/urlschemes
+                                 */
+                                ivory: "ivory://acct/user_profile/{account}",
+                                elk: "https://elk.zone/@{account}",
+                                icecubes: "icecubesapp:{profileUrl.noProtocol}",
+                                "mastodon.social":
+                                  "https://mastodon.social/@{account}",
+                                "mastodon.online":
+                                  "https://mastodon.online/@{account}",
+                              }[item];
+
+                              profileUrlSchemeInputRef.current.focus();
+                            }}
+                          >
+                            {
+                              {
+                                ivory: "Ivory",
+                                elk: "Elk",
+                                icecubes: "Ice Cubes",
+                                "mastodon.social": "mastodon.social",
+                                "mastodon.online": "mastodon.online",
+                              }[item]
+                            }
+                          </button>
+                        </React.Fragment>
+                      );
+                    })}
+                  </div>
+
+                  <div
+                    className={cx(
+                      borderColor,
+                      "flex justify-end gap-x-8 border-t px-8 py-8",
+                    )}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!profileUrlSchemeInputRef.current) {
+                          return;
+                        }
+
+                        profileUrlSchemeInputRef.current.value = "";
+                        profileUrlSchemeInputRef.current.focus();
+                      }}
+                      className={cx(secondaryColor, navButtonClassName)}
                     >
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (!profileUrlSchemeInputRef.current) {
-                            return;
-                          }
+                      Clear
+                    </button>
 
-                          profileUrlSchemeInputRef.current.value = "";
-                          profileUrlSchemeInputRef.current.focus();
-                        }}
-                        className={cx(secondaryColor, navButtonClassName)}
-                      >
-                        Clear
-                      </button>
-
-                      <button className={cx(accentColor, navButtonClassName)}>
-                        Save
-                      </button>
-                    </div>
-                  </form>
-                </Tabs.Content>
-              </Tabs.Root>
-            </Popover.Content>
-          </Popover.Root>
-        </div>
+                    <button className={cx(accentColor, navButtonClassName)}>
+                      Save
+                    </button>
+                  </div>
+                </form>
+              </Tabs.Content>
+            </Tabs.Root>
+          </Popover.Content>
+        </Popover.Root>
       </div>
     </div>
   );
