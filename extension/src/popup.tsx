@@ -85,7 +85,7 @@ const secondaryBg = cva("bg-[--gray-a2]")();
 
 const borderColor = cva("border-[--gray-a3]")();
 
-const navButtonClassName = cva([
+const navButton = cva([
   "h-[1.68em]",
   "min-w-[1.4em]",
   "flex",
@@ -281,7 +281,7 @@ function Popup() {
 
       <div className="absolute right-12 top-12 flex gap-8">
         {!!profilesQuery.data?.length && (
-          <span className={cx(accentColor, navButtonClassName)}>
+          <span className={cx(accentColor, navButton)}>
             {profilesQuery.data.length}
           </span>
         )}
@@ -289,7 +289,7 @@ function Popup() {
         <Popover.Root modal>
           <Popover.Close hidden ref={popoverCloseRef} />
 
-          <Popover.Trigger className={cx(accentColor, navButtonClassName)}>
+          <Popover.Trigger className={cx(accentColor, navButton)}>
             <svg
               fill="currentColor"
               className="aspect-square w-[1em]"
@@ -323,19 +323,19 @@ function Popup() {
                   <Tabs.List className="contents">
                     <Tabs.Trigger
                       value={Tab.openProfilesWith}
-                      className={cx(accentColor, navButtonClassName)}
+                      className={cx(accentColor, navButton)}
                     >
                       Open Profiles With…
                     </Tabs.Trigger>
                   </Tabs.List>
                   <Popover.Close
                     onClick={exportProfiles}
-                    className={cx(accentColor, navButtonClassName)}
+                    className={cx(accentColor, navButton)}
                   >
                     Export (.json)
                   </Popover.Close>
                   <Popover.Close
-                    className={cx(accentColor, navButtonClassName)}
+                    className={cx(accentColor, navButton)}
                     onClick={getOnClickLink(downloadLink[__TARGET__])}
                   >
                     Rate StreetPass
@@ -396,7 +396,7 @@ function Popup() {
                           <React.Fragment key={item}>
                             <button
                               type="button"
-                              className={cx(accentColor, navButtonClassName)}
+                              className={cx(accentColor, navButton)}
                               onClick={() => {
                                 if (!profileUrlSchemeInputRef.current) {
                                   return;
@@ -450,12 +450,12 @@ function Popup() {
                           profileUrlSchemeInputRef.current.value = "";
                           profileUrlSchemeInputRef.current.focus();
                         }}
-                        className={cx(secondaryColor, navButtonClassName)}
+                        className={cx(secondaryColor, navButton)}
                       >
                         Clear
                       </button>
 
-                      <button className={cx(accentColor, navButtonClassName)}>
+                      <button className={cx(accentColor, navButton)}>
                         Save
                       </button>
                     </div>
