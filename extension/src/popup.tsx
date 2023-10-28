@@ -237,7 +237,6 @@ function Popup() {
                     )}
                   </div>
                 </div>
-
                 <div className="flex min-w-0 grow flex-col">
                   <div className="flex items-baseline justify-between gap-x-6 leading-[1.45]">
                     <span
