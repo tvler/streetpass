@@ -213,7 +213,7 @@ function Popup() {
                   className="flex shrink-0 pr-[7px] pt-[4px]"
                   title={profileDisplayName}
                 >
-                  <div className="relative flex aspect-square w-[19px] shrink-0 overflow-hidden rounded-full">
+                  <div className="relative flex h-[19px] w-[19px] shrink-0 overflow-hidden rounded-full">
                     {hrefData.profileData.avatar ? (
                       <>
                         <img
@@ -222,6 +222,7 @@ function Popup() {
                           height={19}
                           className="object-cover"
                           loading="lazy"
+                          decoding="async"
                         />
 
                         <div
