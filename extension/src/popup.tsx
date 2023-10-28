@@ -29,31 +29,42 @@ enum Tab {
   openProfilesWith = "openProfilesWith",
 }
 
-function getOnClickLink(
-  hrefOrFn: string | (() => string),
-): React.DOMAttributes<HTMLElement>["onClick"] {
-  return async (ev) => {
-    ev.preventDefault();
-    const { metaKey } = ev;
+function getHrefProps(
+  baseHref: string,
+  actualHref?: string,
+): Pick<JSX.IntrinsicElements["a"], "href" | "onClick"> {
+  const href = actualHref ?? baseHref;
+  const isHrefHttpOrHttps = getIsUrlHttpOrHttps(href);
 
-    const href = typeof hrefOrFn === "string" ? hrefOrFn : hrefOrFn();
+  return {
+    /**
+     * If the link is a native app deeplink, make the href value the baseHref.
+     * The only reason the href value is set is to that right-click+copy url can work.
+     * And the ability to copy the basehref is more useful than a native app link.
+     */
+    href: isHrefHttpOrHttps ? href : baseHref,
 
-    if (getIsUrlHttpOrHttps(href)) {
-      await browser.tabs.create({
-        url: href,
-        active: !metaKey,
-      });
+    async onClick(ev) {
+      ev.preventDefault();
+      const { metaKey } = ev;
 
-      if (!metaKey) {
+      if (isHrefHttpOrHttps) {
+        await browser.tabs.create({
+          url: href,
+          active: !metaKey,
+        });
+
+        if (!metaKey) {
+          window.close();
+        }
+      } else {
+        await browser.tabs.update({
+          url: href,
+        });
+
         window.close();
       }
-    } else {
-      await browser.tabs.update({
-        url: href,
-      });
-
-      window.close();
-    }
+    },
   };
 }
 
@@ -97,6 +108,7 @@ const navButton = cva([
   "focus-visible:outline-none",
   "font-medium",
   "bg-faded",
+  "cursor-default",
 ])();
 
 function Popup() {
@@ -130,12 +142,12 @@ function Popup() {
           >
             <p>
               No profiles. Try{" "}
-              <span
-                onClick={getOnClickLink("https://streetpass.social/")}
+              <a
+                {...getHrefProps("https://streetpass.social")}
                 className={cx(accentColor, "cursor-pointer font-medium")}
               >
                 this
-              </span>
+              </a>
               !
             </p>
           </div>
@@ -148,7 +160,8 @@ function Popup() {
             : new Date().getDate();
           const previousItemWasDayBefore =
             prevHrefDate !== new Date(hrefData.viewedAt).getDate();
-          const onClickProfile = getOnClickLink(() =>
+          const profileHrefProps = getHrefProps(
+            hrefData.profileData.profileUrl,
             getProfileUrl(hrefData.profileData, profileUrlSchemeQuery.data),
           );
           const profileDisplayName = hrefData.profileData.account
@@ -195,9 +208,9 @@ function Popup() {
                   }
                 }}
               >
-                <div
+                <a
+                  {...profileHrefProps}
                   className="flex shrink-0 cursor-pointer pr-[7px] pt-[4px]"
-                  onClick={onClickProfile}
                   title={profileDisplayName}
                 >
                   <div className="relative flex aspect-square w-[19px] shrink-0 overflow-hidden rounded-full">
@@ -236,11 +249,11 @@ function Popup() {
                       </div>
                     )}
                   </div>
-                </div>
+                </a>
                 <div className="flex min-w-0 grow flex-col">
                   <div className="flex items-baseline justify-between gap-x-6 leading-[1.45]">
-                    <span
-                      onClick={onClickProfile}
+                    <a
+                      {...profileHrefProps}
                       className={cx(
                         accentColor,
                         "cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-medium",
@@ -248,7 +261,7 @@ function Popup() {
                       title={profileDisplayName}
                     >
                       {profileDisplayName}
-                    </span>
+                    </a>
 
                     <span
                       className={cx(secondaryColor, "shrink-0 text-[12px]")}
@@ -262,15 +275,15 @@ function Popup() {
                     </span>
                   </div>
 
-                  <span
-                    onClick={getOnClickLink(hrefData.websiteUrl)}
+                  <a
+                    {...getHrefProps(hrefData.websiteUrl)}
                     className={cx(
                       secondaryColor,
                       "cursor-pointer self-start break-all text-[12.5px] leading-[1.5]",
                     )}
                   >
                     {getDisplayHref(hrefData.websiteUrl)}
-                  </span>
+                  </a>
                 </div>
               </InView>
             </React.Fragment>
@@ -333,12 +346,13 @@ function Popup() {
                   >
                     Export (.json)
                   </Popover.Close>
-                  <Popover.Close
+
+                  <a
                     className={cx(accentColor, navButton)}
-                    onClick={getOnClickLink(downloadLink[__TARGET__])}
+                    {...getHrefProps(downloadLink[__TARGET__])}
                   >
                     Rate StreetPass
-                  </Popover.Close>
+                  </a>
                 </Tabs.Content>
 
                 <Tabs.Content
