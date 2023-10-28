@@ -1,3 +1,9 @@
+# 2023.19 (Oct 28, 2023)
+
+- Update all dependencies
+- Remove yahoo tracking params from streetpass list
+- Render links as anchor elements to allow for standard link right click options to show up
+
 # 2023.18
 
 - Dark mode
