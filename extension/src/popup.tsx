@@ -39,7 +39,7 @@ function getHrefProps(
   return {
     /**
      * If the link is a native app deeplink, make the href value the baseHref.
-     * The only reason the href value is set is to that right-click+copy url can work.
+     * The only reason the href value is set is so right-click+copy url can work.
      * And the ability to copy the basehref is more useful than a native app link.
      */
     href: isHrefHttpOrHttps ? href : baseHref,
