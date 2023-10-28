@@ -15,6 +15,11 @@ function getCurrentUrlSanitized() {
   url.searchParams.delete("utm_term");
   url.searchParams.delete("utm_content");
 
+  // Delete yahoo trackers https://github.com/brave/adblock-lists/pull/978/files
+  url.searchParams.delete("guccounter");
+  url.searchParams.delete("guce_referrer");
+  url.searchParams.delete("guce_referrer_sig");
+
   return url.toString();
 }
 
