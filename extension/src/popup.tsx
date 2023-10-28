@@ -144,7 +144,7 @@ function Popup() {
               No profiles. Try{" "}
               <a
                 {...getHrefProps("https://streetpass.social")}
-                className={cx(accentColor, "cursor-pointer font-medium")}
+                className={cx(accentColor, "font-medium")}
               >
                 this
               </a>
@@ -210,7 +210,7 @@ function Popup() {
               >
                 <a
                   {...profileHrefProps}
-                  className="flex shrink-0 cursor-pointer pr-[7px] pt-[4px]"
+                  className="flex shrink-0 pr-[7px] pt-[4px]"
                   title={profileDisplayName}
                 >
                   <div className="relative flex aspect-square w-[19px] shrink-0 overflow-hidden rounded-full">
@@ -256,7 +256,7 @@ function Popup() {
                       {...profileHrefProps}
                       className={cx(
                         accentColor,
-                        "cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-medium",
+                        "overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-medium",
                       )}
                       title={profileDisplayName}
                     >
@@ -279,7 +279,7 @@ function Popup() {
                     {...getHrefProps(hrefData.websiteUrl)}
                     className={cx(
                       secondaryColor,
-                      "cursor-pointer self-start break-all text-[12.5px] leading-[1.5]",
+                      "self-start break-all text-[12.5px] leading-[1.5]",
                     )}
                   >
                     {getDisplayHref(hrefData.websiteUrl)}
