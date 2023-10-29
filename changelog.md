@@ -1,3 +1,7 @@
+# 2023.20 (Oct 28, 2023)
+
+- Reset your StreetPass list
+
 # 2023.19 (Oct 28, 2023)
 
 - Update all dependencies
