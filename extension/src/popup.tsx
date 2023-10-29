@@ -144,7 +144,7 @@ function Popup() {
               No profiles. Try{" "}
               <a
                 {...getHrefProps("https://streetpass.social")}
-                className={cx(accentColor, "cursor-pointer font-medium")}
+                className={cx(accentColor, "font-medium")}
               >
                 this
               </a>
@@ -210,10 +210,10 @@ function Popup() {
               >
                 <a
                   {...profileHrefProps}
-                  className="flex shrink-0 cursor-pointer pr-[7px] pt-[4px]"
+                  className="flex shrink-0 pr-[7px] pt-[4px]"
                   title={profileDisplayName}
                 >
-                  <div className="relative flex aspect-square w-[19px] shrink-0 overflow-hidden rounded-full">
+                  <div className="relative flex h-[19px] w-[19px] shrink-0 overflow-hidden rounded-full">
                     {hrefData.profileData.avatar ? (
                       <>
                         <img
@@ -222,6 +222,7 @@ function Popup() {
                           height={19}
                           className="object-cover"
                           loading="lazy"
+                          decoding="async"
                         />
 
                         <div
@@ -256,7 +257,7 @@ function Popup() {
                       {...profileHrefProps}
                       className={cx(
                         accentColor,
-                        "cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-medium",
+                        "overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-medium",
                       )}
                       title={profileDisplayName}
                     >
@@ -279,7 +280,7 @@ function Popup() {
                     {...getHrefProps(hrefData.websiteUrl)}
                     className={cx(
                       secondaryColor,
-                      "cursor-pointer self-start break-all text-[12.5px] leading-[1.5]",
+                      "self-start break-all text-[12.5px] leading-[1.5]",
                     )}
                   >
                     {getDisplayHref(hrefData.websiteUrl)}
@@ -346,6 +347,24 @@ function Popup() {
                   >
                     Export (.json)
                   </Popover.Close>
+
+                  <ConfirmButton
+                    className={cx(
+                      "data-[confirm]:text-[--red-10]",
+                      accentColor,
+                      navButton,
+                    )}
+                    onClick={async () => {
+                      popoverCloseRef.current?.click();
+                      await getHrefStore(() => {
+                        return new Map();
+                      });
+                      queryClient.refetchQueries();
+                    }}
+                    confirmJsx=" (Confirm)"
+                  >
+                    Reset
+                  </ConfirmButton>
 
                   <a
                     className={cx(accentColor, navButton)}
@@ -481,6 +500,34 @@ function Popup() {
         </Popover.Root>
       </div>
     </div>
+  );
+}
+
+function ConfirmButton(
+  props: {
+    confirmJsx: React.ReactNode;
+  } & Pick<
+    JSX.IntrinsicElements["button"],
+    "onClick" | "className" | "children"
+  >,
+) {
+  const [confirm, setConfirm] = React.useState(false);
+
+  return (
+    <button
+      data-confirm={confirm ? "" : undefined}
+      className={props.className}
+      onClick={
+        confirm
+          ? props.onClick
+          : () => {
+              setConfirm(true);
+            }
+      }
+    >
+      {props.children}
+      {confirm && props.confirmJsx}
+    </button>
   );
 }
 
