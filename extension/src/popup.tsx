@@ -361,7 +361,7 @@ function Popup() {
                       });
                       queryClient.refetchQueries();
                     }}
-                    confirmJsx={<> (Confirm)</>}
+                    confirmJsx=" (Confirm)"
                   >
                     Reset
                   </ConfirmButton>
