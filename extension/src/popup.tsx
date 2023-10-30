@@ -93,23 +93,38 @@ const secondaryColor = cva(["text-[--gray-a11]"])();
 
 const primaryBg = cva(["bg-white", "dark:bg-[--slate-4]"])();
 const secondaryBg = cva("bg-[--gray-a2]")();
+const accentBg = cva(["bg-[#5f55ec]", "dark:bg-[--iris-11]"])();
 
 const borderColor = cva("border-[--gray-a3]")();
 
-const navButton = cva([
-  "h-[1.68em]",
-  "min-w-[1.4em]",
-  "flex",
-  "items-center",
-  "justify-center",
-  "rounded-6",
-  "px-[0.38em]",
-  "text-11",
-  "focus-visible:outline-none",
-  "font-medium",
-  "bg-faded",
-  "cursor-default",
-])();
+const baseNavButton = cva(
+  [
+    "h-[1.68em]",
+    "min-w-[1.4em]",
+    "flex",
+    "items-center",
+    "justify-center",
+    "rounded-6",
+    "px-[0.38em]",
+    "text-11",
+    "focus-visible:outline-none",
+    "font-medium",
+    "cursor-default",
+  ],
+  {
+    variants: {
+      bg: {
+        faded: "bg-faded",
+        accent: accentBg,
+      },
+    },
+    defaultVariants: {
+      bg: "faded",
+    },
+  },
+);
+const navButton = baseNavButton();
+const accentNavButton = baseNavButton({ bg: "accent" });
 
 function Popup() {
   const profilesQuery = useProfilesQuery();
@@ -152,6 +167,30 @@ function Popup() {
             </p>
           </div>
         )}
+
+        <div
+          className={cx(
+            accentColor,
+            "flex items-center gap-x-8 rounded-6 bg-faded px-8 py-12",
+          )}
+        >
+          <img
+            width={36}
+            height={36}
+            loading="lazy"
+            decoding="async"
+            className="rounded-full object-contain"
+            src="https://files.mastodon.social/accounts/avatars/000/134/637/original/ba15acbca0323538.jpeg"
+          />
+          <div className="flex flex-col items-start">
+            <span className={cx("text-[--slate-4]", accentNavButton)}>
+              Current Tab
+            </span>
+            <a href="#" className="text-[12.5px] font-medium">
+              @tvler@mastodon.social
+            </a>
+          </div>
+        </div>
 
         {profilesQuery.data?.map((hrefData, index, arr) => {
           const prevHrefData = arr[index - 1];
