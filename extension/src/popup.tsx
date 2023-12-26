@@ -69,18 +69,13 @@ function getHrefProps(
 }
 
 const useProfilesQuery = createQuery({
-  primaryKey: "profiles",
-  async queryFn() {
-    const profiles = getProfiles(await getHrefStore());
-    return profiles;
-  },
+  queryKey: ["profiles"],
+  fetcher: async () => getProfiles(await getHrefStore()),
 });
 
 const useProfileUrlSchemeQuery = createQuery({
-  primaryKey: "profileurlscheme",
-  queryFn() {
-    return getProfileUrlScheme();
-  },
+  queryKey: ["profileurlscheme"],
+  fetcher: () => getProfileUrlScheme(),
 });
 
 const queryClient = new QueryClient({
@@ -110,8 +105,6 @@ const navButton = cva([
   "bg-faded",
   "cursor-default",
 ])();
-
-const listGap = cva("gap-18")();
 
 function Popup() {
   const profilesQuery = useProfilesQuery();

@@ -1221,28 +1221,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/query-core@npm:5.7.2":
-  version: 5.7.2
-  resolution: "@tanstack/query-core@npm:5.7.2"
-  checksum: a0c5ad7e7297db6ef9b99f8fb3d74bd748efef8c583257c87339a376cab4d13ad00f61adf38090b8ed4863e7ac48b3a3b6f50717ba99a015e0dc85b8c5e66329
+"@tanstack/query-core@npm:5.14.2":
+  version: 5.14.2
+  resolution: "@tanstack/query-core@npm:5.14.2"
+  checksum: 978427a0bde5ed7ba9eacb7b15f2c384b049b7b90b10d9fe28d7bd4130fbf92980fa9907ccfeb90ebca8f385ad7760c359095af9b65b1ae6431aac01b4f42939
   languageName: node
   linkType: hard
 
-"@tanstack/react-query@npm:^5.7.2":
-  version: 5.7.2
-  resolution: "@tanstack/react-query@npm:5.7.2"
+"@tanstack/react-query@npm:^5.15.0":
+  version: 5.15.0
+  resolution: "@tanstack/react-query@npm:5.15.0"
   dependencies:
-    "@tanstack/query-core": 5.7.2
+    "@tanstack/query-core": 5.14.2
   peerDependencies:
     react: ^18.0.0
-    react-dom: ^18.0.0
-    react-native: "*"
-  peerDependenciesMeta:
-    react-dom:
-      optional: true
-    react-native:
-      optional: true
-  checksum: 99f99e89a82796b1a50696bdaec1b5880d446b497b336237a93ed89ccafa02df86c3f99de71f74ff44f8d0218ed79567fed39cf4fe709a095306f108afc10be1
+  checksum: 9dbe763a6109ebcf91178cc8b4f4172cf207c1ae3009f2e35b7c496447c3ba654cb190d974d0dc340d29cc7e50ad749a1b521c1de40245eb2bfafecfe2e106c3
   languageName: node
   linkType: hard
 
@@ -2778,7 +2771,7 @@ __metadata:
     "@radix-ui/colors": ^3.0.0
     "@radix-ui/react-popover": ^1.0.7
     "@radix-ui/react-tabs": ^1.0.4
-    "@tanstack/react-query": ^5.7.2
+    "@tanstack/react-query": ^5.15.0
     "@types/react": ^18.2.21
     "@types/react-dom": ^18.2.7
     "@types/webextension-polyfill": ^0.10.2
@@ -2797,8 +2790,8 @@ __metadata:
     prettier-plugin-tailwindcss: ^0.5.5
     react: ^18.2.0
     react-dom: ^18.2.0
-    react-intersection-observer: ^9.5.2
-    react-query-kit: ^2.0.8
+    react-intersection-observer: ^9.5.3
+    react-query-kit: ^3.1.0
     tailwindcss: ^3.3.3
     ts-essentials: ^9.4.0
     typescript: 5.2.2
@@ -4576,12 +4569,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-intersection-observer@npm:^9.5.2":
-  version: 9.5.2
-  resolution: "react-intersection-observer@npm:9.5.2"
+"react-intersection-observer@npm:^9.5.3":
+  version: 9.5.3
+  resolution: "react-intersection-observer@npm:9.5.3"
   peerDependencies:
     react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
-  checksum: cdbe40544930d59fc3820bce017fb688910cbecd7baaf382387a3d60d98a36e1d1e4bc27a876775e99b2a9f86762286a29d7bca21f3345f653cff29850c2641d
+  checksum: 2281912a9fe7a52bb1237c1b5299873beee358f79325eb9ba80fc0e4b7640963c1b27528f873453746e93981c503f880fdea9f786ebeae2e6a4216b50d180941
   languageName: node
   linkType: hard
 
@@ -4592,15 +4585,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-query-kit@npm:^2.0.8":
-  version: 2.0.8
-  resolution: "react-query-kit@npm:2.0.8"
+"react-query-kit@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "react-query-kit@npm:3.1.0"
   peerDependencies:
     "@tanstack/react-query": ^4 || ^5
   peerDependenciesMeta:
     "@tanstack/react-query":
       optional: true
-  checksum: 24cf99a47aa5bd965bf8ee3a2f999f4678ebd382fce6a33f9b2dba39364c1fc700caf7ed10aa80f6dbfc5f9d7489ee77ae14f8ad81be75a4ebb802d92c8f855e
+  checksum: de459d7cb8f3fd8881ea33fcd1657cbc198c9c8ab8f28aed17a204edb2be57e4b36f85a573fff9e83cf22f5df06b008163d3641465e1f4c184a141423ad5dbe3
   languageName: node
   linkType: hard
 
