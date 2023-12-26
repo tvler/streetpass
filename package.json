@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "description": "",
   "engines": {
-    "node": "18.x"
+    "node": "20.x"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -15,5 +15,5 @@
   ],
   "author": "",
   "license": "MIT",
-  "packageManager": "yarn@3.3.1"
+  "packageManager": "yarn@4.0.2"
 }
