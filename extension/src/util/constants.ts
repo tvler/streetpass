@@ -49,6 +49,8 @@ export type HrefData = {
   relMeHref: string;
   updatedAt?: number;
 };
+export type HrefDataType<T extends HrefData["profileData"]["type"]> =
+  HrefData & { profileData: Extract<ProfileData, { type: T }> };
 
 export type HrefStore = Map<string, HrefData>;
 

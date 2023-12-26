@@ -6,7 +6,7 @@ import * as Popover from "@radix-ui/react-popover";
 import * as Tabs from "@radix-ui/react-tabs";
 import { createQuery } from "react-query-kit";
 import { InView } from "react-intersection-observer";
-import { Message, MessageReturn } from "./util/constants";
+import { HrefDataType, Message, MessageReturn } from "./util/constants";
 import { getDisplayHref } from "./util/getDisplayHref";
 import { exportProfiles } from "./util/exportProfiles";
 import { getProfiles } from "./util/getProfiles";
@@ -111,6 +111,8 @@ const navButton = cva([
   "cursor-default",
 ])();
 
+const listGap = cva("gap-18")();
+
 function Popup() {
   const profilesQuery = useProfilesQuery();
   const profileUrlSchemeQuery = useProfileUrlSchemeQuery();
@@ -132,27 +134,22 @@ function Popup() {
         </h1>
       </div>
 
-      <div className="flex flex-col gap-[18px] px-12 py-[18px]">
-        {profilesQuery.data?.length === 0 && (
-          <div
-            className={cx(
-              secondaryColor,
-              "absolute inset-0 flex items-center justify-center text-13",
-            )}
-          >
-            <p>
-              No profiles. Try{" "}
-              <a
-                {...getHrefProps("https://streetpass.social")}
-                className={cx(accentColor, "font-medium")}
-              >
-                this
-              </a>
-              !
-            </p>
-          </div>
-        )}
+      {profilesQuery.data?.length === 0 && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <p className={cx(secondaryColor, "text-13")}>
+            No profiles Try{" "}
+            <a
+              {...getHrefProps("https://streetpass.social")}
+              className={cx(accentColor, "font-medium")}
+            >
+              this
+            </a>
+            !
+          </p>
+        </div>
+      )}
 
+      <div className="flex grow flex-col gap-[18px] px-12 py-[18px]">
         {profilesQuery.data?.map((hrefData, index, arr) => {
           const prevHrefData = arr[index - 1];
           const prevHrefDate = prevHrefData
@@ -290,6 +287,157 @@ function Popup() {
             </React.Fragment>
           );
         })}
+
+        <details
+          className="mt-auto"
+          tabIndex={
+            /* safari autofocuses this element when the popup opens */
+            -1
+          }
+        >
+          <summary className={cx(secondaryColor, "text-13")}>Hidden</summary>
+
+          <div className="flex flex-col gap-[18px] pt-[18px]">
+            {profilesQuery.data?.map((hrefData, index, arr) => {
+              const prevHrefData = arr[index - 1];
+              const prevHrefDate = prevHrefData
+                ? new Date(prevHrefData.viewedAt).getDate()
+                : new Date().getDate();
+              const previousItemWasDayBefore =
+                prevHrefDate !== new Date(hrefData.viewedAt).getDate();
+              const profileHrefProps = getHrefProps(
+                hrefData.profileData.profileUrl,
+                getProfileUrl(hrefData.profileData, profileUrlSchemeQuery.data),
+              );
+              const profileDisplayName = hrefData.profileData.account
+                ? `@${hrefData.profileData.account}`
+                : getDisplayHref(hrefData.profileData.profileUrl);
+
+              return (
+                <React.Fragment key={`${index}.${hrefData.relMeHref}`}>
+                  {previousItemWasDayBefore && (
+                    <p className={cx(secondaryColor, "shrink-0 text-13")}>
+                      {new Intl.DateTimeFormat(undefined, {
+                        day: "numeric",
+                        month: "short",
+                      }).format(hrefData.viewedAt)}
+                    </p>
+                  )}
+
+                  <InView
+                    as="div"
+                    className="flex items-start"
+                    triggerOnce
+                    onChange={async (inView) => {
+                      if (!inView) {
+                        return;
+                      }
+
+                      try {
+                        const message: Message = {
+                          name: "FETCH_PROFILE_UPDATE",
+                          args: {
+                            relMeHref: hrefData.relMeHref,
+                          },
+                        };
+                        const resp =
+                          await MessageReturn.FETCH_PROFILE_UPDATE.parse(
+                            browser.runtime.sendMessage(message),
+                          );
+                        if (!resp) {
+                          return;
+                        }
+
+                        queryClient.refetchQueries();
+                      } catch (err) {
+                        console.error(err);
+                      }
+                    }}
+                  >
+                    <a
+                      {...profileHrefProps}
+                      className="flex shrink-0 pr-[7px] pt-[4px]"
+                      title={profileDisplayName}
+                    >
+                      <div className="relative flex h-[19px] w-[19px] shrink-0 overflow-hidden rounded-full">
+                        {hrefData.profileData.avatar ? (
+                          <>
+                            <img
+                              src={hrefData.profileData.avatar}
+                              width={19}
+                              height={19}
+                              className="object-cover"
+                              loading="lazy"
+                              decoding="async"
+                            />
+
+                            <div
+                              className={cx(
+                                primaryColor,
+                                "pointer-events-none absolute inset-0 rounded-[inherit] border border-current opacity-[0.14]",
+                              )}
+                            />
+                          </>
+                        ) : (
+                          <div
+                            className={cx(
+                              accentColor,
+                              "flex w-full items-center justify-center bg-faded",
+                            )}
+                          >
+                            <svg
+                              viewBox="0 0 40 37"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="w-[12px]"
+                            >
+                              {nullIconJsx}
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                    </a>
+                    <div className="flex min-w-0 grow flex-col">
+                      <div className="flex items-baseline justify-between gap-x-6 leading-[1.45]">
+                        <a
+                          {...profileHrefProps}
+                          className={cx(
+                            accentColor,
+                            "overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-medium",
+                          )}
+                          title={profileDisplayName}
+                        >
+                          {profileDisplayName}
+                        </a>
+
+                        <span
+                          className={cx(secondaryColor, "shrink-0 text-[12px]")}
+                        >
+                          {new Intl.DateTimeFormat(undefined, {
+                            timeStyle: "short",
+                          })
+                            .format(hrefData.viewedAt)
+                            .toLowerCase()
+                            .replace(/\s+/g, "")}
+                        </span>
+                      </div>
+
+                      <a
+                        {...getHrefProps(hrefData.websiteUrl)}
+                        className={cx(
+                          secondaryColor,
+                          "self-start break-all text-[12.5px] leading-[1.5]",
+                        )}
+                      >
+                        {getDisplayHref(hrefData.websiteUrl)}
+                      </a>
+                    </div>
+                  </InView>
+                </React.Fragment>
+              );
+            })}
+          </div>
+        </details>
       </div>
 
       <div className="absolute right-12 top-12 flex gap-8">
@@ -530,6 +678,8 @@ function ConfirmButton(
     </button>
   );
 }
+
+function ProfileListItem(props: { hrefData: HrefDataType<"profile"> }) {}
 
 const nullIconJsx = (
   <>
