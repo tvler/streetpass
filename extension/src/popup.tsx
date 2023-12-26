@@ -150,7 +150,7 @@ function Popup() {
         <details
           className="mt-auto"
           tabIndex={
-            /* safari autofocuses this element when the popup opens */
+            /* Safari autofocuses this element when the popup opens */
             -1
           }
         >
