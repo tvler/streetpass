@@ -8,7 +8,6 @@ import { createQuery } from "react-query-kit";
 import { InView } from "react-intersection-observer";
 import {
   HrefDataType,
-  HrefStore,
   MaybePromise,
   Message,
   MessageReturn,
@@ -26,7 +25,6 @@ import { cva, cx } from "class-variance-authority";
 import { getProfileUrl } from "./util/getProfileUrl";
 import { getIsUrlHttpOrHttps } from "./util/getIsUrlHttpOrHttps";
 import { downloadLink } from "../../constants";
-import { DeepReadonly } from "ts-essentials";
 
 getIconState(() => {
   return { state: "off" };
