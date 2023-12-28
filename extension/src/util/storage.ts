@@ -112,14 +112,32 @@ export const getHrefStore = storageFactory({
   async onChange({ prev, curr }) {
     const prevProfiles = getProfiles(prev);
     const currProfiles = getProfiles(curr);
-    if (currProfiles.length > prevProfiles.length) {
-      getIconState((iconState) => ({
-        state: "on",
-        unreadCount:
-          (iconState.unreadCount ?? 0) +
-          (currProfiles.length - prevProfiles.length),
-      }));
+    const profilesDiff = currProfiles.length - prevProfiles.length;
+    if (profilesDiff <= 0) {
+      return;
     }
+
+    {
+      const prevHiddenProfiles = getProfiles(prev, { hidden: true });
+      const currHiddenProfiles = getProfiles(curr, { hidden: true });
+      const hiddenProfilesDiff =
+        prevHiddenProfiles.length - currHiddenProfiles.length;
+
+      /**
+       * Early exit if we are just moving profiles from hidden to non hidden.
+       * This can def be figured out in a better way by figuring out the exact
+       * profiles that were added. This is just easier and prob won't break
+       * anything.
+       */
+      if (hiddenProfilesDiff === profilesDiff) {
+        return;
+      }
+    }
+
+    getIconState((iconState) => ({
+      state: "on",
+      unreadCount: (iconState.unreadCount ?? 0) + profilesDiff,
+    }));
   },
 });
 
@@ -130,6 +148,16 @@ export const getProfileUrlScheme = storageFactory({
   },
   serialize(data) {
     return data ?? "";
+  },
+});
+
+export const getHideProfilesOnClick = storageFactory({
+  storageKey: "hide-profiles-on-click-1",
+  parse(storageData: boolean) {
+    return storageData ?? false;
+  },
+  serialize(data) {
+    return data;
   },
 });
 

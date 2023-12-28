@@ -6,7 +6,12 @@ import * as Popover from "@radix-ui/react-popover";
 import * as Tabs from "@radix-ui/react-tabs";
 import { createQuery } from "react-query-kit";
 import { InView } from "react-intersection-observer";
-import { Message, MessageReturn } from "./util/constants";
+import {
+  HrefDataType,
+  MaybePromise,
+  Message,
+  MessageReturn,
+} from "./util/constants";
 import { getDisplayHref } from "./util/getDisplayHref";
 import { exportProfiles } from "./util/exportProfiles";
 import { getProfiles } from "./util/getProfiles";
@@ -14,6 +19,7 @@ import {
   getIconState,
   getHrefStore,
   getProfileUrlScheme,
+  getHideProfilesOnClick,
 } from "./util/storage";
 import { cva, cx } from "class-variance-authority";
 import { getProfileUrl } from "./util/getProfileUrl";
@@ -29,26 +35,20 @@ enum Tab {
   openProfilesWith = "openProfilesWith",
 }
 
+const hideProfilesFormId = "hideProfilesFormId";
+
 function getHrefProps(
   baseHref: string,
-  actualHref?: string,
+  getActualHref?: () => MaybePromise<string>,
 ): Pick<JSX.IntrinsicElements["a"], "href" | "onClick"> {
-  const href = actualHref ?? baseHref;
-  const isHrefHttpOrHttps = getIsUrlHttpOrHttps(href);
-
   return {
-    /**
-     * If the link is a native app deeplink, make the href value the baseHref.
-     * The only reason the href value is set is so right-click+copy url can work.
-     * And the ability to copy the basehref is more useful than a native app link.
-     */
-    href: isHrefHttpOrHttps ? href : baseHref,
-
+    href: baseHref,
     async onClick(ev) {
       ev.preventDefault();
       const { metaKey } = ev;
 
-      if (isHrefHttpOrHttps) {
+      const href = (await getActualHref?.()) ?? baseHref;
+      if (getIsUrlHttpOrHttps(href)) {
         await browser.tabs.create({
           url: href,
           active: !metaKey,
@@ -68,19 +68,25 @@ function getHrefProps(
   };
 }
 
-const useProfilesQuery = createQuery({
-  primaryKey: "profiles",
-  async queryFn() {
-    const profiles = getProfiles(await getHrefStore());
-    return profiles;
+const useHrefStoreQuery = createQuery({
+  queryKey: ["profiles"],
+  async fetcher() {
+    const hrefStore = await getHrefStore();
+    return {
+      profiles: getProfiles(hrefStore),
+      hiddenProfiles: getProfiles(hrefStore, { hidden: true }),
+    };
   },
 });
 
 const useProfileUrlSchemeQuery = createQuery({
-  primaryKey: "profileurlscheme",
-  queryFn() {
-    return getProfileUrlScheme();
-  },
+  queryKey: ["profileurlscheme"],
+  fetcher: () => getProfileUrlScheme(),
+});
+
+const useHideProfilesOnClickQuery = createQuery({
+  queryKey: ["hideprofilesonclick"],
+  fetcher: () => getHideProfilesOnClick(),
 });
 
 const queryClient = new QueryClient({
@@ -109,11 +115,16 @@ const navButton = cva([
   "font-medium",
   "bg-faded",
   "cursor-default",
+  "shrink-0",
 ])();
 
+const checkbox = cva("scale-[0.82]")();
+
 function Popup() {
-  const profilesQuery = useProfilesQuery();
+  const [hideProfiles, setHideProfiles] = React.useState(false);
+  const hrefStoreQuery = useHrefStoreQuery();
   const profileUrlSchemeQuery = useProfileUrlSchemeQuery();
+  const hideProfilesOnClickQuery = useHideProfilesOnClickQuery();
   const popoverCloseRef = React.useRef<HTMLButtonElement>(null);
   const profileUrlSchemeInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -132,170 +143,92 @@ function Popup() {
         </h1>
       </div>
 
-      <div className="flex flex-col gap-[18px] px-12 py-[18px]">
-        {profilesQuery.data?.length === 0 && (
-          <div
-            className={cx(
-              secondaryColor,
-              "absolute inset-0 flex items-center justify-center text-13",
-            )}
+      <div className="flex grow flex-col gap-[18px] px-12 py-[18px]">
+        <Profiles
+          hideProfiles={hideProfiles}
+          profiles={hrefStoreQuery.data?.profiles}
+        />
+
+        {!!hrefStoreQuery.data?.hiddenProfiles.length && (
+          <details
+            className="peer mt-auto"
+            tabIndex={
+              /* Safari autofocuses this element when the popup opens */
+              -1
+            }
           >
-            <p>
-              No profiles. Try{" "}
-              <a
-                {...getHrefProps("https://streetpass.social")}
-                className={cx(accentColor, "font-medium")}
-              >
-                this
-              </a>
-              !
+            <summary className={cx(secondaryColor, "text-13")}>Hidden</summary>
+
+            <div className="flex flex-col gap-[18px] pt-[18px]">
+              <Profiles
+                hideProfiles={hideProfiles}
+                profiles={hrefStoreQuery.data?.hiddenProfiles}
+              />
+            </div>
+          </details>
+        )}
+
+        {hrefStoreQuery.data?.profiles.length === 0 && (
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center peer-open:hidden">
+            <p className={cx(secondaryColor, "pointer-events-auto text-13")}>
+              No profiles
+              {hrefStoreQuery.data.hiddenProfiles.length === 0 && (
+                <>
+                  . Try{" "}
+                  <a
+                    {...getHrefProps("https://streetpass.social")}
+                    className={cx(accentColor, "font-medium")}
+                  >
+                    this
+                  </a>
+                  !
+                </>
+              )}
             </p>
           </div>
         )}
-
-        {profilesQuery.data?.map((hrefData, index, arr) => {
-          const prevHrefData = arr[index - 1];
-          const prevHrefDate = prevHrefData
-            ? new Date(prevHrefData.viewedAt).getDate()
-            : new Date().getDate();
-          const previousItemWasDayBefore =
-            prevHrefDate !== new Date(hrefData.viewedAt).getDate();
-          const profileHrefProps = getHrefProps(
-            hrefData.profileData.profileUrl,
-            getProfileUrl(hrefData.profileData, profileUrlSchemeQuery.data),
-          );
-          const profileDisplayName = hrefData.profileData.account
-            ? `@${hrefData.profileData.account}`
-            : getDisplayHref(hrefData.profileData.profileUrl);
-
-          return (
-            <React.Fragment key={`${index}.${hrefData.relMeHref}`}>
-              {previousItemWasDayBefore && (
-                <p className={cx(secondaryColor, "shrink-0 text-13")}>
-                  {new Intl.DateTimeFormat(undefined, {
-                    day: "numeric",
-                    month: "short",
-                  }).format(hrefData.viewedAt)}
-                </p>
-              )}
-
-              <InView
-                as="div"
-                className="flex items-start"
-                triggerOnce
-                onChange={async (inView) => {
-                  if (!inView) {
-                    return;
-                  }
-
-                  try {
-                    const message: Message = {
-                      name: "FETCH_PROFILE_UPDATE",
-                      args: {
-                        relMeHref: hrefData.relMeHref,
-                      },
-                    };
-                    const resp = await MessageReturn.FETCH_PROFILE_UPDATE.parse(
-                      browser.runtime.sendMessage(message),
-                    );
-                    if (!resp) {
-                      return;
-                    }
-
-                    queryClient.refetchQueries();
-                  } catch (err) {
-                    console.error(err);
-                  }
-                }}
-              >
-                <a
-                  {...profileHrefProps}
-                  className="flex shrink-0 pr-[7px] pt-[4px]"
-                  title={profileDisplayName}
-                >
-                  <div className="relative flex h-[19px] w-[19px] shrink-0 overflow-hidden rounded-full">
-                    {hrefData.profileData.avatar ? (
-                      <>
-                        <img
-                          src={hrefData.profileData.avatar}
-                          width={19}
-                          height={19}
-                          className="object-cover"
-                          loading="lazy"
-                          decoding="async"
-                        />
-
-                        <div
-                          className={cx(
-                            primaryColor,
-                            "pointer-events-none absolute inset-0 rounded-[inherit] border border-current opacity-[0.14]",
-                          )}
-                        />
-                      </>
-                    ) : (
-                      <div
-                        className={cx(
-                          accentColor,
-                          "flex w-full items-center justify-center bg-faded",
-                        )}
-                      >
-                        <svg
-                          viewBox="0 0 40 37"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="w-[12px]"
-                        >
-                          {nullIconJsx}
-                        </svg>
-                      </div>
-                    )}
-                  </div>
-                </a>
-                <div className="flex min-w-0 grow flex-col">
-                  <div className="flex items-baseline justify-between gap-x-6 leading-[1.45]">
-                    <a
-                      {...profileHrefProps}
-                      className={cx(
-                        accentColor,
-                        "overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-medium",
-                      )}
-                      title={profileDisplayName}
-                    >
-                      {profileDisplayName}
-                    </a>
-
-                    <span
-                      className={cx(secondaryColor, "shrink-0 text-[12px]")}
-                    >
-                      {new Intl.DateTimeFormat(undefined, {
-                        timeStyle: "short",
-                      })
-                        .format(hrefData.viewedAt)
-                        .toLowerCase()
-                        .replace(/\s+/g, "")}
-                    </span>
-                  </div>
-
-                  <a
-                    {...getHrefProps(hrefData.websiteUrl)}
-                    className={cx(
-                      secondaryColor,
-                      "self-start break-all text-[12.5px] leading-[1.5]",
-                    )}
-                  >
-                    {getDisplayHref(hrefData.websiteUrl)}
-                  </a>
-                </div>
-              </InView>
-            </React.Fragment>
-          );
-        })}
       </div>
 
-      <div className="absolute right-12 top-12 flex gap-8">
-        {!!profilesQuery.data?.length && (
+      <div
+        className="absolute right-12 top-12 flex gap-8"
+        hidden={!hideProfiles}
+      >
+        <form
+          id={hideProfilesFormId}
+          className="contents"
+          onSubmit={async (ev) => {
+            ev.preventDefault();
+            const formData = new FormData(ev.currentTarget);
+
+            await getHrefStore((prev) => {
+              const hrefStore = new Map(prev);
+
+              for (const [key, hrefData] of hrefStore) {
+                const hidden = formData.get(key) === "on";
+                hrefStore.set(key, {
+                  ...hrefData,
+                  hidden: hidden,
+                });
+              }
+
+              return hrefStore;
+            });
+
+            setHideProfiles((prev) => !prev);
+            queryClient.refetchQueries();
+          }}
+        >
+          <button className={cx(navButton, accentColor)}>Save</button>
+        </form>
+      </div>
+
+      <div
+        className="absolute right-12 top-12 flex gap-8"
+        hidden={hideProfiles}
+      >
+        {!!hrefStoreQuery.data?.profiles.length && (
           <span className={cx(accentColor, navButton)}>
-            {profilesQuery.data.length}
+            {hrefStoreQuery.data?.profiles.length}
           </span>
         )}
 
@@ -341,6 +274,29 @@ function Popup() {
                       Open Profiles With…
                     </Tabs.Trigger>
                   </Tabs.List>
+
+                  <Popover.Close
+                    className={cx(accentColor, navButton)}
+                    onClick={() => {
+                      setHideProfiles((prev) => !prev);
+                    }}
+                  >
+                    Hide Profiles…
+                  </Popover.Close>
+
+                  <label className={cx(accentColor, navButton)}>
+                    Hide Profiles On Click&nbsp;
+                    <input
+                      type="checkbox"
+                      defaultChecked={hideProfilesOnClickQuery.data}
+                      className={checkbox}
+                      onChange={async (ev) => {
+                        await getHideProfilesOnClick(() => ev.target.checked);
+                        queryClient.refetchQueries();
+                      }}
+                    />
+                  </label>
+
                   <Popover.Close
                     onClick={exportProfiles}
                     className={cx(accentColor, navButton)}
@@ -529,6 +485,180 @@ function ConfirmButton(
       {confirm && props.confirmJsx}
     </button>
   );
+}
+
+function Profiles(props: {
+  profiles: Array<HrefDataType<"profile">> | undefined;
+  hideProfiles: boolean;
+}) {
+  return props.profiles?.map((hrefData, index, arr) => {
+    const prevHrefData = arr[index - 1];
+    const prevHrefDate = prevHrefData
+      ? new Date(prevHrefData.viewedAt).getDate()
+      : new Date().getDate();
+    const previousItemWasDayBefore =
+      prevHrefDate !== new Date(hrefData.viewedAt).getDate();
+    const profileHrefProps = getHrefProps(
+      hrefData.profileData.profileUrl,
+      async () => {
+        const [profileUrlScheme, hideProfilesOnClick] = await Promise.all([
+          queryClient.fetchQuery(useProfileUrlSchemeQuery.getFetchOptions()),
+          queryClient.fetchQuery(useHideProfilesOnClickQuery.getFetchOptions()),
+        ]);
+
+        if (hideProfilesOnClick) {
+          await getHrefStore((prev) =>
+            new Map(prev).set(hrefData.relMeHref, {
+              ...hrefData,
+              hidden: true,
+            }),
+          );
+
+          queryClient.refetchQueries();
+        }
+
+        return getProfileUrl(hrefData.profileData, profileUrlScheme);
+      },
+    );
+    const profileDisplayName = hrefData.profileData.account
+      ? `@${hrefData.profileData.account}`
+      : getDisplayHref(hrefData.profileData.profileUrl);
+
+    return (
+      <React.Fragment key={`${index}.${hrefData.relMeHref}`}>
+        {previousItemWasDayBefore && (
+          <p className={cx(secondaryColor, "shrink-0 text-13")}>
+            {new Intl.DateTimeFormat(undefined, {
+              day: "numeric",
+              month: "short",
+            }).format(hrefData.viewedAt)}
+          </p>
+        )}
+
+        <InView
+          as="div"
+          className="flex items-start"
+          triggerOnce
+          onChange={async (inView) => {
+            if (!inView) {
+              return;
+            }
+
+            try {
+              const message: Message = {
+                name: "FETCH_PROFILE_UPDATE",
+                args: {
+                  relMeHref: hrefData.relMeHref,
+                },
+              };
+              const resp = await MessageReturn.FETCH_PROFILE_UPDATE.parse(
+                browser.runtime.sendMessage(message),
+              );
+              if (!resp) {
+                return;
+              }
+
+              queryClient.refetchQueries();
+            } catch (err) {
+              console.error(err);
+            }
+          }}
+        >
+          <a
+            {...profileHrefProps}
+            className="flex shrink-0 pr-[7px] pt-[4px]"
+            title={profileDisplayName}
+          >
+            <div className="relative flex size-[19px] shrink-0 overflow-hidden rounded-full">
+              {hrefData.profileData.avatar ? (
+                <>
+                  <img
+                    src={hrefData.profileData.avatar}
+                    width={19}
+                    height={19}
+                    className="object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
+
+                  <div
+                    className={cx(
+                      primaryColor,
+                      "pointer-events-none absolute inset-0 rounded-[inherit] border border-current opacity-[0.14]",
+                    )}
+                  />
+                </>
+              ) : (
+                <div
+                  className={cx(
+                    accentColor,
+                    "flex w-full items-center justify-center bg-faded",
+                  )}
+                >
+                  <svg
+                    viewBox="0 0 40 37"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-[12px]"
+                  >
+                    {nullIconJsx}
+                  </svg>
+                </div>
+              )}
+            </div>
+          </a>
+          <div className="flex min-w-0 grow flex-col">
+            <div className="flex items-baseline justify-between gap-x-6 leading-[1.45]">
+              <a
+                {...profileHrefProps}
+                className={cx(
+                  accentColor,
+                  "overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-medium",
+                )}
+                title={profileDisplayName}
+              >
+                {profileDisplayName}
+              </a>
+
+              {!props.hideProfiles && (
+                <span className={cx(secondaryColor, "shrink-0 text-[12px]")}>
+                  {new Intl.DateTimeFormat(undefined, {
+                    timeStyle: "short",
+                  })
+                    .format(hrefData.viewedAt)
+                    .toLowerCase()
+                    .replace(/\s+/g, "")}
+                </span>
+              )}
+            </div>
+
+            <a
+              {...getHrefProps(hrefData.websiteUrl)}
+              className={cx(
+                secondaryColor,
+                "self-start break-all text-[12.5px] leading-[1.5]",
+              )}
+            >
+              {getDisplayHref(hrefData.websiteUrl)}
+            </a>
+          </div>
+
+          {props.hideProfiles && (
+            <label className={cx(accentColor, navButton, "ml-8")}>
+              Hide&nbsp;
+              <input
+                name={hrefData.relMeHref}
+                form={hideProfilesFormId}
+                type="checkbox"
+                defaultChecked={hrefData.hidden}
+                className={checkbox}
+              />
+            </label>
+          )}
+        </InView>
+      </React.Fragment>
+    );
+  });
 }
 
 const nullIconJsx = (
