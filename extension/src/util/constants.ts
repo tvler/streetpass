@@ -48,6 +48,7 @@ export type HrefData = {
   viewedAt: number;
   relMeHref: string;
   updatedAt?: number;
+  hidden?: boolean;
 };
 export type HrefDataType<T extends HrefData["profileData"]["type"]> =
   HrefData & { profileData: Extract<ProfileData, { type: T }> };

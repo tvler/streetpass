@@ -1,8 +1,9 @@
 import type { DeepReadonly } from "ts-essentials";
-import { HrefData, HrefDataType, HrefStore, Profile } from "./constants";
+import { HrefDataType, HrefStore } from "./constants";
 
 export function getProfiles(
   hrefStore: DeepReadonly<HrefStore>,
+  options?: { hidden?: boolean },
 ): Array<HrefDataType<"profile">> {
   const profiles: Array<HrefDataType<"profile">> = [];
 
@@ -10,6 +11,11 @@ export function getProfiles(
     if (hrefData.profileData.type !== "profile") {
       continue;
     }
+
+    if (!!hrefData.hidden !== !!options?.hidden) {
+      continue;
+    }
+
     profiles.push({
       ...hrefData,
       profileData: hrefData.profileData,

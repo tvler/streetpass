@@ -6,7 +6,12 @@ import * as Popover from "@radix-ui/react-popover";
 import * as Tabs from "@radix-ui/react-tabs";
 import { createQuery } from "react-query-kit";
 import { InView } from "react-intersection-observer";
-import { Message, MessageReturn } from "./util/constants";
+import {
+  HrefDataType,
+  HrefStore,
+  Message,
+  MessageReturn,
+} from "./util/constants";
 import { getDisplayHref } from "./util/getDisplayHref";
 import { exportProfiles } from "./util/exportProfiles";
 import { getProfiles } from "./util/getProfiles";
@@ -19,6 +24,7 @@ import { cva, cx } from "class-variance-authority";
 import { getProfileUrl } from "./util/getProfileUrl";
 import { getIsUrlHttpOrHttps } from "./util/getIsUrlHttpOrHttps";
 import { downloadLink } from "../../constants";
+import { DeepReadonly } from "ts-essentials";
 
 getIconState(() => {
   return { state: "off" };
@@ -28,6 +34,8 @@ enum Tab {
   root = "root",
   openProfilesWith = "openProfilesWith",
 }
+
+const hideProfilesFormId = "hideProfilesFormId";
 
 function getHrefProps(
   baseHref: string,
@@ -68,9 +76,9 @@ function getHrefProps(
   };
 }
 
-const useProfilesQuery = createQuery({
+const useHrefStoreQuery = createQuery({
   queryKey: ["profiles"],
-  fetcher: async () => getProfiles(await getHrefStore()),
+  fetcher: () => getHrefStore(),
 });
 
 const useProfileUrlSchemeQuery = createQuery({
@@ -104,12 +112,21 @@ const navButton = cva([
   "font-medium",
   "bg-faded",
   "cursor-default",
+  "shrink-0",
 ])();
 
+function selectHrefStore(
+  hrefStore: DeepReadonly<HrefStore>,
+): Record<"profiles" | "hiddenProfiles", Array<HrefDataType<"profile">>> {
+  return {
+    profiles: getProfiles(hrefStore),
+    hiddenProfiles: getProfiles(hrefStore, { hidden: true }),
+  };
+}
+
 function Popup() {
-  const profilesLengthQuery = useProfilesQuery({
-    select: (profiles) => profiles.length,
-  });
+  const [hideProfiles, setHideProfiles] = React.useState(true);
+  const hrefStoreQuery = useHrefStoreQuery({ select: selectHrefStore });
   const profileUrlSchemeQuery = useProfileUrlSchemeQuery();
   const popoverCloseRef = React.useRef<HTMLButtonElement>(null);
   const profileUrlSchemeInputRef = React.useRef<HTMLInputElement>(null);
@@ -129,25 +146,30 @@ function Popup() {
         </h1>
       </div>
 
-      {profilesLengthQuery.data === 0 && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <p className={cx(secondaryColor, "text-13")}>
-            No profiles Try{" "}
-            <a
-              {...getHrefProps("https://streetpass.social")}
-              className={cx(accentColor, "font-medium")}
-            >
-              this
-            </a>
-            !
-          </p>
-        </div>
-      )}
+      {hrefStoreQuery.data?.profiles.length === 0 &&
+        hrefStoreQuery.data.hiddenProfiles.length === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <p className={cx(secondaryColor, "text-13")}>
+              No profiles Try{" "}
+              <a
+                {...getHrefProps("https://streetpass.social")}
+                className={cx(accentColor, "font-medium")}
+              >
+                this
+              </a>
+              !
+            </p>
+          </div>
+        )}
 
       <div className="flex grow flex-col gap-[18px] px-12 py-[18px]">
-        <Profiles />
+        <Profiles
+          hideProfiles={hideProfiles}
+          profiles={hrefStoreQuery.data?.profiles}
+        />
 
         <details
+          hidden={!hrefStoreQuery.data?.hiddenProfiles.length}
           className="mt-auto"
           tabIndex={
             /* Safari autofocuses this element when the popup opens */
@@ -157,15 +179,61 @@ function Popup() {
           <summary className={cx(secondaryColor, "text-13")}>Hidden</summary>
 
           <div className="flex flex-col gap-[18px] pt-[18px]">
-            <Profiles />
+            <Profiles
+              hideProfiles={hideProfiles}
+              profiles={hrefStoreQuery.data?.hiddenProfiles}
+            />
           </div>
         </details>
       </div>
 
-      <div className="absolute right-12 top-12 flex gap-8">
-        {!!profilesLengthQuery.data && (
+      <div
+        className="absolute right-12 top-12 flex gap-8"
+        hidden={!hideProfiles}
+      >
+        <form
+          id={hideProfilesFormId}
+          className="contents"
+          onSubmit={async (ev) => {
+            ev.preventDefault();
+            const formData = new FormData(ev.currentTarget);
+
+            await getHrefStore((prev) => {
+              const hrefStore = new Map(prev);
+
+              for (const [key, hrefData] of hrefStore) {
+                const hidden = formData.get(key) === "on";
+                hrefStore.set(key, {
+                  ...hrefData,
+                  hidden: hidden,
+                });
+              }
+
+              return hrefStore;
+            });
+
+            setHideProfiles((prev) => !prev);
+            queryClient.refetchQueries();
+          }}
+        >
+          <button
+            className={cx(navButton, accentColor)}
+            // onClick={() => {
+            //   setHideProfiles((prev) => !prev);
+            // }}
+          >
+            Save
+          </button>
+        </form>
+      </div>
+
+      <div
+        className="absolute right-12 top-12 flex gap-8"
+        hidden={hideProfiles}
+      >
+        {!!hrefStoreQuery.data?.profiles.length && (
           <span className={cx(accentColor, navButton)}>
-            {profilesLengthQuery.data}
+            {hrefStoreQuery.data?.profiles.length}
           </span>
         )}
 
@@ -211,6 +279,21 @@ function Popup() {
                       Open Profiles With…
                     </Tabs.Trigger>
                   </Tabs.List>
+
+                  <Popover.Close
+                    className={cx(accentColor, navButton)}
+                    onClick={() => {
+                      setHideProfiles((prev) => !prev);
+                    }}
+                  >
+                    Hide Profiles…
+                  </Popover.Close>
+
+                  <label className={cx(accentColor, navButton)}>
+                    Hide Profiles On Click&nbsp;
+                    <input type="checkbox" className="scale-[0.82]" />
+                  </label>
+
                   <Popover.Close
                     onClick={exportProfiles}
                     className={cx(accentColor, navButton)}
@@ -401,11 +484,13 @@ function ConfirmButton(
   );
 }
 
-function Profiles() {
-  const profilesQuery = useProfilesQuery();
+function Profiles(props: {
+  profiles: Array<HrefDataType<"profile">> | undefined;
+  hideProfiles: boolean;
+}) {
   const profileUrlSchemeQuery = useProfileUrlSchemeQuery();
 
-  return profilesQuery.data?.map((hrefData, index, arr) => {
+  return props.profiles?.map((hrefData, index, arr) => {
     const prevHrefData = arr[index - 1];
     const prevHrefDate = prevHrefData
       ? new Date(prevHrefData.viewedAt).getDate()
@@ -465,7 +550,7 @@ function Profiles() {
             className="flex shrink-0 pr-[7px] pt-[4px]"
             title={profileDisplayName}
           >
-            <div className="relative flex h-[19px] w-[19px] shrink-0 overflow-hidden rounded-full">
+            <div className="relative flex size-[19px] shrink-0 overflow-hidden rounded-full">
               {hrefData.profileData.avatar ? (
                 <>
                   <img
@@ -516,14 +601,16 @@ function Profiles() {
                 {profileDisplayName}
               </a>
 
-              <span className={cx(secondaryColor, "shrink-0 text-[12px]")}>
-                {new Intl.DateTimeFormat(undefined, {
-                  timeStyle: "short",
-                })
-                  .format(hrefData.viewedAt)
-                  .toLowerCase()
-                  .replace(/\s+/g, "")}
-              </span>
+              {!props.hideProfiles && (
+                <span className={cx(secondaryColor, "shrink-0 text-[12px]")}>
+                  {new Intl.DateTimeFormat(undefined, {
+                    timeStyle: "short",
+                  })
+                    .format(hrefData.viewedAt)
+                    .toLowerCase()
+                    .replace(/\s+/g, "")}
+                </span>
+              )}
             </div>
 
             <a
@@ -536,6 +623,19 @@ function Profiles() {
               {getDisplayHref(hrefData.websiteUrl)}
             </a>
           </div>
+
+          {props.hideProfiles && (
+            <label className={cx(accentColor, navButton, "ml-8")}>
+              Hide&nbsp;
+              <input
+                name={hrefData.relMeHref}
+                form={hideProfilesFormId}
+                type="checkbox"
+                defaultChecked={hrefData.hidden}
+                className="scale-[0.82]"
+              />
+            </label>
+          )}
         </InView>
       </React.Fragment>
     );
