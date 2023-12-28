@@ -1,3 +1,8 @@
+# 2023.21 (Dec 28, 2023)
+
+- Hide profiles
+- Option to hide profiles on click
+
 # 2023.20 (Oct 28, 2023)
 
 - Reset your StreetPass list
