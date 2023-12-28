@@ -157,7 +157,15 @@ function Popup() {
               -1
             }
           >
-            <summary className={cx(secondaryColor, "text-13")}>Hidden</summary>
+            <summary
+              tabIndex={
+                /* Safari autofocuses this element when the popup opens */
+                -1
+              }
+              className={cx(secondaryColor, "text-13")}
+            >
+              Hidden
+            </summary>
 
             <div className="flex flex-col gap-[18px] pt-[18px]">
               <Profiles
