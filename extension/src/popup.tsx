@@ -72,7 +72,13 @@ function getHrefProps(
 
 const useHrefStoreQuery = createQuery({
   queryKey: ["profiles"],
-  fetcher: () => getHrefStore(),
+  async fetcher() {
+    const hrefStore = await getHrefStore();
+    return {
+      profiles: getProfiles(hrefStore),
+      hiddenProfiles: getProfiles(hrefStore, { hidden: true }),
+    };
+  },
 });
 
 const useProfileUrlSchemeQuery = createQuery({
@@ -116,18 +122,9 @@ const navButton = cva([
 
 const checkbox = cva("scale-[0.82]")();
 
-function selectHrefStore(
-  hrefStore: DeepReadonly<HrefStore>,
-): Record<"profiles" | "hiddenProfiles", Array<HrefDataType<"profile">>> {
-  return {
-    profiles: getProfiles(hrefStore),
-    hiddenProfiles: getProfiles(hrefStore, { hidden: true }),
-  };
-}
-
 function Popup() {
   const [hideProfiles, setHideProfiles] = React.useState(false);
-  const hrefStoreQuery = useHrefStoreQuery({ select: selectHrefStore });
+  const hrefStoreQuery = useHrefStoreQuery();
   const profileUrlSchemeQuery = useProfileUrlSchemeQuery();
   const hideProfilesOnClickQuery = useHideProfilesOnClickQuery();
   const popoverCloseRef = React.useRef<HTMLButtonElement>(null);
@@ -508,30 +505,23 @@ function Profiles(props: {
     const profileHrefProps = getHrefProps(
       hrefData.profileData.profileUrl,
       async () => {
-        try {
-          const message: Message = {
-            name: "HIDE_PROFILE_ON_CLICK",
-            args: {
-              relMeHref: hrefData.relMeHref,
-            },
-          };
-          MessageReturn.HIDE_PROFILE_ON_CLICK.parse(
-            browser.runtime.sendMessage(message),
-          ).then((resp) => {
-            if (resp) {
-              queryClient.refetchQueries();
-            }
-          });
-        } catch (err) {
-          // Do nothing
+        const [profileUrlScheme, hideProfilesOnClick] = await Promise.all([
+          queryClient.fetchQuery(useProfileUrlSchemeQuery.getFetchOptions()),
+          queryClient.fetchQuery(useHideProfilesOnClickQuery.getFetchOptions()),
+        ]);
+
+        if (hideProfilesOnClick) {
+          await getHrefStore((prev) =>
+            new Map(prev).set(hrefData.relMeHref, {
+              ...hrefData,
+              hidden: true,
+            }),
+          );
+
+          queryClient.refetchQueries();
         }
 
-        return getProfileUrl(
-          hrefData.profileData,
-          await queryClient.fetchQuery(
-            useProfileUrlSchemeQuery.getFetchOptions(),
-          ),
-        );
+        return getProfileUrl(hrefData.profileData, profileUrlScheme);
       },
     );
     const profileDisplayName = hrefData.profileData.account

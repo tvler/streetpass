@@ -7,7 +7,7 @@ import {
   timeToUpdateProfile,
 } from "./constants";
 import { getUncachedProfileData } from "./getUncachedProfileData";
-import { getHideProfilesOnClick, getHrefStore } from "./storage";
+import { getHrefStore } from "./storage";
 
 type ArgMap = {
   [Key in Message["name"]]: Extract<Message, { name: Key }>["args"];
@@ -113,27 +113,6 @@ export const messageCallbacks: {
     //   uncachedProfileData,
     // });
     return shouldUpdateProfile;
-  },
-  async HIDE_PROFILE_ON_CLICK(args) {
-    const hideProfilesOnClick = await getHideProfilesOnClick();
-    if (!hideProfilesOnClick) {
-      return false;
-    }
-
-    await getHrefStore((prev) => {
-      const hrefStore = new Map(prev);
-      const hrefData = hrefStore.get(args.relMeHref);
-      if (!hrefData) {
-        return;
-      }
-
-      hrefStore.set(args.relMeHref, {
-        ...hrefData,
-        hidden: true,
-      });
-    });
-
-    return true;
   },
 };
 
