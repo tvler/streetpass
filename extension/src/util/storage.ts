@@ -151,6 +151,16 @@ export const getProfileUrlScheme = storageFactory({
   },
 });
 
+export const getHideProfilesOnClick = storageFactory({
+  storageKey: "hide-profiles-on-click-1",
+  parse(storageData: boolean) {
+    return storageData ?? false;
+  },
+  serialize(data) {
+    return data;
+  },
+});
+
 /**
  * Test the safe storage
  */

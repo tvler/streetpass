@@ -9,6 +9,7 @@ import { InView } from "react-intersection-observer";
 import {
   HrefDataType,
   HrefStore,
+  MaybePromise,
   Message,
   MessageReturn,
 } from "./util/constants";
@@ -19,6 +20,7 @@ import {
   getIconState,
   getHrefStore,
   getProfileUrlScheme,
+  getHideProfilesOnClick,
 } from "./util/storage";
 import { cva, cx } from "class-variance-authority";
 import { getProfileUrl } from "./util/getProfileUrl";
@@ -39,24 +41,16 @@ const hideProfilesFormId = "hideProfilesFormId";
 
 function getHrefProps(
   baseHref: string,
-  actualHref?: string,
+  getActualHref?: () => MaybePromise<string>,
 ): Pick<JSX.IntrinsicElements["a"], "href" | "onClick"> {
-  const href = actualHref ?? baseHref;
-  const isHrefHttpOrHttps = getIsUrlHttpOrHttps(href);
-
   return {
-    /**
-     * If the link is a native app deeplink, make the href value the baseHref.
-     * The only reason the href value is set is so right-click+copy url can work.
-     * And the ability to copy the basehref is more useful than a native app link.
-     */
-    href: isHrefHttpOrHttps ? href : baseHref,
-
+    href: baseHref,
     async onClick(ev) {
       ev.preventDefault();
       const { metaKey } = ev;
 
-      if (isHrefHttpOrHttps) {
+      const href = (await getActualHref?.()) ?? baseHref;
+      if (getIsUrlHttpOrHttps(href)) {
         await browser.tabs.create({
           url: href,
           active: !metaKey,
@@ -84,6 +78,11 @@ const useHrefStoreQuery = createQuery({
 const useProfileUrlSchemeQuery = createQuery({
   queryKey: ["profileurlscheme"],
   fetcher: () => getProfileUrlScheme(),
+});
+
+const useHideProfilesOnClickQuery = createQuery({
+  queryKey: ["hideprofilesonclick"],
+  fetcher: () => getHideProfilesOnClick(),
 });
 
 const queryClient = new QueryClient({
@@ -115,6 +114,8 @@ const navButton = cva([
   "shrink-0",
 ])();
 
+const checkbox = cva("scale-[0.82]")();
+
 function selectHrefStore(
   hrefStore: DeepReadonly<HrefStore>,
 ): Record<"profiles" | "hiddenProfiles", Array<HrefDataType<"profile">>> {
@@ -128,6 +129,7 @@ function Popup() {
   const [hideProfiles, setHideProfiles] = React.useState(false);
   const hrefStoreQuery = useHrefStoreQuery({ select: selectHrefStore });
   const profileUrlSchemeQuery = useProfileUrlSchemeQuery();
+  const hideProfilesOnClickQuery = useHideProfilesOnClickQuery();
   const popoverCloseRef = React.useRef<HTMLButtonElement>(null);
   const profileUrlSchemeInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -291,7 +293,15 @@ function Popup() {
 
                   <label className={cx(accentColor, navButton)}>
                     Hide Profiles On Click&nbsp;
-                    <input type="checkbox" className="scale-[0.82]" />
+                    <input
+                      type="checkbox"
+                      defaultChecked={hideProfilesOnClickQuery.data}
+                      className={checkbox}
+                      onChange={async (ev) => {
+                        await getHideProfilesOnClick(() => ev.target.checked);
+                        queryClient.refetchQueries();
+                      }}
+                    />
                   </label>
 
                   <Popover.Close
@@ -488,8 +498,6 @@ function Profiles(props: {
   profiles: Array<HrefDataType<"profile">> | undefined;
   hideProfiles: boolean;
 }) {
-  const profileUrlSchemeQuery = useProfileUrlSchemeQuery();
-
   return props.profiles?.map((hrefData, index, arr) => {
     const prevHrefData = arr[index - 1];
     const prevHrefDate = prevHrefData
@@ -499,7 +507,32 @@ function Profiles(props: {
       prevHrefDate !== new Date(hrefData.viewedAt).getDate();
     const profileHrefProps = getHrefProps(
       hrefData.profileData.profileUrl,
-      getProfileUrl(hrefData.profileData, profileUrlSchemeQuery.data),
+      async () => {
+        try {
+          const message: Message = {
+            name: "HIDE_PROFILE_ON_CLICK",
+            args: {
+              relMeHref: hrefData.relMeHref,
+            },
+          };
+          MessageReturn.HIDE_PROFILE_ON_CLICK.parse(
+            browser.runtime.sendMessage(message),
+          ).then((resp) => {
+            if (resp) {
+              queryClient.refetchQueries();
+            }
+          });
+        } catch (err) {
+          // Do nothing
+        }
+
+        return getProfileUrl(
+          hrefData.profileData,
+          await queryClient.fetchQuery(
+            useProfileUrlSchemeQuery.getFetchOptions(),
+          ),
+        );
+      },
     );
     const profileDisplayName = hrefData.profileData.account
       ? `@${hrefData.profileData.account}`
@@ -632,7 +665,7 @@ function Profiles(props: {
                 form={hideProfilesFormId}
                 type="checkbox"
                 defaultChecked={hrefData.hidden}
-                className="scale-[0.82]"
+                className={checkbox}
               />
             </label>
           )}

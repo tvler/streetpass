@@ -25,11 +25,18 @@ export const Message = z.discriminatedUnion("name", [
       relMeHref: z.string(),
     }),
   }),
+  z.object({
+    name: z.literal("HIDE_PROFILE_ON_CLICK"),
+    args: z.object({
+      relMeHref: z.string(),
+    }),
+  }),
 ]);
 
 export const MessageReturn = {
   HREF_PAYLOAD: z.void(),
   FETCH_PROFILE_UPDATE: z.promise(z.boolean()),
+  HIDE_PROFILE_ON_CLICK: z.promise(z.boolean()),
 } satisfies Record<Message["name"], unknown>;
 
 export type Message = z.infer<typeof Message>;
