@@ -125,7 +125,7 @@ function selectHrefStore(
 }
 
 function Popup() {
-  const [hideProfiles, setHideProfiles] = React.useState(true);
+  const [hideProfiles, setHideProfiles] = React.useState(false);
   const hrefStoreQuery = useHrefStoreQuery({ select: selectHrefStore });
   const profileUrlSchemeQuery = useProfileUrlSchemeQuery();
   const popoverCloseRef = React.useRef<HTMLButtonElement>(null);
