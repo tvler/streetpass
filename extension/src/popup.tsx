@@ -143,45 +143,50 @@ function Popup() {
         </h1>
       </div>
 
-      {hrefStoreQuery.data?.profiles.length === 0 &&
-        hrefStoreQuery.data.hiddenProfiles.length === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <p className={cx(secondaryColor, "text-13")}>
-              No profiles Try{" "}
-              <a
-                {...getHrefProps("https://streetpass.social")}
-                className={cx(accentColor, "font-medium")}
-              >
-                this
-              </a>
-              !
-            </p>
-          </div>
-        )}
-
       <div className="flex grow flex-col gap-[18px] px-12 py-[18px]">
         <Profiles
           hideProfiles={hideProfiles}
           profiles={hrefStoreQuery.data?.profiles}
         />
 
-        <details
-          hidden={!hrefStoreQuery.data?.hiddenProfiles.length}
-          className="mt-auto"
-          tabIndex={
-            /* Safari autofocuses this element when the popup opens */
-            -1
-          }
-        >
-          <summary className={cx(secondaryColor, "text-13")}>Hidden</summary>
+        {!!hrefStoreQuery.data?.hiddenProfiles.length && (
+          <details
+            className="peer mt-auto"
+            tabIndex={
+              /* Safari autofocuses this element when the popup opens */
+              -1
+            }
+          >
+            <summary className={cx(secondaryColor, "text-13")}>Hidden</summary>
 
-          <div className="flex flex-col gap-[18px] pt-[18px]">
-            <Profiles
-              hideProfiles={hideProfiles}
-              profiles={hrefStoreQuery.data?.hiddenProfiles}
-            />
+            <div className="flex flex-col gap-[18px] pt-[18px]">
+              <Profiles
+                hideProfiles={hideProfiles}
+                profiles={hrefStoreQuery.data?.hiddenProfiles}
+              />
+            </div>
+          </details>
+        )}
+
+        {hrefStoreQuery.data?.profiles.length === 0 && (
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center peer-open:hidden">
+            <p className={cx(secondaryColor, "pointer-events-auto text-13")}>
+              No profiles
+              {hrefStoreQuery.data.hiddenProfiles.length === 0 && (
+                <>
+                  . Try{" "}
+                  <a
+                    {...getHrefProps("https://streetpass.social")}
+                    className={cx(accentColor, "font-medium")}
+                  >
+                    this
+                  </a>
+                  !
+                </>
+              )}
+            </p>
           </div>
-        </details>
+        )}
       </div>
 
       <div
@@ -213,14 +218,7 @@ function Popup() {
             queryClient.refetchQueries();
           }}
         >
-          <button
-            className={cx(navButton, accentColor)}
-            // onClick={() => {
-            //   setHideProfiles((prev) => !prev);
-            // }}
-          >
-            Save
-          </button>
+          <button className={cx(navButton, accentColor)}>Save</button>
         </form>
       </div>
 
