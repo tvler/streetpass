@@ -145,6 +145,26 @@ function Popup() {
             queryClient.refetchQueries();
           }}
         >
+          <button
+            type="button"
+            hidden={!hrefStoreQuery.data?.profiles.length}
+            className={cx(button, "text-secondaryText")}
+            onClick={(ev) => {
+              const formElements = ev.currentTarget.form?.elements;
+              if (!formElements) {
+                return;
+              }
+
+              for (const formElement of formElements) {
+                if (formElement instanceof HTMLInputElement) {
+                  formElement.checked = true;
+                }
+              }
+            }}
+          >
+            Hide All
+          </button>
+
           <button className={cx(button, "text-accent")}>Save</button>
         </form>
       </div>
