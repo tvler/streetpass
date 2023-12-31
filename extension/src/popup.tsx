@@ -4,17 +4,17 @@ import * as ReactDom from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as Popover from "@radix-ui/react-popover";
 import * as Tabs from "@radix-ui/react-tabs";
-import { createQuery } from "react-query-kit";
 import { InView } from "react-intersection-observer";
 import {
   HrefDataType,
   MaybePromise,
   Message,
   MessageReturn,
+  Tab,
+  hideProfilesFormId,
 } from "./util/constants";
 import { getDisplayHref } from "./util/getDisplayHref";
 import { exportProfiles } from "./util/exportProfiles";
-import { getProfiles } from "./util/getProfiles";
 import {
   getIconState,
   getHrefStore,
@@ -23,70 +23,16 @@ import {
 } from "./util/storage";
 import { cva, cx } from "class-variance-authority";
 import { getProfileUrl } from "./util/getProfileUrl";
-import { getIsUrlHttpOrHttps } from "./util/getIsUrlHttpOrHttps";
 import { downloadLink } from "../../constants";
+import { getHrefProps } from "./util/getHrefProps";
+import {
+  useHrefStoreQuery,
+  useProfileUrlSchemeQuery,
+  useHideProfilesOnClickQuery,
+} from "./util/reactQuery";
 
 getIconState(() => {
   return { state: "off" };
-});
-
-enum Tab {
-  root = "root",
-  openProfilesWith = "openProfilesWith",
-}
-
-const hideProfilesFormId = "hideProfilesFormId";
-
-function getHrefProps(
-  baseHref: string,
-  getActualHref?: () => MaybePromise<string>,
-): Pick<JSX.IntrinsicElements["a"], "href" | "onClick"> {
-  return {
-    href: baseHref,
-    async onClick(ev) {
-      ev.preventDefault();
-      const { metaKey } = ev;
-
-      const href = (await getActualHref?.()) ?? baseHref;
-      if (getIsUrlHttpOrHttps(href)) {
-        await browser.tabs.create({
-          url: href,
-          active: !metaKey,
-        });
-
-        if (!metaKey) {
-          window.close();
-        }
-      } else {
-        await browser.tabs.update({
-          url: href,
-        });
-
-        window.close();
-      }
-    },
-  };
-}
-
-const useHrefStoreQuery = createQuery({
-  queryKey: ["profiles"],
-  async fetcher() {
-    const hrefStore = await getHrefStore();
-    return {
-      profiles: getProfiles(hrefStore),
-      hiddenProfiles: getProfiles(hrefStore, { hidden: true }),
-    };
-  },
-});
-
-const useProfileUrlSchemeQuery = createQuery({
-  queryKey: ["profileurlscheme"],
-  fetcher: () => getProfileUrlScheme(),
-});
-
-const useHideProfilesOnClickQuery = createQuery({
-  queryKey: ["hideprofilesonclick"],
-  fetcher: () => getHideProfilesOnClick(),
 });
 
 const queryClient = new QueryClient({
