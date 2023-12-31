@@ -10,6 +10,12 @@ module.exports = {
       current: "currentColor",
       black: "#000",
       faded: "color-mix(in srgb, currentColor 10%, transparent)",
+      accent: "var(--color-accent)",
+      primaryText: "var(--color-text-primary)",
+      secondaryText: "var(--color-text-secondary)",
+      primaryBorder: "var(--color-border-primary)",
+      primaryBg: "var(--color-bg-primary)",
+      secondaryBg: "var(--color-bg-secondary)",
     },
     fontSize: {
       11: "11px",

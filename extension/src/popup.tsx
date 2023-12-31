@@ -4,121 +4,45 @@ import * as ReactDom from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as Popover from "@radix-ui/react-popover";
 import * as Tabs from "@radix-ui/react-tabs";
-import { createQuery } from "react-query-kit";
 import { InView } from "react-intersection-observer";
 import {
   HrefDataType,
-  MaybePromise,
   Message,
   MessageReturn,
+  PopupTab,
+  hideProfilesFormId,
 } from "./util/constants";
 import { getDisplayHref } from "./util/getDisplayHref";
 import { exportProfiles } from "./util/exportProfiles";
-import { getProfiles } from "./util/getProfiles";
 import {
   getIconState,
   getHrefStore,
   getProfileUrlScheme,
   getHideProfilesOnClick,
 } from "./util/storage";
-import { cva, cx } from "class-variance-authority";
+import { cx } from "class-variance-authority";
 import { getProfileUrl } from "./util/getProfileUrl";
-import { getIsUrlHttpOrHttps } from "./util/getIsUrlHttpOrHttps";
 import { downloadLink } from "../../constants";
+import { getHrefProps } from "./util/getHrefProps";
+import {
+  useHrefStoreQuery,
+  useProfileUrlSchemeQuery,
+  useHideProfilesOnClickQuery,
+} from "./util/reactQuery";
 
 getIconState(() => {
   return { state: "off" };
-});
-
-enum Tab {
-  root = "root",
-  openProfilesWith = "openProfilesWith",
-}
-
-const hideProfilesFormId = "hideProfilesFormId";
-
-function getHrefProps(
-  baseHref: string,
-  getActualHref?: () => MaybePromise<string>,
-): Pick<JSX.IntrinsicElements["a"], "href" | "onClick"> {
-  return {
-    href: baseHref,
-    async onClick(ev) {
-      ev.preventDefault();
-      const { metaKey } = ev;
-
-      const href = (await getActualHref?.()) ?? baseHref;
-      if (getIsUrlHttpOrHttps(href)) {
-        await browser.tabs.create({
-          url: href,
-          active: !metaKey,
-        });
-
-        if (!metaKey) {
-          window.close();
-        }
-      } else {
-        await browser.tabs.update({
-          url: href,
-        });
-
-        window.close();
-      }
-    },
-  };
-}
-
-const useHrefStoreQuery = createQuery({
-  queryKey: ["profiles"],
-  async fetcher() {
-    const hrefStore = await getHrefStore();
-    return {
-      profiles: getProfiles(hrefStore),
-      hiddenProfiles: getProfiles(hrefStore, { hidden: true }),
-    };
-  },
-});
-
-const useProfileUrlSchemeQuery = createQuery({
-  queryKey: ["profileurlscheme"],
-  fetcher: () => getProfileUrlScheme(),
-});
-
-const useHideProfilesOnClickQuery = createQuery({
-  queryKey: ["hideprofilesonclick"],
-  fetcher: () => getHideProfilesOnClick(),
 });
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: Infinity } },
 });
 
-const accentColor = cva(["text-[#5f55ec]", "dark:text-[--iris-11]"])();
-const primaryColor = cva(["text-[--gray-12]", "dark:text-white"])();
-const secondaryColor = cva(["text-[--gray-a11]"])();
+const button = cx(
+  "flex h-[1.68em] min-w-[1.4em] shrink-0 cursor-default items-center justify-center rounded-6 bg-faded px-[0.38em] text-11 font-medium focus-visible:outline-none",
+);
 
-const primaryBg = cva(["bg-white", "dark:bg-[--slate-4]"])();
-const secondaryBg = cva("bg-[--gray-a2]")();
-
-const borderColor = cva("border-[--gray-a3]")();
-
-const navButton = cva([
-  "h-[1.68em]",
-  "min-w-[1.4em]",
-  "flex",
-  "items-center",
-  "justify-center",
-  "rounded-6",
-  "px-[0.38em]",
-  "text-11",
-  "focus-visible:outline-none",
-  "font-medium",
-  "bg-faded",
-  "cursor-default",
-  "shrink-0",
-])();
-
-const checkbox = cva("scale-[0.82]")();
+const buttonCheckbox = cx("scale-[0.82]");
 
 function Popup() {
   const [hideProfiles, setHideProfiles] = React.useState(false);
@@ -129,16 +53,11 @@ function Popup() {
   const profileUrlSchemeInputRef = React.useRef<HTMLInputElement>(null);
 
   return (
-    <div
-      className={cx(
-        primaryBg,
-        "relative flex h-[600px] w-[350px] flex-col overflow-auto",
-      )}
-    >
+    <div className="relative flex h-[600px] w-[350px] flex-col overflow-auto bg-primaryBg">
       <div className="flex flex-col items-center pt-[12px]">
         <img src="/icon-128.png" width="36" height="36" />
 
-        <h1 className={cx(primaryColor, "text-14 font-medium leading-[1.21]")}>
+        <h1 className="text-14 font-medium leading-[1.21] text-primaryText">
           StreetPass
         </h1>
       </div>
@@ -162,7 +81,7 @@ function Popup() {
                 /* Safari autofocuses this element when the popup opens */
                 -1
               }
-              className={cx(secondaryColor, "text-13")}
+              className="text-13 text-secondaryText"
             >
               Hidden
             </summary>
@@ -178,14 +97,14 @@ function Popup() {
 
         {hrefStoreQuery.data?.profiles.length === 0 && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center peer-open:hidden">
-            <p className={cx(secondaryColor, "pointer-events-auto text-13")}>
+            <p className="pointer-events-auto text-13 text-secondaryText">
               No profiles
               {hrefStoreQuery.data.hiddenProfiles.length === 0 && (
                 <>
                   . Try{" "}
                   <a
                     {...getHrefProps("https://streetpass.social")}
-                    className={cx(accentColor, "font-medium")}
+                    className="font-medium text-accent"
                   >
                     this
                   </a>
@@ -226,7 +145,26 @@ function Popup() {
             queryClient.refetchQueries();
           }}
         >
-          <button className={cx(navButton, accentColor)}>Save</button>
+          <button
+            type="button"
+            className={cx(button, "text-secondaryText")}
+            onClick={(ev) => {
+              const formElements = ev.currentTarget.form?.elements;
+              if (!formElements) {
+                return;
+              }
+
+              for (const formElement of formElements) {
+                if (formElement instanceof HTMLInputElement) {
+                  formElement.checked = true;
+                }
+              }
+            }}
+          >
+            Hide All
+          </button>
+
+          <button className={cx(button, "text-accent")}>Save</button>
         </form>
       </div>
 
@@ -235,7 +173,7 @@ function Popup() {
         hidden={hideProfiles}
       >
         {!!hrefStoreQuery.data?.profiles.length && (
-          <span className={cx(accentColor, navButton)}>
+          <span className={cx(button, "text-accent")}>
             {hrefStoreQuery.data?.profiles.length}
           </span>
         )}
@@ -243,10 +181,10 @@ function Popup() {
         <Popover.Root modal>
           <Popover.Close hidden ref={popoverCloseRef} />
 
-          <Popover.Trigger className={cx(accentColor, navButton)}>
+          <Popover.Trigger className={cx(button, "text-accent")}>
             <svg
               fill="currentColor"
-              className="aspect-square w-[1em]"
+              className="size-[1em]"
               viewBox="0 0 100 100"
               xmlns="http://www.w3.org/2000/svg"
             >
@@ -261,7 +199,7 @@ function Popup() {
               side="bottom"
               sideOffset={6}
               avoidCollisions={false}
-              className={cx(primaryBg, borderColor, "flex rounded-6 border")}
+              className="flex rounded-6 border border-primaryBorder bg-primaryBg"
               onOpenAutoFocus={(ev) => {
                 ev.preventDefault();
               }}
@@ -269,22 +207,22 @@ function Popup() {
                 ev.preventDefault();
               }}
             >
-              <Tabs.Root defaultValue={Tab.root} className="contents">
+              <Tabs.Root defaultValue={PopupTab.root} className="contents">
                 <Tabs.Content
-                  value={Tab.root}
+                  value={PopupTab.root}
                   className="flex flex-col items-start gap-y-8 p-8"
                 >
                   <Tabs.List className="contents">
                     <Tabs.Trigger
-                      value={Tab.openProfilesWith}
-                      className={cx(accentColor, navButton)}
+                      value={PopupTab.openProfilesWith}
+                      className={cx(button, "text-accent")}
                     >
                       Open Profiles With…
                     </Tabs.Trigger>
                   </Tabs.List>
 
                   <Popover.Close
-                    className={cx(accentColor, navButton)}
+                    className={cx(button, "text-accent")}
                     onClick={() => {
                       setHideProfiles((prev) => !prev);
                     }}
@@ -292,12 +230,12 @@ function Popup() {
                     Hide Profiles…
                   </Popover.Close>
 
-                  <label className={cx(accentColor, navButton)}>
+                  <label className={cx(button, "text-accent")}>
                     Hide Profiles On Click&nbsp;
                     <input
                       type="checkbox"
                       defaultChecked={hideProfilesOnClickQuery.data}
-                      className={checkbox}
+                      className={buttonCheckbox}
                       onChange={async (ev) => {
                         await getHideProfilesOnClick(() => ev.target.checked);
                         queryClient.refetchQueries();
@@ -307,16 +245,15 @@ function Popup() {
 
                   <Popover.Close
                     onClick={exportProfiles}
-                    className={cx(accentColor, navButton)}
+                    className={cx(button, "text-accent")}
                   >
                     Export (.json)
                   </Popover.Close>
 
                   <ConfirmButton
                     className={cx(
-                      "data-[confirm]:text-[--red-10]",
-                      accentColor,
-                      navButton,
+                      button,
+                      "text-accent data-[confirm]:text-[--red-10]",
                     )}
                     onClick={async () => {
                       popoverCloseRef.current?.click();
@@ -331,7 +268,7 @@ function Popup() {
                   </ConfirmButton>
 
                   <a
-                    className={cx(accentColor, navButton)}
+                    className={cx(button, "text-accent")}
                     {...getHrefProps(downloadLink[__TARGET__])}
                   >
                     Rate StreetPass
@@ -339,7 +276,7 @@ function Popup() {
                 </Tabs.Content>
 
                 <Tabs.Content
-                  value={Tab.openProfilesWith}
+                  value={PopupTab.openProfilesWith}
                   className="flex w-[275px] flex-col gap-y-8 pt-8"
                 >
                   <form
@@ -354,7 +291,7 @@ function Popup() {
                     }}
                   >
                     <label className="contents">
-                      <span className={cx(secondaryColor, "px-8 text-12")}>
+                      <span className="px-8 text-12 text-secondaryText">
                         URL to open profiles with. Set as empty for default
                         behavior.
                       </span>
@@ -363,19 +300,14 @@ function Popup() {
                         spellCheck={false}
                         type="text"
                         placeholder="https://mastodon.example/@{account}"
-                        className={cx(
-                          primaryColor,
-                          secondaryBg,
-                          borderColor,
-                          "mx-8 rounded-6 border px-6 py-2 text-12 placeholder:text-[--gray-a10]",
-                        )}
+                        className="mx-8 rounded-6 border border-primaryBorder bg-secondaryBg px-6 py-2 text-12 text-primaryText placeholder:text-[--gray-a10]"
                         ref={profileUrlSchemeInputRef}
                         defaultValue={profileUrlSchemeQuery.data}
                         key={profileUrlSchemeQuery.data}
                       />
                     </label>
 
-                    <span className={cx(secondaryColor, "px-8 text-12")}>
+                    <span className="px-8 text-12 text-secondaryText">
                       …or select a preset:
                     </span>
 
@@ -393,7 +325,7 @@ function Popup() {
                           <React.Fragment key={item}>
                             <button
                               type="button"
-                              className={cx(accentColor, navButton)}
+                              className={cx(button, "text-accent")}
                               onClick={() => {
                                 if (!profileUrlSchemeInputRef.current) {
                                   return;
@@ -431,12 +363,7 @@ function Popup() {
                       })}
                     </div>
 
-                    <div
-                      className={cx(
-                        borderColor,
-                        "flex justify-end gap-x-8 border-t px-8 py-8",
-                      )}
-                    >
+                    <div className="flex justify-end gap-x-8 border-t border-primaryBorder px-8 py-8">
                       <button
                         type="button"
                         onClick={() => {
@@ -447,12 +374,12 @@ function Popup() {
                           profileUrlSchemeInputRef.current.value = "";
                           profileUrlSchemeInputRef.current.focus();
                         }}
-                        className={cx(secondaryColor, navButton)}
+                        className={cx(button, "text-secondaryText")}
                       >
                         Clear
                       </button>
 
-                      <button className={cx(accentColor, navButton)}>
+                      <button className={cx(button, "text-accent")}>
                         Save
                       </button>
                     </div>
@@ -535,7 +462,7 @@ function Profiles(props: {
     return (
       <React.Fragment key={`${index}.${hrefData.relMeHref}`}>
         {previousItemWasDayBefore && (
-          <p className={cx(secondaryColor, "shrink-0 text-13")}>
+          <p className="shrink-0 text-13 text-secondaryText">
             {new Intl.DateTimeFormat(undefined, {
               day: "numeric",
               month: "short",
@@ -589,20 +516,10 @@ function Profiles(props: {
                     decoding="async"
                   />
 
-                  <div
-                    className={cx(
-                      primaryColor,
-                      "pointer-events-none absolute inset-0 rounded-[inherit] border border-current opacity-[0.14]",
-                    )}
-                  />
+                  <div className="pointer-events-none absolute inset-0 rounded-[inherit] border border-primaryText opacity-[0.14]" />
                 </>
               ) : (
-                <div
-                  className={cx(
-                    accentColor,
-                    "flex w-full items-center justify-center bg-faded",
-                  )}
-                >
+                <div className="flex w-full items-center justify-center bg-faded text-accent">
                   <svg
                     viewBox="0 0 40 37"
                     fill="none"
@@ -619,17 +536,14 @@ function Profiles(props: {
             <div className="flex items-baseline justify-between gap-x-6 leading-[1.45]">
               <a
                 {...profileHrefProps}
-                className={cx(
-                  accentColor,
-                  "overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-medium",
-                )}
+                className="overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-medium text-accent"
                 title={profileDisplayName}
               >
                 {profileDisplayName}
               </a>
 
               {!props.hideProfiles && (
-                <span className={cx(secondaryColor, "shrink-0 text-[12px]")}>
+                <span className="shrink-0 text-[12px] text-secondaryText">
                   {new Intl.DateTimeFormat(undefined, {
                     timeStyle: "short",
                   })
@@ -642,24 +556,21 @@ function Profiles(props: {
 
             <a
               {...getHrefProps(hrefData.websiteUrl)}
-              className={cx(
-                secondaryColor,
-                "self-start break-all text-[12.5px] leading-[1.5]",
-              )}
+              className="self-start break-all text-[12.5px] leading-[1.5] text-secondaryText"
             >
               {getDisplayHref(hrefData.websiteUrl)}
             </a>
           </div>
 
           {props.hideProfiles && (
-            <label className={cx(accentColor, navButton, "ml-8")}>
+            <label className={cx(button, "ml-8 text-accent")}>
               Hide&nbsp;
               <input
                 name={hrefData.relMeHref}
                 form={hideProfilesFormId}
                 type="checkbox"
                 defaultChecked={hrefData.hidden}
-                className={checkbox}
+                className={buttonCheckbox}
               />
             </label>
           )}
