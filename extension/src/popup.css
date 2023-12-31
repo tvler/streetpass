@@ -11,17 +11,19 @@
   @media not (prefers-color-scheme: dark) {
     :root {
       --color-accent: #5f55ec;
-      --color-primary: var(--gray-12);
+      --color-text-primary: var(--gray-12);
     }
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --color-accent: var(--iris-11);
-      --color-primary: white;
+      --color-text-primary: white;
     }
   }
 
   :root {
+    --color-text-secondary: var(--gray-a11);
+
     color-scheme: light dark;
     cursor: default;
     -webkit-font-smoothing: antialiased;

@@ -38,8 +38,6 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: Infinity } },
 });
 
-const secondaryColor = cva(["text-[--gray-a11]"])();
-
 const primaryBg = cva(["bg-white", "dark:bg-[--slate-4]"])();
 const secondaryBg = cva("bg-[--gray-a2]")();
 
@@ -81,7 +79,7 @@ function Popup() {
       <div className="flex flex-col items-center pt-[12px]">
         <img src="/icon-128.png" width="36" height="36" />
 
-        <h1 className="text-14 font-medium leading-[1.21] text-primary">
+        <h1 className="text-14 font-medium leading-[1.21] text-primaryText">
           StreetPass
         </h1>
       </div>
@@ -105,7 +103,7 @@ function Popup() {
                 /* Safari autofocuses this element when the popup opens */
                 -1
               }
-              className={cx(secondaryColor, "text-13")}
+              className="text-13 text-secondaryText"
             >
               Hidden
             </summary>
@@ -121,7 +119,7 @@ function Popup() {
 
         {hrefStoreQuery.data?.profiles.length === 0 && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center peer-open:hidden">
-            <p className={cx(secondaryColor, "pointer-events-auto text-13")}>
+            <p className="pointer-events-auto text-13 text-secondaryText">
               No profiles
               {hrefStoreQuery.data.hiddenProfiles.length === 0 && (
                 <>
@@ -296,7 +294,7 @@ function Popup() {
                     }}
                   >
                     <label className="contents">
-                      <span className={cx(secondaryColor, "px-8 text-12")}>
+                      <span className="px-8 text-12 text-secondaryText">
                         URL to open profiles with. Set as empty for default
                         behavior.
                       </span>
@@ -308,7 +306,7 @@ function Popup() {
                         className={cx(
                           secondaryBg,
                           borderColor,
-                          "mx-8 rounded-6 border px-6 py-2 text-12 text-primary placeholder:text-[--gray-a10]",
+                          "mx-8 rounded-6 border px-6 py-2 text-12 text-primaryText placeholder:text-[--gray-a10]",
                         )}
                         ref={profileUrlSchemeInputRef}
                         defaultValue={profileUrlSchemeQuery.data}
@@ -316,7 +314,7 @@ function Popup() {
                       />
                     </label>
 
-                    <span className={cx(secondaryColor, "px-8 text-12")}>
+                    <span className="px-8 text-12 text-secondaryText">
                       …or select a preset:
                     </span>
 
@@ -388,7 +386,7 @@ function Popup() {
                           profileUrlSchemeInputRef.current.value = "";
                           profileUrlSchemeInputRef.current.focus();
                         }}
-                        className={cx(secondaryColor, navButton)}
+                        className={cx(navButton, "text-secondaryText")}
                       >
                         Clear
                       </button>
@@ -476,7 +474,7 @@ function Profiles(props: {
     return (
       <React.Fragment key={`${index}.${hrefData.relMeHref}`}>
         {previousItemWasDayBefore && (
-          <p className={cx(secondaryColor, "shrink-0 text-13")}>
+          <p className="shrink-0 text-13 text-secondaryText">
             {new Intl.DateTimeFormat(undefined, {
               day: "numeric",
               month: "short",
@@ -530,7 +528,7 @@ function Profiles(props: {
                     decoding="async"
                   />
 
-                  <div className="pointer-events-none absolute inset-0 rounded-[inherit] border border-primary opacity-[0.14]" />
+                  <div className="pointer-events-none absolute inset-0 rounded-[inherit] border border-primaryText opacity-[0.14]" />
                 </>
               ) : (
                 <div className="flex w-full items-center justify-center bg-faded text-accent">
@@ -557,7 +555,7 @@ function Profiles(props: {
               </a>
 
               {!props.hideProfiles && (
-                <span className={cx(secondaryColor, "shrink-0 text-[12px]")}>
+                <span className="shrink-0 text-[12px] text-secondaryText">
                   {new Intl.DateTimeFormat(undefined, {
                     timeStyle: "short",
                   })
@@ -570,10 +568,7 @@ function Profiles(props: {
 
             <a
               {...getHrefProps(hrefData.websiteUrl)}
-              className={cx(
-                secondaryColor,
-                "self-start break-all text-[12.5px] leading-[1.5]",
-              )}
+              className="self-start break-all text-[12.5px] leading-[1.5] text-secondaryText"
             >
               {getDisplayHref(hrefData.websiteUrl)}
             </a>
