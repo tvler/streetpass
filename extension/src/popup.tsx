@@ -38,7 +38,6 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: Infinity } },
 });
 
-const primaryColor = cva(["text-[--gray-12]", "dark:text-white"])();
 const secondaryColor = cva(["text-[--gray-a11]"])();
 
 const primaryBg = cva(["bg-white", "dark:bg-[--slate-4]"])();
@@ -82,7 +81,7 @@ function Popup() {
       <div className="flex flex-col items-center pt-[12px]">
         <img src="/icon-128.png" width="36" height="36" />
 
-        <h1 className={cx(primaryColor, "text-14 font-medium leading-[1.21]")}>
+        <h1 className="text-14 font-medium leading-[1.21] text-primary">
           StreetPass
         </h1>
       </div>
@@ -129,7 +128,7 @@ function Popup() {
                   . Try{" "}
                   <a
                     {...getHrefProps("https://streetpass.social")}
-                    className="text-accent font-medium"
+                    className="font-medium text-accent"
                   >
                     this
                   </a>
@@ -187,10 +186,10 @@ function Popup() {
         <Popover.Root modal>
           <Popover.Close hidden ref={popoverCloseRef} />
 
-          <Popover.Trigger className={cx(navButton, 'text-accent"')}>
+          <Popover.Trigger className={cx(navButton, "text-accent")}>
             <svg
               fill="currentColor"
-              className="aspect-square w-[1em]"
+              className="size-[1em]"
               viewBox="0 0 100 100"
               xmlns="http://www.w3.org/2000/svg"
             >
@@ -307,10 +306,9 @@ function Popup() {
                         type="text"
                         placeholder="https://mastodon.example/@{account}"
                         className={cx(
-                          primaryColor,
                           secondaryBg,
                           borderColor,
-                          "mx-8 rounded-6 border px-6 py-2 text-12 placeholder:text-[--gray-a10]",
+                          "mx-8 rounded-6 border px-6 py-2 text-12 text-primary placeholder:text-[--gray-a10]",
                         )}
                         ref={profileUrlSchemeInputRef}
                         defaultValue={profileUrlSchemeQuery.data}
@@ -532,15 +530,10 @@ function Profiles(props: {
                     decoding="async"
                   />
 
-                  <div
-                    className={cx(
-                      primaryColor,
-                      "pointer-events-none absolute inset-0 rounded-[inherit] border border-current opacity-[0.14]",
-                    )}
-                  />
+                  <div className="pointer-events-none absolute inset-0 rounded-[inherit] border border-primary opacity-[0.14]" />
                 </>
               ) : (
-                <div className="text-accent flex w-full items-center justify-center bg-faded">
+                <div className="flex w-full items-center justify-center bg-faded text-accent">
                   <svg
                     viewBox="0 0 40 37"
                     fill="none"
@@ -557,7 +550,7 @@ function Profiles(props: {
             <div className="flex items-baseline justify-between gap-x-6 leading-[1.45]">
               <a
                 {...profileHrefProps}
-                className="text-accent overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-medium"
+                className="overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-medium text-accent"
                 title={profileDisplayName}
               >
                 {profileDisplayName}
@@ -587,7 +580,7 @@ function Profiles(props: {
           </div>
 
           {props.hideProfiles && (
-            <label className={cx(navButton, "text-accent ml-8")}>
+            <label className={cx(navButton, "ml-8 text-accent")}>
               Hide&nbsp;
               <input
                 name={hrefData.relMeHref}

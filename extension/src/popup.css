@@ -11,11 +11,13 @@
   @media not (prefers-color-scheme: dark) {
     :root {
       --color-accent: #5f55ec;
+      --color-primary: var(--gray-12);
     }
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --color-accent: var(--iris-11);
+      --color-primary: white;
     }
   }
 

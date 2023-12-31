@@ -11,6 +11,7 @@ module.exports = {
       black: "#000",
       faded: "color-mix(in srgb, currentColor 10%, transparent)",
       accent: "var(--color-accent)",
+      primary: "var(--color-primary)",
     },
     fontSize: {
       11: "11px",
