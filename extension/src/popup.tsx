@@ -38,28 +38,11 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: Infinity } },
 });
 
-const primaryBg = cva(["bg-white", "dark:bg-[--slate-4]"])();
-const secondaryBg = cva("bg-[--gray-a2]")();
+const button = cx(
+  "flex h-[1.68em] min-w-[1.4em] shrink-0 cursor-default items-center justify-center rounded-6 bg-faded px-[0.38em] text-11 font-medium focus-visible:outline-none",
+);
 
-const borderColor = cva("border-[--gray-a3]")();
-
-const navButton = cva([
-  "h-[1.68em]",
-  "min-w-[1.4em]",
-  "flex",
-  "items-center",
-  "justify-center",
-  "rounded-6",
-  "px-[0.38em]",
-  "text-11",
-  "focus-visible:outline-none",
-  "font-medium",
-  "bg-faded",
-  "cursor-default",
-  "shrink-0",
-])();
-
-const checkbox = cva("scale-[0.82]")();
+const buttonCheckbox = cx("scale-[0.82]");
 
 function Popup() {
   const [hideProfiles, setHideProfiles] = React.useState(false);
@@ -70,12 +53,7 @@ function Popup() {
   const profileUrlSchemeInputRef = React.useRef<HTMLInputElement>(null);
 
   return (
-    <div
-      className={cx(
-        primaryBg,
-        "relative flex h-[600px] w-[350px] flex-col overflow-auto",
-      )}
-    >
+    <div className="relative flex h-[600px] w-[350px] flex-col overflow-auto bg-primaryBg">
       <div className="flex flex-col items-center pt-[12px]">
         <img src="/icon-128.png" width="36" height="36" />
 
@@ -167,7 +145,7 @@ function Popup() {
             queryClient.refetchQueries();
           }}
         >
-          <button className={cx(navButton, "text-accent")}>Save</button>
+          <button className={cx(button, "text-accent")}>Save</button>
         </form>
       </div>
 
@@ -176,7 +154,7 @@ function Popup() {
         hidden={hideProfiles}
       >
         {!!hrefStoreQuery.data?.profiles.length && (
-          <span className={cx(navButton, "text-accent")}>
+          <span className={cx(button, "text-accent")}>
             {hrefStoreQuery.data?.profiles.length}
           </span>
         )}
@@ -184,7 +162,7 @@ function Popup() {
         <Popover.Root modal>
           <Popover.Close hidden ref={popoverCloseRef} />
 
-          <Popover.Trigger className={cx(navButton, "text-accent")}>
+          <Popover.Trigger className={cx(button, "text-accent")}>
             <svg
               fill="currentColor"
               className="size-[1em]"
@@ -202,7 +180,7 @@ function Popup() {
               side="bottom"
               sideOffset={6}
               avoidCollisions={false}
-              className={cx(primaryBg, borderColor, "flex rounded-6 border")}
+              className="flex rounded-6 border border-primaryBorder bg-primaryBg"
               onOpenAutoFocus={(ev) => {
                 ev.preventDefault();
               }}
@@ -218,14 +196,14 @@ function Popup() {
                   <Tabs.List className="contents">
                     <Tabs.Trigger
                       value={PopupTab.openProfilesWith}
-                      className={cx(navButton, "text-accent")}
+                      className={cx(button, "text-accent")}
                     >
                       Open Profiles With…
                     </Tabs.Trigger>
                   </Tabs.List>
 
                   <Popover.Close
-                    className={cx(navButton, "text-accent")}
+                    className={cx(button, "text-accent")}
                     onClick={() => {
                       setHideProfiles((prev) => !prev);
                     }}
@@ -233,12 +211,12 @@ function Popup() {
                     Hide Profiles…
                   </Popover.Close>
 
-                  <label className={cx(navButton, "text-accent")}>
+                  <label className={cx(button, "text-accent")}>
                     Hide Profiles On Click&nbsp;
                     <input
                       type="checkbox"
                       defaultChecked={hideProfilesOnClickQuery.data}
-                      className={checkbox}
+                      className={buttonCheckbox}
                       onChange={async (ev) => {
                         await getHideProfilesOnClick(() => ev.target.checked);
                         queryClient.refetchQueries();
@@ -248,14 +226,14 @@ function Popup() {
 
                   <Popover.Close
                     onClick={exportProfiles}
-                    className={cx(navButton, "text-accent")}
+                    className={cx(button, "text-accent")}
                   >
                     Export (.json)
                   </Popover.Close>
 
                   <ConfirmButton
                     className={cx(
-                      navButton,
+                      button,
                       "text-accent data-[confirm]:text-[--red-10]",
                     )}
                     onClick={async () => {
@@ -271,7 +249,7 @@ function Popup() {
                   </ConfirmButton>
 
                   <a
-                    className={cx(navButton, "text-accent")}
+                    className={cx(button, "text-accent")}
                     {...getHrefProps(downloadLink[__TARGET__])}
                   >
                     Rate StreetPass
@@ -303,11 +281,7 @@ function Popup() {
                         spellCheck={false}
                         type="text"
                         placeholder="https://mastodon.example/@{account}"
-                        className={cx(
-                          secondaryBg,
-                          borderColor,
-                          "mx-8 rounded-6 border px-6 py-2 text-12 text-primaryText placeholder:text-[--gray-a10]",
-                        )}
+                        className="mx-8 rounded-6 border border-primaryBorder bg-secondaryBg px-6 py-2 text-12 text-primaryText placeholder:text-[--gray-a10]"
                         ref={profileUrlSchemeInputRef}
                         defaultValue={profileUrlSchemeQuery.data}
                         key={profileUrlSchemeQuery.data}
@@ -332,7 +306,7 @@ function Popup() {
                           <React.Fragment key={item}>
                             <button
                               type="button"
-                              className={cx(navButton, "text-accent")}
+                              className={cx(button, "text-accent")}
                               onClick={() => {
                                 if (!profileUrlSchemeInputRef.current) {
                                   return;
@@ -370,12 +344,7 @@ function Popup() {
                       })}
                     </div>
 
-                    <div
-                      className={cx(
-                        borderColor,
-                        "flex justify-end gap-x-8 border-t px-8 py-8",
-                      )}
-                    >
+                    <div className="flex justify-end gap-x-8 border-t border-primaryBorder px-8 py-8">
                       <button
                         type="button"
                         onClick={() => {
@@ -386,12 +355,12 @@ function Popup() {
                           profileUrlSchemeInputRef.current.value = "";
                           profileUrlSchemeInputRef.current.focus();
                         }}
-                        className={cx(navButton, "text-secondaryText")}
+                        className={cx(button, "text-secondaryText")}
                       >
                         Clear
                       </button>
 
-                      <button className={cx(navButton, "text-accent")}>
+                      <button className={cx(button, "text-accent")}>
                         Save
                       </button>
                     </div>
@@ -575,14 +544,14 @@ function Profiles(props: {
           </div>
 
           {props.hideProfiles && (
-            <label className={cx(navButton, "ml-8 text-accent")}>
+            <label className={cx(button, "ml-8 text-accent")}>
               Hide&nbsp;
               <input
                 name={hrefData.relMeHref}
                 form={hideProfilesFormId}
                 type="checkbox"
                 defaultChecked={hrefData.hidden}
-                className={checkbox}
+                className={buttonCheckbox}
               />
             </label>
           )}

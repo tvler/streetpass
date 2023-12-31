@@ -12,17 +12,21 @@
     :root {
       --color-accent: #5f55ec;
       --color-text-primary: var(--gray-12);
+      --color-bg-primary: white;
     }
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --color-accent: var(--iris-11);
       --color-text-primary: white;
+      --color-bg-primary: var(--slate-4);
     }
   }
 
   :root {
     --color-text-secondary: var(--gray-a11);
+    --color-border-primary: var(--gray-a3);
+    --color-bg-secondary: var(--gray-a2);
 
     color-scheme: light dark;
     cursor: default;
