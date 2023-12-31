@@ -7,10 +7,9 @@ import * as Tabs from "@radix-ui/react-tabs";
 import { InView } from "react-intersection-observer";
 import {
   HrefDataType,
-  MaybePromise,
   Message,
   MessageReturn,
-  Tab,
+  PopupTab,
   hideProfilesFormId,
 } from "./util/constants";
 import { getDisplayHref } from "./util/getDisplayHref";
@@ -39,7 +38,6 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: Infinity } },
 });
 
-const accentColor = cva(["text-[#5f55ec]", "dark:text-[--iris-11]"])();
 const primaryColor = cva(["text-[--gray-12]", "dark:text-white"])();
 const secondaryColor = cva(["text-[--gray-a11]"])();
 
@@ -131,7 +129,7 @@ function Popup() {
                   . Try{" "}
                   <a
                     {...getHrefProps("https://streetpass.social")}
-                    className={cx(accentColor, "font-medium")}
+                    className="text-accent font-medium"
                   >
                     this
                   </a>
@@ -172,7 +170,7 @@ function Popup() {
             queryClient.refetchQueries();
           }}
         >
-          <button className={cx(navButton, accentColor)}>Save</button>
+          <button className={cx(navButton, "text-accent")}>Save</button>
         </form>
       </div>
 
@@ -181,7 +179,7 @@ function Popup() {
         hidden={hideProfiles}
       >
         {!!hrefStoreQuery.data?.profiles.length && (
-          <span className={cx(accentColor, navButton)}>
+          <span className={cx(navButton, "text-accent")}>
             {hrefStoreQuery.data?.profiles.length}
           </span>
         )}
@@ -189,7 +187,7 @@ function Popup() {
         <Popover.Root modal>
           <Popover.Close hidden ref={popoverCloseRef} />
 
-          <Popover.Trigger className={cx(accentColor, navButton)}>
+          <Popover.Trigger className={cx(navButton, 'text-accent"')}>
             <svg
               fill="currentColor"
               className="aspect-square w-[1em]"
@@ -215,22 +213,22 @@ function Popup() {
                 ev.preventDefault();
               }}
             >
-              <Tabs.Root defaultValue={Tab.root} className="contents">
+              <Tabs.Root defaultValue={PopupTab.root} className="contents">
                 <Tabs.Content
-                  value={Tab.root}
+                  value={PopupTab.root}
                   className="flex flex-col items-start gap-y-8 p-8"
                 >
                   <Tabs.List className="contents">
                     <Tabs.Trigger
-                      value={Tab.openProfilesWith}
-                      className={cx(accentColor, navButton)}
+                      value={PopupTab.openProfilesWith}
+                      className={cx(navButton, "text-accent")}
                     >
                       Open Profiles With…
                     </Tabs.Trigger>
                   </Tabs.List>
 
                   <Popover.Close
-                    className={cx(accentColor, navButton)}
+                    className={cx(navButton, "text-accent")}
                     onClick={() => {
                       setHideProfiles((prev) => !prev);
                     }}
@@ -238,7 +236,7 @@ function Popup() {
                     Hide Profiles…
                   </Popover.Close>
 
-                  <label className={cx(accentColor, navButton)}>
+                  <label className={cx(navButton, "text-accent")}>
                     Hide Profiles On Click&nbsp;
                     <input
                       type="checkbox"
@@ -253,16 +251,15 @@ function Popup() {
 
                   <Popover.Close
                     onClick={exportProfiles}
-                    className={cx(accentColor, navButton)}
+                    className={cx(navButton, "text-accent")}
                   >
                     Export (.json)
                   </Popover.Close>
 
                   <ConfirmButton
                     className={cx(
-                      "data-[confirm]:text-[--red-10]",
-                      accentColor,
                       navButton,
+                      "text-accent data-[confirm]:text-[--red-10]",
                     )}
                     onClick={async () => {
                       popoverCloseRef.current?.click();
@@ -277,7 +274,7 @@ function Popup() {
                   </ConfirmButton>
 
                   <a
-                    className={cx(accentColor, navButton)}
+                    className={cx(navButton, "text-accent")}
                     {...getHrefProps(downloadLink[__TARGET__])}
                   >
                     Rate StreetPass
@@ -285,7 +282,7 @@ function Popup() {
                 </Tabs.Content>
 
                 <Tabs.Content
-                  value={Tab.openProfilesWith}
+                  value={PopupTab.openProfilesWith}
                   className="flex w-[275px] flex-col gap-y-8 pt-8"
                 >
                   <form
@@ -339,7 +336,7 @@ function Popup() {
                           <React.Fragment key={item}>
                             <button
                               type="button"
-                              className={cx(accentColor, navButton)}
+                              className={cx(navButton, "text-accent")}
                               onClick={() => {
                                 if (!profileUrlSchemeInputRef.current) {
                                   return;
@@ -398,7 +395,7 @@ function Popup() {
                         Clear
                       </button>
 
-                      <button className={cx(accentColor, navButton)}>
+                      <button className={cx(navButton, "text-accent")}>
                         Save
                       </button>
                     </div>
@@ -543,12 +540,7 @@ function Profiles(props: {
                   />
                 </>
               ) : (
-                <div
-                  className={cx(
-                    accentColor,
-                    "flex w-full items-center justify-center bg-faded",
-                  )}
-                >
+                <div className="text-accent flex w-full items-center justify-center bg-faded">
                   <svg
                     viewBox="0 0 40 37"
                     fill="none"
@@ -565,10 +557,7 @@ function Profiles(props: {
             <div className="flex items-baseline justify-between gap-x-6 leading-[1.45]">
               <a
                 {...profileHrefProps}
-                className={cx(
-                  accentColor,
-                  "overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-medium",
-                )}
+                className="text-accent overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-medium"
                 title={profileDisplayName}
               >
                 {profileDisplayName}
@@ -598,7 +587,7 @@ function Profiles(props: {
           </div>
 
           {props.hideProfiles && (
-            <label className={cx(accentColor, navButton, "ml-8")}>
+            <label className={cx(navButton, "text-accent ml-8")}>
               Hide&nbsp;
               <input
                 name={hrefData.relMeHref}

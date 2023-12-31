@@ -8,6 +8,17 @@
 @import "tailwindcss/utilities";
 
 @layer base {
+  @media not (prefers-color-scheme: dark) {
+    :root {
+      --color-accent: #5f55ec;
+    }
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-accent: var(--iris-11);
+    }
+  }
+
   :root {
     color-scheme: light dark;
     cursor: default;

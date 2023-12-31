@@ -10,6 +10,7 @@ module.exports = {
       current: "currentColor",
       black: "#000",
       faded: "color-mix(in srgb, currentColor 10%, transparent)",
+      accent: "var(--color-accent)",
     },
     fontSize: {
       11: "11px",

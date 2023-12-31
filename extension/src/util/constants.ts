@@ -87,7 +87,7 @@ export const timeToUpdateProfile = 1 * 60 * 60 * 1_000; // 1 hr in milliseconds
 
 export const hideProfilesFormId = "hideProfilesFormId";
 
-export enum Tab {
+export enum PopupTab {
   root = "root",
   openProfilesWith = "openProfilesWith",
 }
