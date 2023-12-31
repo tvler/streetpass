@@ -1,3 +1,7 @@
+# 2023.22 (Dec 31, 2023)
+
+- Hide All button when editing hidden profiles
+
 # 2023.21 (Dec 28, 2023)
 
 - Hide profiles
