@@ -20,7 +20,7 @@ import {
   getProfileUrlScheme,
   getHideProfilesOnClick,
 } from "./util/storage";
-import { cva, cx } from "class-variance-authority";
+import { cx } from "class-variance-authority";
 import { getProfileUrl } from "./util/getProfileUrl";
 import { downloadLink } from "../../constants";
 import { getHrefProps } from "./util/getHrefProps";
@@ -147,7 +147,6 @@ function Popup() {
         >
           <button
             type="button"
-            hidden={!hrefStoreQuery.data?.profiles.length}
             className={cx(button, "text-secondaryText")}
             onClick={(ev) => {
               const formElements = ev.currentTarget.form?.elements;
