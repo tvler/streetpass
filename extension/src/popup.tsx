@@ -314,11 +314,13 @@ function Popup() {
                     <div className="flex flex-wrap gap-8 px-8">
                       {(
                         [
-                          "ivory",
                           "elk",
                           "icecubes",
-                          "mastodon.social",
+                          "ivory",
                           "mastodon.online",
+                          "mastodon.social",
+                          "mona",
+                          "phanpy",
                         ] as const
                       ).map((item) => {
                         return (
@@ -343,6 +345,8 @@ function Popup() {
                                     "https://mastodon.social/@{account}",
                                   "mastodon.online":
                                     "https://mastodon.online/@{account}",
+                                  mona: "mona:{profileUrl.noProtocol}",
+                                  phanpy: `https://phanpy.social/#/https:{profileUrl.noProtocol}`,
                                 }[item];
 
                                 profileUrlSchemeInputRef.current.focus();
@@ -355,6 +359,8 @@ function Popup() {
                                   icecubes: "Ice Cubes",
                                   "mastodon.social": "mastodon.social",
                                   "mastodon.online": "mastodon.online",
+                                  mona: "Mona",
+                                  phanpy: "Phanpy",
                                 }[item]
                               }
                             </button>
