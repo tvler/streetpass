@@ -1,3 +1,7 @@
+# 2024.1 (Feb 21, 2024)
+
+- Add Mona and Phanpy to "Open Profiles With…" presets
+
 # 2023.22 (Dec 31, 2023)
 
 - Hide All button when editing hidden profiles
